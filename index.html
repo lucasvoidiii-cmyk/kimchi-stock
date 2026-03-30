@@ -278,7 +278,7 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
   <p>앱을 처음 사용하는 경우<br>Firebase 정보를 입력하세요.<br><small>(한 번만 입력하면 저장됩니다)</small></p>
   <div id="config-form">
     <label>Firebase Database URL</label>
-    <input id="cfg-url" type="url" placeholder="https://your-project-default-rtdb.firebaseio.com">
+    <input id="cfg-url" type="url" placeholder="https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app">
     <div class="config-hint">Firebase 콘솔 → Realtime Database → 데이터 탭 상단 URL</div>
     <label>Firebase API Key</label>
     <input id="cfg-key" type="text" placeholder="AIzaSy...">
@@ -584,7 +584,7 @@ document.getElementById('btn-save-config').onclick = function(){
   const key = document.getElementById('cfg-key').value.trim();
   const user = document.getElementById('cfg-user').value.trim();
   if(!url || !key){ showToast('URL과 API Key를 입력하세요'); return; }
-  if(!url.includes('firebaseio.com')){ showToast('올바른 Database URL을 입력하세요'); return; }
+  if(!url.includes('firebaseio.com') && !url.includes('firebasedatabase.app')){ showToast('올바른 Database URL을 입력하세요'); return; }
   saveConfig({dbUrl:url, apiKey:key, username:user});
   location.reload();
 };
