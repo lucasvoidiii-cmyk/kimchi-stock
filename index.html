@@ -7,7 +7,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>대한김치 재고관리</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
@@ -17,509 +16,596 @@
   --success:#0e9f6e;--success-light:#f0fdf4;
   --warning:#ff8800;--warning-light:#fff7ed;
   --danger:#e02424;--danger-light:#fff1f1;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --teal:#0891b2;--teal-light:#ecfeff;
   --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
   --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
   --gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;
-  --white:#ffffff;--shadow:0 2px 12px rgba(0,0,0,.10);
+  --white:#fff;--shadow:0 2px 12px rgba(0,0,0,.10);
   --radius:14px;--radius-sm:8px;
-  --nav-h:64px;--header-h:60px;
+  --nav-h:62px;--header-h:58px;
   --font:'Noto Sans KR','Noto Sans',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--gray-100);font-family:var(--font)}
 body{display:flex;flex-direction:column}
 
-/* ── HEADER ── */
-#app-header{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  height:var(--header-h);background:var(--primary);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;
-  box-shadow:0 2px 12px rgba(26,86,219,.3);
-}
-.header-left{display:flex;flex-direction:column}
-.header-title{color:#fff;font-size:16px;font-weight:700;letter-spacing:-.3px}
-.header-sub{color:rgba(255,255,255,.75);font-size:10px;margin-top:1px}
-.header-right{display:flex;align-items:center;gap:8px}
-.header-badge{background:#fff;color:var(--primary);
-  font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
-#alert-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;
-  display:none;margin-left:2px;flex-shrink:0}
-
-/* ── LANG SWITCHER ── */
-.lang-switcher{display:flex;background:rgba(255,255,255,.2);border-radius:20px;padding:2px;gap:1px}
-.lang-btn{
-  padding:3px 8px;border-radius:16px;border:none;
-  font-size:11px;font-weight:700;font-family:var(--font);
-  cursor:pointer;color:rgba(255,255,255,.75);background:transparent;
-  transition:.15s;white-space:nowrap;
-}
+/* HEADER */
+#app-header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);
+  background:var(--primary);display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;box-shadow:0 2px 12px rgba(26,86,219,.3);}
+.hdr-left .hdr-title{color:#fff;font-size:15px;font-weight:700}
+.hdr-left .hdr-sub{color:rgba(255,255,255,.7);font-size:10px;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:7px}
+.lang-sw{display:flex;background:rgba(255,255,255,.2);border-radius:16px;padding:2px;gap:1px}
+.lang-btn{padding:3px 10px;border-radius:13px;border:none;font-size:11px;font-weight:700;
+  font-family:var(--font);cursor:pointer;color:rgba(255,255,255,.75);background:transparent;transition:.15s}
 .lang-btn.active{background:#fff;color:var(--primary)}
+.hdr-badge{background:#fff;color:var(--primary);font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:16px;white-space:nowrap}
+#alert-dot{width:7px;height:7px;background:#ff4444;border-radius:50%;display:none}
 
-/* ── SCREENS ── */
-#app-body{
-  position:fixed;top:var(--header-h);bottom:var(--nav-h);
-  left:0;right:0;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-}
-.screen{display:none;padding:14px;min-height:100%}
+/* BODY */
+#app-body{position:fixed;top:var(--header-h);bottom:var(--nav-h);left:0;right:0;
+  overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{display:none;padding:12px;min-height:100%}
 .screen.active{display:block}
 
-/* ── BOTTOM NAV ── */
-#bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:100;
-  height:var(--nav-h);background:#fff;
-  border-top:1px solid var(--gray-200);
-  display:flex;align-items:stretch;
-  box-shadow:0 -4px 20px rgba(0,0,0,.08);
-}
-.nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;cursor:pointer;
-  color:var(--gray-400);transition:.15s;border:none;background:none;
-  padding-bottom:4px;position:relative;
-}
+/* BOTTOM NAV */
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);
+  background:#fff;border-top:1px solid var(--gray-200);display:flex;align-items:stretch;
+  box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;cursor:pointer;color:var(--gray-400);transition:.15s;border:none;background:none;
+  padding-bottom:3px;position:relative}
 .nav-btn.active{color:var(--primary)}
-.nav-btn svg{width:22px;height:22px}
-.nav-btn span{font-size:10px;font-weight:600;letter-spacing:-.2px}
-.nav-badge{
-  position:absolute;top:6px;right:calc(50% - 16px);
-  background:var(--danger);color:#fff;font-size:9px;font-weight:700;
-  min-width:16px;height:16px;border-radius:8px;
-  display:none;align-items:center;justify-content:center;padding:0 3px;
-}
+.nav-btn svg{width:20px;height:20px}
+.nav-btn span{font-size:9px;font-weight:600}
+.nav-badge{position:absolute;top:5px;right:calc(50% - 14px);background:var(--danger);
+  color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;
+  display:none;align-items:center;justify-content:center;padding:0 3px}
 
-/* ── CARDS ── */
-.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
-.card-header{padding:14px 16px 10px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:14px;font-weight:700;color:var(--gray-800)}
-.card-body{padding:14px 16px}
+/* CARDS */
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.card-header{padding:12px 14px 8px;border-bottom:1px solid var(--gray-100);
+  display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;color:var(--gray-800)}
+.card-body{padding:12px 14px}
 
-/* ── SUMMARY ── */
-.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.sum-card{background:#fff;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);text-align:center}
-.sum-card .num{font-size:28px;font-weight:800;line-height:1}
-.sum-card .lbl{font-size:11px;color:var(--gray-500);margin-top:4px;font-weight:500}
-.sum-card.danger .num{color:var(--danger)}
-.sum-card.success .num{color:var(--success)}
-.sum-card.warning .num{color:var(--warning)}
-.sum-card.primary .num{color:var(--primary)}
+/* SUMMARY GRID */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sum-card{background:#fff;border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);text-align:center}
+.sum-card .num{font-size:26px;font-weight:800;line-height:1}
+.sum-card .lbl{font-size:10px;color:var(--gray-500);margin-top:3px;font-weight:500}
+.sum-card.c-primary .num{color:var(--primary)}
+.sum-card.c-success .num{color:var(--success)}
+.sum-card.c-warning .num{color:var(--warning)}
+.sum-card.c-danger .num{color:var(--danger)}
+.sum-card.c-purple .num{color:var(--purple)}
+.sum-card.c-teal .num{color:var(--teal)}
 
-/* ── STOCK LIST ── */
-.stock-item{
-  background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;
-  padding:12px 14px;display:flex;align-items:center;gap:12px;
-  box-shadow:0 1px 4px rgba(0,0,0,.07);
-}
-.stock-icon{width:38px;height:38px;border-radius:10px;
-  background:var(--primary-light);display:flex;align-items:center;
-  justify-content:center;font-size:18px;flex-shrink:0}
+/* STOCK ITEMS */
+.stock-item{background:#fff;border-radius:var(--radius-sm);margin-bottom:7px;
+  padding:11px 13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.stock-icon{width:36px;height:36px;border-radius:9px;background:var(--primary-light);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .stock-info{flex:1;min-width:0}
-.stock-name{font-size:14px;font-weight:600;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stock-detail{font-size:11px;color:var(--gray-500);margin-top:2px}
+.stock-name{font-size:13px;font-weight:600;color:var(--gray-800);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stock-detail{font-size:10px;color:var(--gray-500);margin-top:2px}
 .stock-right{text-align:right;flex-shrink:0}
 .stock-qty{font-size:20px;font-weight:800}
-.stock-unit{font-size:11px;color:var(--gray-500)}
-.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:3px}
+.stock-unit{font-size:10px;color:var(--gray-500)}
+.badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:16px;margin-top:2px}
 .badge-ok{background:var(--success-light);color:var(--success)}
 .badge-warn{background:var(--warning-light);color:var(--warning)}
 .badge-danger{background:var(--danger-light);color:var(--danger)}
 .badge-zero{background:var(--gray-100);color:var(--gray-500)}
+.badge-baedalk{background:#fff0f6;color:#c2185b}
+.badge-seller{background:var(--purple-light);color:var(--purple)}
 
-/* ── FORMS ── */
-.section-label{font-size:12px;font-weight:700;color:var(--gray-500);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px}
-.form-group{margin-bottom:14px}
-.form-label{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:5px;display:block}
-.form-label .req{color:var(--danger)}
-.form-control{
-  width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);
-  border-radius:var(--radius-sm);font-size:15px;font-family:var(--font);
-  background:#fff;color:var(--gray-800);outline:none;
-  transition:border-color .15s;-webkit-appearance:none;
-}
+/* FORMS */
+.form-group{margin-bottom:12px}
+.form-label{font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:4px;display:block}
+.req{color:var(--danger)}
+.form-control{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);
+  border-radius:var(--radius-sm);font-size:14px;font-family:var(--font);
+  background:#fff;color:var(--gray-800);outline:none;transition:border-color .15s;-webkit-appearance:none}
 .form-control:focus{border-color:var(--primary)}
-select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
-.form-hint{font-size:11px;color:var(--gray-400);margin-top:4px}
-.toggle-group{display:flex;gap:8px;flex-wrap:wrap}
-.toggle-btn{
-  flex:1;padding:10px 8px;border:1.5px solid var(--gray-200);
-  border-radius:var(--radius-sm);font-size:13px;font-weight:600;
-  font-family:var(--font);background:#fff;color:var(--gray-600);
-  cursor:pointer;text-align:center;transition:.15s;min-width:72px;
-}
+select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;padding-right:34px}
+.form-hint{font-size:10px;color:var(--gray-400);margin-top:3px}
+
+/* CHANNEL SELECTOR */
+.channel-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.channel-btn{padding:12px 8px;border:2px solid var(--gray-200);border-radius:var(--radius-sm);
+  font-size:13px;font-weight:700;font-family:var(--font);background:#fff;
+  cursor:pointer;text-align:center;transition:.15s;line-height:1.3}
+.channel-btn .ch-icon{font-size:20px;display:block;margin-bottom:4px}
+.channel-btn.ch-baedalk.active{border-color:#c2185b;background:#fff0f6;color:#c2185b}
+.channel-btn.ch-seller.active{border-color:var(--purple);background:var(--purple-light);color:var(--purple)}
+.channel-btn:not(.active){color:var(--gray-500)}
+
+/* TOGGLE */
+.toggle-group{display:flex;gap:7px;flex-wrap:wrap}
+.toggle-btn{flex:1;padding:9px 7px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+  font-size:12px;font-weight:600;font-family:var(--font);background:#fff;color:var(--gray-600);
+  cursor:pointer;text-align:center;transition:.15s;min-width:64px}
 .toggle-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
 
-/* ── BUTTONS ── */
-.btn{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
-  font-size:15px;font-weight:700;font-family:var(--font);
-  cursor:pointer;transition:.15s;
-}
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+  padding:13px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;
+  font-family:var(--font);cursor:pointer;transition:.15s}
 .btn-primary{background:var(--primary);color:#fff}
 .btn-primary:active{background:var(--primary-dark)}
+.btn-success{background:var(--success);color:#fff}
 .btn-danger{background:var(--danger);color:#fff}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
-.btn-sm{padding:9px 16px;font-size:13px;border-radius:var(--radius-sm)}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-sm{padding:8px 14px;font-size:12px}
 
-/* ── HISTORY ── */
-.hist-item{
-  background:#fff;border-radius:var(--radius-sm);padding:12px 14px;
-  margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.07);
-  display:flex;align-items:flex-start;gap:10px;
-}
-.hist-type{
-  flex-shrink:0;width:36px;height:36px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;
-}
+/* HISTORY ITEMS */
+.hist-item{background:#fff;border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:7px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:flex-start;gap:9px}
+.hist-type{flex-shrink:0;width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 .hist-type.in{background:#e8f5e9;color:#2e7d32}
-.hist-type.out{background:#fff3e0;color:#e65100}
+.hist-type.baedalk{background:#fff0f6;color:#c2185b}
+.hist-type.seller{background:var(--purple-light);color:var(--purple)}
 .hist-info{flex:1;min-width:0}
-.hist-name{font-size:13px;font-weight:700;color:var(--gray-800)}
-.hist-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
+.hist-name{font-size:12px;font-weight:700;color:var(--gray-800)}
+.hist-meta{font-size:10px;color:var(--gray-500);margin-top:2px}
 .hist-right{text-align:right;flex-shrink:0}
-.hist-amount{font-size:14px;font-weight:700}
+.hist-amount{font-size:13px;font-weight:700}
 .hist-amount.in{color:#2e7d32}
-.hist-amount.out{color:#e65100}
-.hist-delete{background:none;border:none;cursor:pointer;color:var(--gray-300);font-size:18px;padding:2px;display:flex;align-items:center}
+.hist-amount.baedalk{color:#c2185b}
+.hist-amount.seller{color:var(--purple)}
+.hist-delete{background:none;border:none;cursor:pointer;color:var(--gray-300);
+  font-size:17px;padding:2px;display:flex;align-items:center;flex-shrink:0}
 
-/* ── PRODUCT MANAGE ── */
-.prod-item{background:#fff;border-radius:var(--radius-sm);padding:14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
-.prod-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.prod-name{font-size:15px;font-weight:700;color:var(--gray-800)}
-.prod-meta{font-size:12px;color:var(--gray-500);margin-top:2px}
-.prod-actions{display:flex;gap:8px;margin-top:10px}
+/* SELLER ITEMS */
+.seller-item{background:#fff;border-radius:var(--radius-sm);padding:13px 14px;
+  margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.seller-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.seller-name{font-size:14px;font-weight:700;color:var(--gray-800)}
+.seller-meta{font-size:11px;color:var(--gray-500)}
+.seller-actions{display:flex;gap:7px;margin-top:8px}
 
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 18px 32px}
-.modal-handle{width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 18px}
-.modal-title{font-size:17px;font-weight:800;color:var(--gray-800);margin-bottom:18px}
-.modal-close{float:right;background:none;border:none;font-size:22px;color:var(--gray-400);cursor:pointer;line-height:1;margin-top:-2px}
+/* SETTLEMENT */
+.settle-section{margin-bottom:12px}
+.settle-title{font-size:12px;font-weight:700;color:var(--gray-500);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.settle-row{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:#fff;border-radius:var(--radius-sm);
+  margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.settle-row .s-label{font-size:13px;color:var(--gray-700);font-weight:500}
+.settle-row .s-val{font-size:14px;font-weight:700}
+.settle-row.total{background:var(--primary);border-radius:var(--radius-sm)}
+.settle-row.total .s-label{color:rgba(255,255,255,.85);font-weight:600}
+.settle-row.total .s-val{color:#fff}
+.settle-row.hq{background:var(--success-light)}
+.settle-row.hq .s-val{color:var(--success)}
+.settle-row.seller-profit{background:var(--purple-light)}
+.settle-row.seller-profit .s-val{color:var(--purple)}
 
-/* ── TABS ── */
-.tab-row{display:flex;background:var(--gray-100);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px}
-.tab-item{flex:1;text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:var(--gray-500);border-radius:7px;cursor:pointer;transition:.15s}
+.date-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.date-nav-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--gray-200);
+  background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--gray-700);flex-shrink:0}
+.date-nav-label{flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--gray-800);
+  background:#fff;padding:8px;border-radius:var(--radius-sm);border:1.5px solid var(--gray-200)}
+
+.seller-settle-card{background:#fff;border-radius:var(--radius-sm);padding:13px 14px;
+  margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.ss-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ss-name{font-size:14px;font-weight:700;color:var(--gray-800)}
+.ss-cnt{font-size:11px;color:var(--gray-500)}
+.ss-rows{display:flex;flex-direction:column;gap:4px}
+.ss-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--gray-100)}
+.ss-row:last-child{border-bottom:none;font-weight:700}
+.ss-row .sr-lbl{color:var(--gray-600)}
+.ss-row .sr-val{font-weight:600}
+.ss-row.sr-profit .sr-val{color:var(--purple);font-weight:700}
+.ss-row.sr-hq .sr-val{color:var(--success);font-weight:700}
+
+/* TABS */
+.tab-row{display:flex;background:var(--gray-100);border-radius:var(--radius-sm);
+  padding:3px;margin-bottom:12px}
+.tab-item{flex:1;text-align:center;padding:7px 4px;font-size:11px;font-weight:600;
+  color:var(--gray-500);border-radius:7px;cursor:pointer;transition:.15s}
 .tab-item.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 
-/* ── MONTHLY ── */
-.month-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray-100)}
-.month-row:last-child{border-bottom:none}
-.month-label{width:36px;font-size:13px;font-weight:700;color:var(--gray-700)}
-.month-bars{flex:1;margin:0 10px}
-.month-in,.month-out{height:6px;border-radius:3px;margin-bottom:3px}
-.month-in{background:var(--primary)}
-.month-out{background:var(--success)}
-.month-nums{text-align:right;font-size:11px;color:var(--gray-500)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:92vh;
+  overflow-y:auto;padding:18px 16px 30px}
+.modal-handle{width:38px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:16px;font-weight:800;color:var(--gray-800);margin-bottom:16px}
+.modal-close{float:right;background:none;border:none;font-size:22px;
+  color:var(--gray-400);cursor:pointer;line-height:1;margin-top:-3px}
 
-/* ── EMPTY ── */
-.empty{text-align:center;padding:40px 20px;color:var(--gray-400)}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty-text{font-size:14px;font-weight:600}
+/* STOCK ADJ */
+.stock-adj{display:flex;align-items:center;gap:8px}
+.adj-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--gray-200);
+  background:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;color:var(--gray-700);flex-shrink:0}
+.adj-input{flex:1;min-width:0;width:0;text-align:center;padding:9px;
+  border:1.5px solid var(--gray-200);border-radius:8px;font-size:16px;
+  font-weight:700;font-family:var(--font);outline:none}
+.adj-input:focus{border-color:var(--primary)}
 
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:calc(var(--nav-h) + 14px);left:50%;
-  transform:translateX(-50%) translateY(20px);
-  background:var(--gray-800);color:#fff;
-  padding:11px 20px;border-radius:24px;font-size:13px;font-weight:600;
-  opacity:0;transition:.25s;z-index:300;white-space:nowrap;pointer-events:none;
-}
+/* EMPTY */
+.empty{text-align:center;padding:36px 20px;color:var(--gray-400)}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.empty-text{font-size:13px;font-weight:600}
+.empty-sub{font-size:11px;margin-top:3px}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav-h) + 12px);left:50%;
+  transform:translateX(-50%) translateY(20px);background:var(--gray-800);color:#fff;
+  padding:10px 18px;border-radius:22px;font-size:12px;font-weight:600;
+  opacity:0;transition:.25s;z-index:300;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── CONFIG ── */
-#config-screen{
-  position:fixed;inset:0;z-index:500;background:var(--primary);
+/* CONFIG */
+#config-screen{position:fixed;inset:0;z-index:500;background:var(--primary);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px;text-align:center;
-}
-#config-screen h1{color:#fff;font-size:22px;font-weight:800;margin-bottom:8px}
-#config-screen p{color:rgba(255,255,255,.8);font-size:13px;margin-bottom:16px;line-height:1.6}
-.config-lang-row{display:flex;gap:8px;margin-bottom:20px}
-.config-lang-btn{
-  flex:1;padding:9px 6px;border-radius:20px;border:2px solid rgba(255,255,255,.4);
-  font-size:13px;font-weight:700;font-family:var(--font);
-  cursor:pointer;color:rgba(255,255,255,.75);background:transparent;transition:.15s;
-}
-.config-lang-btn.active{background:#fff;color:var(--primary);border-color:#fff}
-#config-form{background:#fff;border-radius:var(--radius);padding:20px;width:100%;max-width:400px}
-#config-form input{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);
+  padding:22px;text-align:center}
+#config-screen h1{color:#fff;font-size:20px;font-weight:800;margin-bottom:6px}
+#config-screen p{color:rgba(255,255,255,.8);font-size:12px;margin-bottom:14px;line-height:1.6}
+.cfg-lang-row{display:flex;gap:8px;margin-bottom:18px}
+.cfg-lang-btn{flex:1;padding:9px 6px;border-radius:18px;border:2px solid rgba(255,255,255,.4);
+  font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;
+  color:rgba(255,255,255,.75);background:transparent;transition:.15s}
+.cfg-lang-btn.active{background:#fff;color:var(--primary);border-color:#fff}
+#config-form{background:#fff;border-radius:var(--radius);padding:18px;width:100%;max-width:400px}
+#config-form label{font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:3px}
+#config-form input{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);
   border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);
-  margin-bottom:10px;outline:none}
+  margin-bottom:8px;outline:none}
 #config-form input:focus{border-color:var(--primary)}
-#config-form label{font-size:12px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px}
-.config-hint{font-size:11px;color:var(--gray-400);margin-top:-4px;margin-bottom:10px}
-#btn-save-config{
-  width:100%;padding:13px;background:var(--primary);color:#fff;
-  border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;
-  font-family:var(--font);cursor:pointer;margin-top:4px;
-}
-.stock-adj{display:flex;align-items:center;gap:8px}
-.adj-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--gray-200);background:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-700);flex-shrink:0}
-.adj-input{flex:1;min-width:0;width:0;text-align:center;padding:8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:16px;font-weight:700;font-family:var(--font);outline:none}
-.adj-input:focus{border-color:var(--primary)}
+.cfg-hint{font-size:10px;color:var(--gray-400);margin-top:-4px;margin-bottom:8px}
+#btn-save-cfg{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer}
+
+.section-label{font-size:11px;font-weight:700;color:var(--gray-500);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;margin-top:3px}
+.divider{height:1px;background:var(--gray-100);margin:12px 0}
 </style>
 </head>
 <body>
 
-<!-- CONFIG SCREEN -->
+<!-- CONFIG -->
 <div id="config-screen">
-  <h1>🥬 <span data-i18n="appTitle">대한김치 재고관리</span></h1>
-  <p data-i18n="configDesc">앱을 처음 사용하는 경우<br>Firebase 정보를 입력하세요.<br><small>(한 번만 입력하면 저장됩니다)</small></p>
-  <div class="config-lang-row">
-    <button class="config-lang-btn active" onclick="setLang('ko',this)">한국어</button>
-    <button class="config-lang-btn" onclick="setLang('en',this)">English</button>
-    <button class="config-lang-btn" onclick="setLang('vi',this)">Tiếng Việt</button>
+  <h1>🥬 <span data-i="appTitle"></span></h1>
+  <p data-i="cfgDesc"></p>
+  <div class="cfg-lang-row">
+    <button class="cfg-lang-btn active" onclick="setLang('ko',this)">한국어</button>
+    <button class="cfg-lang-btn" onclick="setLang('vi',this)">Tiếng Việt</button>
   </div>
   <div id="config-form">
-    <label data-i18n="cfgUrlLabel">Firebase Database URL</label>
+    <label data-i="cfgUrl">Firebase Database URL</label>
     <input id="cfg-url" type="url" placeholder="https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app">
-    <div class="config-hint" data-i18n="cfgUrlHint">Firebase 콘솔 → Realtime Database → 데이터 탭 상단 URL</div>
-    <label data-i18n="cfgKeyLabel">Firebase API Key</label>
+    <div class="cfg-hint" data-i="cfgUrlHint"></div>
+    <label data-i="cfgKey">Firebase API Key</label>
     <input id="cfg-key" type="text" placeholder="AIzaSy...">
-    <div class="config-hint" data-i18n="cfgKeyHint">Firebase 콘솔 → 프로젝트 설정 → 웹 API 키</div>
-    <label data-i18n="cfgUserLabel">사용자 이름</label>
-    <input id="cfg-user" type="text" placeholder="예: 김루카스">
-    <button id="btn-save-config" data-i18n="cfgSaveBtn">✓ 저장하고 시작</button>
+    <div class="cfg-hint" data-i="cfgKeyHint"></div>
+    <label data-i="cfgUser">사용자 이름</label>
+    <input id="cfg-user" type="text" placeholder="예: 루카스">
+    <button id="btn-save-cfg" data-i="cfgSave"></button>
   </div>
 </div>
 
 <!-- HEADER -->
 <div id="app-header" style="display:none">
-  <div class="header-left">
-    <div class="header-title">🥬 <span data-i18n="appTitle">대한김치 재고관리</span></div>
-    <div class="header-sub" data-i18n="appSub">딘톤 사무소 · TT10, 180 Đinh Thôn</div>
+  <div class="hdr-left">
+    <div class="hdr-title">🥬 <span data-i="appTitle"></span></div>
+    <div class="hdr-sub" data-i="appSub"></div>
   </div>
-  <div class="header-right">
-    <div class="lang-switcher">
-      <button class="lang-btn" onclick="setLang('ko',this,'header')">한</button>
-      <button class="lang-btn" onclick="setLang('en',this,'header')">EN</button>
-      <button class="lang-btn" onclick="setLang('vi',this,'header')">VI</button>
+  <div class="hdr-right">
+    <div class="lang-sw">
+      <button class="lang-btn" onclick="setLang('ko',this,'hdr')">한</button>
+      <button class="lang-btn" onclick="setLang('vi',this,'hdr')">VI</button>
     </div>
-    <span class="header-badge" id="hdr-date"></span>
+    <span class="hdr-badge" id="hdr-date"></span>
     <div id="alert-dot"></div>
   </div>
 </div>
 
-<!-- APP BODY -->
+<!-- BODY -->
 <div id="app-body" style="display:none">
 
-  <!-- 재고현황 -->
+  <!-- ① 재고현황 -->
   <div class="screen active" id="sc-stock">
-    <div class="summary-grid">
-      <div class="sum-card primary"><div class="num" id="sum-total">0</div><div class="lbl" data-i18n="sumTotal">전체 품목</div></div>
-      <div class="sum-card danger"><div class="num" id="sum-alert">0</div><div class="lbl" data-i18n="sumAlert">재발주 필요</div></div>
-      <div class="sum-card success"><div class="num" id="sum-today-sale">0</div><div class="lbl" data-i18n="sumTodaySale">오늘 판매 건수</div></div>
-      <div class="sum-card warning"><div class="num" id="sum-expiring">0</div><div class="lbl" data-i18n="sumExpiring">유통기한 임박</div></div>
+    <div class="sum-grid">
+      <div class="sum-card c-primary"><div class="num" id="sum-total">0</div><div class="lbl" data-i="sumTotal"></div></div>
+      <div class="sum-card c-danger"><div class="num" id="sum-alert">0</div><div class="lbl" data-i="sumAlert"></div></div>
+      <div class="sum-card c-success"><div class="num" id="sum-today">0</div><div class="lbl" data-i="sumToday"></div></div>
+      <div class="sum-card c-warning"><div class="num" id="sum-exp">0</div><div class="lbl" data-i="sumExp"></div></div>
     </div>
-    <div class="section-label" data-i18n="stockListTitle">품목별 재고 현황</div>
+    <div class="section-label" data-i="stockTitle"></div>
     <div id="stock-list"></div>
   </div>
 
-  <!-- 입고 -->
+  <!-- ② 입고 -->
   <div class="screen" id="sc-in">
     <div class="card">
-      <div class="card-header"><div class="card-title" data-i18n="inTitle">📥 입고 등록</div></div>
+      <div class="card-header"><div class="card-title" data-i="inTitle"></div></div>
       <div class="card-body">
         <div class="form-group">
-          <label class="form-label" data-i18n="fldDate">입고일자 <span class="req">*</span></label>
+          <label class="form-label" data-i="fDate"></label>
           <input type="date" class="form-control" id="in-date">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldProduct">제품 선택 <span class="req">*</span></label>
+          <label class="form-label" data-i="fProduct"></label>
           <select class="form-control" id="in-product"></select>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldQty">입고 수량 <span class="req">*</span></label>
+          <label class="form-label" data-i="fQtyIn"></label>
           <input type="number" class="form-control" id="in-qty" min="1">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldSupplyPrice">공급단가 (VND)</label>
+          <label class="form-label" data-i="fSupply"></label>
           <input type="number" class="form-control" id="in-price">
           <div class="form-hint" id="in-price-hint"></div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldExpiry">유통기한</label>
+          <label class="form-label" data-i="fExpiry"></label>
           <input type="date" class="form-control" id="in-expiry">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldStaff">담당자</label>
+          <label class="form-label" data-i="fStaff"></label>
           <input type="text" class="form-control" id="in-staff">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldNote">비고</label>
+          <label class="form-label" data-i="fNote"></label>
           <input type="text" class="form-control" id="in-note">
         </div>
         <button class="btn btn-primary" onclick="saveInbound()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M5 13l4 4L19 7"/></svg>
-          <span data-i18n="inSaveBtn">입고 저장</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M5 13l4 4L19 7"/></svg>
+          <span data-i="inSave"></span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 판매 -->
+  <!-- ③ 판매 -->
   <div class="screen" id="sc-out">
     <div class="card">
-      <div class="card-header"><div class="card-title" data-i18n="outTitle">📤 판매 등록</div></div>
+      <div class="card-header"><div class="card-title" data-i="outTitle"></div></div>
       <div class="card-body">
         <div class="form-group">
-          <label class="form-label" data-i18n="fldSaleDate">판매일자 <span class="req">*</span></label>
+          <label class="form-label" data-i="fSaleDate"></label>
           <input type="date" class="form-control" id="out-date">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldProduct">제품 선택 <span class="req">*</span></label>
+          <label class="form-label" data-i="fChannel"></label>
+          <div class="channel-group">
+            <button class="channel-btn ch-baedalk active" onclick="setChannel('baedalk',this)">
+              <span class="ch-icon">🛵</span>
+              <span data-i="chBaedalk"></span>
+            </button>
+            <button class="channel-btn ch-seller" onclick="setChannel('seller',this)">
+              <span class="ch-icon">🧑‍💼</span>
+              <span data-i="chSeller"></span>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" id="seller-select-group" style="display:none">
+          <label class="form-label" data-i="fSellerSelect"></label>
+          <select class="form-control" id="out-seller"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i="fProduct"></label>
           <select class="form-control" id="out-product"></select>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldSaleQty">판매 수량 <span class="req">*</span></label>
+          <label class="form-label" data-i="fQtyOut"></label>
           <input type="number" class="form-control" id="out-qty" min="1">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldSalePrice">판매단가 (VND)</label>
+          <label class="form-label" data-i="fSalePrice"></label>
           <input type="number" class="form-control" id="out-price">
           <div class="form-hint" id="out-price-hint"></div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldCustomer">거래처 / 구매자</label>
+          <label class="form-label" data-i="fCustomer"></label>
           <input type="text" class="form-control" id="out-customer">
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldPayMethod">결제방법</label>
+          <label class="form-label" data-i="fPay"></label>
           <div class="toggle-group" id="pay-group">
-            <button class="toggle-btn active" data-i18n="payCash">현금</button>
-            <button class="toggle-btn" data-i18n="payTransfer">계좌이체</button>
-            <button class="toggle-btn" data-i18n="payOther">기타</button>
+            <button class="toggle-btn active" data-pay="현금" data-i-pay="payCash"></button>
+            <button class="toggle-btn" data-pay="계좌이체" data-i-pay="payTransfer"></button>
+            <button class="toggle-btn" data-pay="기타" data-i-pay="payOther"></button>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="fldDelivery">배달 여부</label>
-          <div class="toggle-group" id="del-group">
-            <button class="toggle-btn active" data-i18n="delPickup">현장픽업</button>
-            <button class="toggle-btn" data-i18n="delDelivery">배달</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="fldNote">비고</label>
+          <label class="form-label" data-i="fNote"></label>
           <input type="text" class="form-control" id="out-note">
         </div>
+
+        <!-- 판매 요약 박스 -->
+        <div id="sale-summary-box" style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;display:none">
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:8px" data-i="saleSummaryTitle"></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span data-i="ssTotal"></span><span id="ss-total" style="font-weight:700"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span data-i="ssHQ"></span><span id="ss-hq" style="font-weight:700;color:var(--success)"></span>
+          </div>
+          <div id="ss-seller-row" style="display:flex;justify-content:space-between;font-size:12px;display:none">
+            <span data-i="ssSellerProfit"></span><span id="ss-seller" style="font-weight:700;color:var(--purple)"></span>
+          </div>
+        </div>
+
         <button class="btn btn-primary" onclick="saveSale()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M5 13l4 4L19 7"/></svg>
-          <span data-i18n="outSaveBtn">판매 저장</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><path d="M5 13l4 4L19 7"/></svg>
+          <span data-i="outSave"></span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 내역 -->
-  <div class="screen" id="sc-hist">
+  <!-- ④ 정산 -->
+  <div class="screen" id="sc-settle">
     <div class="tab-row">
-      <div class="tab-item active" onclick="setHistTab('in')" data-i18n="tabIn">📥 입고내역</div>
-      <div class="tab-item" onclick="setHistTab('out')" data-i18n="tabOut">📤 판매내역</div>
-      <div class="tab-item" onclick="setHistTab('monthly')" data-i18n="tabMonthly">📊 월별요약</div>
+      <div class="tab-item active" onclick="setSettleTab('daily')" data-i="tabDaily"></div>
+      <div class="tab-item" onclick="setSettleTab('weekly')" data-i="tabWeekly"></div>
+      <div class="tab-item" onclick="setSettleTab('monthly')" data-i="tabMonthly"></div>
+      <div class="tab-item" onclick="setSettleTab('seller')" data-i="tabSeller"></div>
     </div>
-    <div id="hist-in-list"></div>
-    <div id="hist-out-list" style="display:none"></div>
-    <div id="hist-monthly" style="display:none"></div>
+    <div id="settle-daily"></div>
+    <div id="settle-weekly" style="display:none"></div>
+    <div id="settle-monthly" style="display:none"></div>
+    <div id="settle-seller" style="display:none"></div>
   </div>
 
-  <!-- 관리 -->
+  <!-- ⑤ 관리 -->
   <div class="screen" id="sc-mgmt">
-    <div class="card" style="margin-bottom:12px">
+    <!-- 판매자 관리 -->
+    <div class="card" style="margin-bottom:10px">
       <div class="card-header">
-        <div class="card-title" data-i18n="prodListTitle">🥬 제품 목록</div>
-        <button class="btn btn-sm btn-primary" style="width:auto" onclick="openAddProduct()" data-i18n="addProductBtn">+ 제품 추가</button>
+        <div class="card-title" data-i="sellerMgmtTitle"></div>
+        <button class="btn btn-sm btn-purple" style="width:auto" onclick="openAddSeller()" data-i="addSellerBtn"></button>
+      </div>
+      <div class="card-body" style="padding-top:8px"><div id="seller-list"></div></div>
+    </div>
+    <!-- 제품 관리 -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-header">
+        <div class="card-title" data-i="prodMgmtTitle"></div>
+        <button class="btn btn-sm btn-primary" style="width:auto" onclick="openAddProduct()" data-i="addProdBtn"></button>
       </div>
       <div class="card-body" style="padding-top:8px"><div id="prod-list"></div></div>
     </div>
+    <!-- 입출고 내역 -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-header"><div class="card-title" data-i="histTitle"></div></div>
+      <div class="card-body" style="padding:0">
+        <div class="tab-row" style="margin:10px 14px 0">
+          <div class="tab-item active" onclick="setHistTab('in')" data-i="tabIn"></div>
+          <div class="tab-item" onclick="setHistTab('out')" data-i="tabOut"></div>
+        </div>
+        <div style="padding:0 14px 14px">
+          <div id="hist-in"></div>
+          <div id="hist-out" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 앱 설정 -->
     <div class="card">
-      <div class="card-header"><div class="card-title" data-i18n="settingsTitle">🔧 앱 설정</div></div>
+      <div class="card-header"><div class="card-title" data-i="settingsTitle"></div></div>
       <div class="card-body">
         <div class="form-group">
-          <label class="form-label" data-i18n="cfgUserLabel">사용자 이름</label>
-          <input type="text" class="form-control" id="mgmt-username">
+          <label class="form-label" data-i="cfgUser"></label>
+          <input type="text" class="form-control" id="mgmt-user">
         </div>
-        <button class="btn btn-ghost" onclick="saveUsername()" data-i18n="saveNameBtn">이름 저장</button>
-        <div style="margin-top:12px">
-          <button class="btn btn-ghost" onclick="resetConfig()" style="color:var(--danger)" data-i18n="resetBtn">Firebase 설정 초기화</button>
-        </div>
+        <button class="btn btn-ghost" onclick="saveUsername()" style="margin-bottom:8px" data-i="saveNameBtn"></button>
+        <button class="btn btn-ghost" onclick="resetConfig()" style="color:var(--danger)" data-i="resetBtn"></button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <div id="bottom-nav" style="display:none">
   <button class="nav-btn active" onclick="showScreen('stock',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-    <span data-i18n="navStock">재고현황</span>
+    <span data-i="navStock"></span>
     <div class="nav-badge" id="badge-stock"></div>
   </button>
   <button class="nav-btn" onclick="showScreen('in',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-    <span data-i18n="navIn">입고</span>
+    <span data-i="navIn"></span>
   </button>
   <button class="nav-btn" onclick="showScreen('out',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-    <span data-i18n="navOut">판매</span>
+    <span data-i="navOut"></span>
   </button>
-  <button class="nav-btn" onclick="showScreen('hist',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3M3.05 11a9 9 0 1 0 .5-3"/><path d="M3 4v4h4"/></svg>
-    <span data-i18n="navHist">내역</span>
+  <button class="nav-btn" onclick="showScreen('settle',this);initSettleTab()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M9 15h3l8.5-8.5a1.5 1.5 0 0 0-3-3L9 12v3"/></svg>
+    <span data-i="navSettle"></span>
   </button>
   <button class="nav-btn" onclick="showScreen('mgmt',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 1 21 12M12 2a10 10 0 0 1 7.07 2.93"/><path d="M4.93 19.07A10 10 0 0 1 3 12M12 22a10 10 0 0 1-7.07-2.93"/></svg>
-    <span data-i18n="navMgmt">관리</span>
+    <span data-i="navMgmt"></span>
   </button>
 </div>
 
-<!-- MODALS -->
+<!-- MODAL: 제품 추가/수정 -->
 <div class="modal-overlay" id="modal-product">
   <div class="modal">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeModal('modal-product')">×</button>
-    <div class="modal-title" id="prod-modal-title" data-i18n="addProductBtn">제품 추가</div>
+    <div class="modal-title" id="prod-modal-title"></div>
     <div class="form-group">
-      <label class="form-label" data-i18n="pmName">제품명 <span class="req">*</span></label>
+      <label class="form-label" data-i="pmName"></label>
       <input type="text" class="form-control" id="pm-name">
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="pmSize">규격/용량 <span class="req">*</span></label>
+      <label class="form-label" data-i="pmSize"></label>
       <input type="text" class="form-control" id="pm-size">
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="pmUnit">단위</label>
+      <label class="form-label" data-i="pmUnit"></label>
       <select class="form-control" id="pm-unit">
         <option>개</option><option>병</option><option>봉</option><option>박스</option>
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="fldSupplyPrice">공급단가 (VND)</label>
+      <label class="form-label" data-i="fSupply"></label>
       <input type="number" class="form-control" id="pm-supply">
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="fldSalePrice">판매단가 (VND)</label>
+      <label class="form-label" data-i="fSalePrice"></label>
       <input type="number" class="form-control" id="pm-sale">
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="pmMinStock">최소 안전재고</label>
+      <label class="form-label" data-i="pmMin"></label>
       <input type="number" class="form-control" id="pm-min">
     </div>
-    <input type="hidden" id="pm-edit-id">
-    <button class="btn btn-primary" onclick="saveProduct()" data-i18n="saveBtn">저장</button>
+    <input type="hidden" id="pm-id">
+    <button class="btn btn-primary" onclick="saveProduct()" data-i="saveBtn"></button>
   </div>
 </div>
 
-<div class="modal-overlay" id="modal-stock-adj">
+<!-- MODAL: 판매자 추가/수정 -->
+<div class="modal-overlay" id="modal-seller">
   <div class="modal">
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('modal-stock-adj')">×</button>
-    <div class="modal-title" data-i18n="adjTitle">📦 재고 수량 조정</div>
-    <div id="adj-product-name" style="font-size:15px;font-weight:700;color:var(--gray-700);margin-bottom:16px"></div>
+    <button class="modal-close" onclick="closeModal('modal-seller')">×</button>
+    <div class="modal-title" id="seller-modal-title"></div>
     <div class="form-group">
-      <label class="form-label" data-i18n="adjQtyLabel">현재 재고 수량</label>
+      <label class="form-label" data-i="slName"></label>
+      <input type="text" class="form-control" id="sl-name">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i="slPhone"></label>
+      <input type="tel" class="form-control" id="sl-phone">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i="slNote"></label>
+      <input type="text" class="form-control" id="sl-note">
+    </div>
+    <input type="hidden" id="sl-id">
+    <button class="btn btn-purple" onclick="saveSeller()" data-i="saveBtn"></button>
+  </div>
+</div>
+
+<!-- MODAL: 재고 조정 -->
+<div class="modal-overlay" id="modal-adj">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('modal-adj')">×</button>
+    <div class="modal-title" data-i="adjTitle"></div>
+    <div id="adj-prod-name" style="font-size:14px;font-weight:700;color:var(--gray-700);margin-bottom:14px"></div>
+    <div class="form-group">
+      <label class="form-label" data-i="adjQtyLabel"></label>
       <div class="stock-adj">
         <button class="adj-btn" onclick="adjStock(-1)">−</button>
         <input type="number" class="adj-input" id="adj-qty" min="0">
@@ -527,331 +613,289 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label" data-i18n="adjExpiringLabel">유통기한 임박 수량</label>
-      <input type="number" class="form-control" id="adj-expiring" min="0">
-      <div class="form-hint" data-i18n="adjExpiringHint">7일 이내 유통기한 제품 수량</div>
+      <label class="form-label" data-i="adjExpLabel"></label>
+      <input type="number" class="form-control" id="adj-exp" min="0">
+      <div class="form-hint" data-i="adjExpHint"></div>
     </div>
-    <input type="hidden" id="adj-product-id">
-    <button class="btn btn-primary" onclick="saveStockAdj()" data-i18n="adjSaveBtn">재고 수정 완료</button>
+    <input type="hidden" id="adj-pid">
+    <button class="btn btn-primary" onclick="saveAdj()" data-i="adjSave"></button>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // TRANSLATIONS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 const T = {
-  ko:{
-    appTitle:'대한김치 재고관리', appSub:'딘톤 사무소 · TT10, 180 Đinh Thôn',
-    configDesc:'앱을 처음 사용하는 경우<br>Firebase 정보를 입력하세요.<br><small>(한 번만 입력하면 저장됩니다)</small>',
-    cfgUrlLabel:'Firebase Database URL', cfgUrlHint:'Firebase 콘솔 → Realtime Database → 데이터 탭 상단 URL',
-    cfgKeyLabel:'Firebase API Key', cfgKeyHint:'Firebase 콘솔 → 프로젝트 설정 → 웹 API 키',
-    cfgUserLabel:'사용자 이름', cfgSaveBtn:'✓ 저장하고 시작',
-    sumTotal:'전체 품목', sumAlert:'재발주 필요', sumTodaySale:'오늘 판매 건수', sumExpiring:'유통기한 임박',
-    stockListTitle:'품목별 재고 현황',
-    inTitle:'📥 입고 등록', inSaveBtn:'입고 저장',
-    outTitle:'📤 판매 등록', outSaveBtn:'판매 저장',
-    fldDate:'입고일자', fldSaleDate:'판매일자', fldProduct:'제품 선택',
-    fldQty:'입고 수량', fldSaleQty:'판매 수량',
-    fldSupplyPrice:'공급단가 (VND)', fldSalePrice:'판매단가 (VND)',
-    fldExpiry:'유통기한', fldStaff:'담당자', fldCustomer:'거래처 / 구매자',
-    fldPayMethod:'결제방법', fldDelivery:'배달 여부', fldNote:'비고',
-    payCash:'현금', payTransfer:'계좌이체', payOther:'기타',
-    delPickup:'현장픽업', delDelivery:'배달',
-    tabIn:'📥 입고내역', tabOut:'📤 판매내역', tabMonthly:'📊 월별요약',
-    navStock:'재고현황', navIn:'입고', navOut:'판매', navHist:'내역', navMgmt:'관리',
-    prodListTitle:'🥬 제품 목록', addProductBtn:'+ 제품 추가',
-    settingsTitle:'🔧 앱 설정', saveNameBtn:'이름 저장', resetBtn:'Firebase 설정 초기화',
-    pmName:'제품명', pmSize:'규격/용량', pmUnit:'단위', pmMinStock:'최소 안전재고',
-    adjTitle:'📦 재고 수량 조정', adjQtyLabel:'현재 재고 수량',
-    adjExpiringLabel:'유통기한 임박 수량', adjExpiringHint:'7일 이내 유통기한 제품 수량',
-    adjSaveBtn:'재고 수정 완료', saveBtn:'저장',
-    badgeOk:'✓ 정상', badgeWarn:'△ 여유 부족', badgeDanger:'⚠ 재발주 필요', badgeZero:'품절',
-    safeStock:'안전재고', expiring:'임박',
-    histIn:'입', histOut:'판',
-    staff:'담당', customer:'고객', expiryLabel:'유통기한',
-    deleteConfirm:'이 기록을 삭제하겠습니까?\n재고 수량도 함께 조정됩니다.',
-    deleteOk:'삭제되었습니다',
-    stockUpdated:'재고가 수정되었습니다',
-    prodAdded:'제품이 추가되었습니다', prodUpdated:'제품이 수정되었습니다', prodDeleted:'삭제되었습니다',
-    prodDeleteConfirm:'을(를) 삭제하겠습니까?',
-    userSaved:'이름이 저장되었습니다',
-    inSaved:'입고 완료', saleSaved:'판매 완료',
-    saveFail:'저장 실패',
-    errDate:'날짜를 입력하세요', errProduct:'제품을 선택하세요', errQty:'수량을 입력하세요',
-    errName:'제품명과 규격을 입력하세요', errUrl:'올바른 Database URL을 입력하세요',
-    errInput:'URL과 API Key를 입력하세요', errUser:'이름을 입력하세요',
-    overStockConfirm:'현재 재고보다 많습니다. 계속 저장하겠습니까?',
-    resetConfirm1:'⚠️ Firebase 설정 초기화',resetConfirm2:'이 폰의 연결 설정만 삭제됩니다. 서버 데이터(재고·입출고 기록)는 삭제되지 않습니다. 계속하겠습니까?',
-    monthlyTitle:'📊 월별 입고/판매 요약',
-    monthLabels:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
-    legendIn:'입고', legendOut:'판매',
-    supplyRef:'기준 공급단가', saleRef:'기준 판매단가',
-    margin:'마진', minStockLabel:'안전재고', unit:'단위',
-    editBtn:'✏️ 수정', deleteBtn:'🗑 삭제',
-    editProduct:'제품 수정',
-    noProducts:'등록된 제품이 없습니다', noHistory:'내역이 없습니다',
-  },
-  en:{
-    appTitle:'Daehan Kimchi Inventory', appSub:'Dinh Thon Office · TT10, 180 Đinh Thôn',
-    configDesc:'First time setup<br>Please enter your Firebase details.<br><small>(Only required once)</small>',
-    cfgUrlLabel:'Firebase Database URL', cfgUrlHint:'Firebase Console → Realtime Database → Data tab URL',
-    cfgKeyLabel:'Firebase API Key', cfgKeyHint:'Firebase Console → Project Settings → Web API Key',
-    cfgUserLabel:'Your Name', cfgSaveBtn:'✓ Save & Start',
-    sumTotal:'Total Items', sumAlert:'Reorder Needed', sumTodaySale:"Today's Sales", sumExpiring:'Expiring Soon',
-    stockListTitle:'Stock Status by Item',
-    inTitle:'📥 Record Inbound', inSaveBtn:'Save Inbound',
-    outTitle:'📤 Record Sale', outSaveBtn:'Save Sale',
-    fldDate:'Inbound Date', fldSaleDate:'Sale Date', fldProduct:'Select Product',
-    fldQty:'Quantity In', fldSaleQty:'Quantity Sold',
-    fldSupplyPrice:'Supply Price (VND)', fldSalePrice:'Sale Price (VND)',
-    fldExpiry:'Expiry Date', fldStaff:'Staff', fldCustomer:'Customer / Buyer',
-    fldPayMethod:'Payment Method', fldDelivery:'Delivery', fldNote:'Note',
-    payCash:'Cash', payTransfer:'Transfer', payOther:'Other',
-    delPickup:'Pickup', delDelivery:'Delivery',
-    tabIn:'📥 Inbound', tabOut:'📤 Sales', tabMonthly:'📊 Monthly',
-    navStock:'Stock', navIn:'Inbound', navOut:'Sales', navHist:'History', navMgmt:'Manage',
-    prodListTitle:'🥬 Product List', addProductBtn:'+ Add Product',
-    settingsTitle:'🔧 App Settings', saveNameBtn:'Save Name', resetBtn:'Reset Firebase Config',
-    pmName:'Product Name', pmSize:'Size/Volume', pmUnit:'Unit', pmMinStock:'Min. Safe Stock',
-    adjTitle:'📦 Adjust Stock', adjQtyLabel:'Current Stock Quantity',
-    adjExpiringLabel:'Expiring Soon Count', adjExpiringHint:'Items expiring within 7 days',
-    adjSaveBtn:'Confirm Adjustment', saveBtn:'Save',
-    badgeOk:'✓ OK', badgeWarn:'△ Low', badgeDanger:'⚠ Reorder', badgeZero:'Out of Stock',
-    safeStock:'Min Stock', expiring:'Expiring',
-    histIn:'IN', histOut:'OUT',
-    staff:'Staff', customer:'Customer', expiryLabel:'Expiry',
-    deleteConfirm:'Delete this record?\nStock quantity will also be adjusted.',
-    deleteOk:'Deleted successfully',
-    stockUpdated:'Stock updated',
-    prodAdded:'Product added', prodUpdated:'Product updated', prodDeleted:'Deleted',
-    prodDeleteConfirm:'Delete this product?',
-    userSaved:'Name saved',
-    inSaved:'Inbound recorded', saleSaved:'Sale recorded',
-    saveFail:'Save failed',
-    errDate:'Please enter a date', errProduct:'Please select a product', errQty:'Please enter a quantity',
-    errName:'Please enter product name and size', errUrl:'Invalid Database URL',
-    errInput:'Please enter URL and API Key', errUser:'Please enter your name',
-    overStockConfirm:'Quantity exceeds current stock. Continue saving?',
-    resetConfirm1:'⚠️ Reset Firebase Config',resetConfirm2:'Only the connection settings on this phone will be deleted. Server data (stock & records) will NOT be deleted. Continue?',
-    monthlyTitle:'📊 Monthly Inbound / Sales Summary',
-    monthLabels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-    legendIn:'Inbound', legendOut:'Sales',
-    supplyRef:'Ref Supply Price', saleRef:'Ref Sale Price',
-    margin:'Margin', minStockLabel:'Min Stock', unit:'Unit',
-    editBtn:'✏️ Edit', deleteBtn:'🗑 Delete',
-    editProduct:'Edit Product',
-    noProducts:'No products registered', noHistory:'No records found',
-  },
-  vi:{
-    appTitle:'Quản lý kho Daehan Kimchi', appSub:'Văn phòng Đinh Thôn · TT10, 180 Đinh Thôn',
-    configDesc:'Lần đầu sử dụng ứng dụng<br>Vui lòng nhập thông tin Firebase.<br><small>(Chỉ cần nhập một lần)</small>',
-    cfgUrlLabel:'Firebase Database URL', cfgUrlHint:'Firebase Console → Realtime Database → URL trên tab Dữ liệu',
-    cfgKeyLabel:'Firebase API Key', cfgKeyHint:'Firebase Console → Cài đặt dự án → Web API Key',
-    cfgUserLabel:'Tên người dùng', cfgSaveBtn:'✓ Lưu và Bắt đầu',
-    sumTotal:'Tổng sản phẩm', sumAlert:'Cần đặt hàng', sumTodaySale:'Đơn bán hôm nay', sumExpiring:'Sắp hết hạn',
-    stockListTitle:'Tình trạng tồn kho theo mặt hàng',
-    inTitle:'📥 Nhập hàng', inSaveBtn:'Lưu nhập hàng',
-    outTitle:'📤 Ghi bán hàng', outSaveBtn:'Lưu bán hàng',
-    fldDate:'Ngày nhập', fldSaleDate:'Ngày bán', fldProduct:'Chọn sản phẩm',
-    fldQty:'Số lượng nhập', fldSaleQty:'Số lượng bán',
-    fldSupplyPrice:'Giá nhập (VND)', fldSalePrice:'Giá bán (VND)',
-    fldExpiry:'Hạn sử dụng', fldStaff:'Nhân viên', fldCustomer:'Khách hàng / Đối tác',
-    fldPayMethod:'Phương thức thanh toán', fldDelivery:'Giao hàng', fldNote:'Ghi chú',
-    payCash:'Tiền mặt', payTransfer:'Chuyển khoản', payOther:'Khác',
-    delPickup:'Tự lấy', delDelivery:'Giao hàng',
-    tabIn:'📥 Nhập hàng', tabOut:'📤 Bán hàng', tabMonthly:'📊 Theo tháng',
-    navStock:'Tồn kho', navIn:'Nhập', navOut:'Bán', navHist:'Lịch sử', navMgmt:'Quản lý',
-    prodListTitle:'🥬 Danh sách sản phẩm', addProductBtn:'+ Thêm sản phẩm',
-    settingsTitle:'🔧 Cài đặt ứng dụng', saveNameBtn:'Lưu tên', resetBtn:'Đặt lại cấu hình Firebase',
-    pmName:'Tên sản phẩm', pmSize:'Quy cách/Dung tích', pmUnit:'Đơn vị', pmMinStock:'Tồn kho tối thiểu',
-    adjTitle:'📦 Điều chỉnh tồn kho', adjQtyLabel:'Số lượng tồn kho hiện tại',
-    adjExpiringLabel:'Số lượng sắp hết hạn', adjExpiringHint:'Sản phẩm hết hạn trong vòng 7 ngày',
-    adjSaveBtn:'Xác nhận điều chỉnh', saveBtn:'Lưu',
-    badgeOk:'✓ Bình thường', badgeWarn:'△ Sắp hết', badgeDanger:'⚠ Cần đặt hàng', badgeZero:'Hết hàng',
-    safeStock:'Tồn tối thiểu', expiring:'Sắp hết hạn',
-    histIn:'NH', histOut:'BH',
-    staff:'NV', customer:'Khách', expiryLabel:'Hạn dùng',
-    deleteConfirm:'Xóa bản ghi này?\nSố lượng tồn kho cũng sẽ được điều chỉnh.',
-    deleteOk:'Đã xóa thành công',
-    stockUpdated:'Đã cập nhật tồn kho',
-    prodAdded:'Đã thêm sản phẩm', prodUpdated:'Đã cập nhật sản phẩm', prodDeleted:'Đã xóa',
-    prodDeleteConfirm:'Xóa sản phẩm này?',
-    userSaved:'Đã lưu tên',
-    inSaved:'Nhập hàng thành công', saleSaved:'Bán hàng thành công',
-    saveFail:'Lưu thất bại',
-    errDate:'Vui lòng nhập ngày', errProduct:'Vui lòng chọn sản phẩm', errQty:'Vui lòng nhập số lượng',
-    errName:'Vui lòng nhập tên và quy cách sản phẩm', errUrl:'URL cơ sở dữ liệu không hợp lệ',
-    errInput:'Vui lòng nhập URL và API Key', errUser:'Vui lòng nhập tên của bạn',
-    overStockConfirm:'Số lượng vượt quá tồn kho hiện tại. Tiếp tục lưu?',
-    resetConfirm1:'⚠️ Đặt lại cấu hình Firebase',resetConfirm2:'Chỉ xóa cài đặt kết nối trên điện thoại này. Dữ liệu máy chủ (tồn kho & lịch sử) sẽ KHÔNG bị xóa. Tiếp tục?',
-    monthlyTitle:'📊 Tổng kết nhập/bán theo tháng',
-    monthLabels:['Th.1','Th.2','Th.3','Th.4','Th.5','Th.6','Th.7','Th.8','Th.9','Th.10','Th.11','Th.12'],
-    legendIn:'Nhập hàng', legendOut:'Bán hàng',
-    supplyRef:'Giá nhập tham chiếu', saleRef:'Giá bán tham chiếu',
-    margin:'Lợi nhuận', minStockLabel:'Tồn tối thiểu', unit:'Đơn vị',
-    editBtn:'✏️ Sửa', deleteBtn:'🗑 Xóa',
-    editProduct:'Chỉnh sửa sản phẩm',
-    noProducts:'Chưa có sản phẩm nào', noHistory:'Không có lịch sử',
-  }
-};
+ko:{
+  appTitle:'대한김치 재고관리', appSub:'딘톤 사무소 · TT10, 180 Đinh Thôn',
+  cfgDesc:'처음 사용 시 Firebase 정보를 입력하세요.<br><small>(한 번만 입력하면 저장됩니다)</small>',
+  cfgUrl:'Firebase Database URL', cfgUrlHint:'Firebase 콘솔 → Realtime Database → 데이터 탭 상단 URL',
+  cfgKey:'Firebase API Key', cfgKeyHint:'Firebase 콘솔 → 프로젝트 설정 → 웹 API 키',
+  cfgUser:'사용자 이름', cfgSave:'✓ 저장하고 시작',
+  sumTotal:'전체 품목', sumAlert:'재발주 필요', sumToday:'오늘 판매', sumExp:'유통기한 임박',
+  stockTitle:'품목별 재고 현황',
+  inTitle:'📥 입고 등록', inSave:'입고 저장',
+  outTitle:'📤 판매 등록', outSave:'판매 저장',
+  fDate:'입고일자 *', fSaleDate:'판매일자 *', fProduct:'제품 선택 *',
+  fQtyIn:'입고 수량 *', fQtyOut:'판매 수량 *',
+  fSupply:'공급단가 (VND)', fSalePrice:'판매단가 (VND)',
+  fExpiry:'유통기한', fStaff:'담당자', fCustomer:'거래처 / 구매자',
+  fPay:'결제방법', fNote:'비고',
+  fChannel:'판매 채널 *', chBaedalk:'배달K', chSeller:'개인판매자',
+  fSellerSelect:'판매자 선택 *',
+  payCash:'현금', payTransfer:'계좌이체', payOther:'기타',
+  saleSummaryTitle:'판매 금액 요약',
+  ssTotal:'판매 총액', ssHQ:'본사 입금액', ssSellerProfit:'판매자 수익',
+  navStock:'재고현황', navIn:'입고', navOut:'판매', navSettle:'정산', navMgmt:'관리',
+  tabDaily:'일일', tabWeekly:'주간', tabMonthly:'월간', tabSeller:'판매자별',
+  tabIn:'입고내역', tabOut:'판매내역',
+  settleTitle:'정산 내역',
+  dailyTitle:'일일 정산', weeklyTitle:'주간 정산', monthlyTitle:'월간 정산',
+  sellerSettleTitle:'판매자별 정산',
+  sTotalSale:'총 판매금액', sHQTotal:'본사 입금 합계', sBaedalkSale:'배달K 매출',
+  sSellerSale:'개인판매자 매출', sSellerProfit:'판매자 수익 합계',
+  sHQFromBaedalk:'배달K → 본사', sHQFromSeller:'개인판매자 → 본사(공급단가)',
+  sCnt:'건수', sQty:'수량',
+  sellerMgmtTitle:'🧑‍💼 개인판매자 관리', addSellerBtn:'+ 판매자 추가',
+  prodMgmtTitle:'🥬 제품 목록', addProdBtn:'+ 제품 추가',
+  histTitle:'📋 입출고 내역',
+  settingsTitle:'🔧 앱 설정', saveNameBtn:'이름 저장', resetBtn:'Firebase 설정 초기화',
+  pmName:'제품명 *', pmSize:'규격/용량 *', pmUnit:'단위', pmMin:'최소 안전재고',
+  slName:'판매자 이름 *', slPhone:'연락처', slNote:'메모',
+  adjTitle:'📦 재고 수량 조정', adjQtyLabel:'현재 재고 수량',
+  adjExpLabel:'유통기한 임박 수량', adjExpHint:'7일 이내 유통기한 제품 수량',
+  adjSave:'재고 수정 완료', saveBtn:'저장',
+  addProdModalTitle:'제품 추가', editProdModalTitle:'제품 수정',
+  addSellerModalTitle:'판매자 추가', editSellerModalTitle:'판매자 수정',
+  badgeOk:'✓ 정상', badgeWarn:'△ 여유 부족', badgeDanger:'⚠ 재발주', badgeZero:'품절',
+  safeMin:'안전재고', expTag:'임박',
+  margin:'마진', minStk:'안전재고', unit:'단위',
+  editBtn:'✏️ 수정', delBtn:'🗑 삭제',
+  noData:'내역 없음', noProd:'등록된 제품 없음', noSeller:'등록된 판매자 없음',
+  supplyRef:'공급단가 기준', saleRef:'판매단가 기준',
+  inSaved:'입고 완료', saleSaved:'판매 완료',
+  saved:'저장되었습니다', deleted:'삭제되었습니다', stockUpdated:'재고가 수정되었습니다',
+  userSaved:'이름이 저장되었습니다', saveFail:'저장 실패',
+  errDate:'날짜를 입력하세요', errProduct:'제품을 선택하세요', errQty:'수량을 입력하세요',
+  errName:'이름을 입력하세요', errProdName:'제품명과 규격을 입력하세요',
+  errUrl:'올바른 Database URL을 입력하세요', errInput:'URL과 API Key를 입력하세요',
+  errSeller:'판매자를 선택하세요',
+  overStock:'현재 재고보다 많습니다. 계속 저장하겠습니까?',
+  delConfirm:'삭제하겠습니까?\n재고 수량도 함께 조정됩니다.',
+  delProdConfirm:'제품을 삭제하겠습니까?',
+  delSellerConfirm:'판매자를 삭제하겠습니까?',
+  reset1:'⚠️ Firebase 설정 초기화', reset2:'이 폰의 연결 설정만 삭제됩니다. 서버 데이터(재고·기록)는 삭제되지 않습니다. 계속하겠습니까?',
+  monthNames:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+  weekLabel:'주',
+  noSettleData:'해당 기간 판매 내역 없음',
+  baedalkTag:'배달K', sellerTag:'개인',
+},
+vi:{
+  appTitle:'Quản lý kho Daehan Kimchi', appSub:'Văn phòng Đinh Thôn · TT10, 180 Đinh Thôn',
+  cfgDesc:'Lần đầu sử dụng, nhập thông tin Firebase.<br><small>(Chỉ cần nhập một lần)</small>',
+  cfgUrl:'Firebase Database URL', cfgUrlHint:'Firebase Console → Realtime Database → URL trên tab Dữ liệu',
+  cfgKey:'Firebase API Key', cfgKeyHint:'Firebase Console → Cài đặt dự án → Web API Key',
+  cfgUser:'Tên người dùng', cfgSave:'✓ Lưu và Bắt đầu',
+  sumTotal:'Tổng sản phẩm', sumAlert:'Cần đặt hàng', sumToday:'Bán hôm nay', sumExp:'Sắp hết hạn',
+  stockTitle:'Tình trạng tồn kho theo mặt hàng',
+  inTitle:'📥 Nhập hàng', inSave:'Lưu nhập hàng',
+  outTitle:'📤 Ghi bán hàng', outSave:'Lưu bán hàng',
+  fDate:'Ngày nhập *', fSaleDate:'Ngày bán *', fProduct:'Chọn sản phẩm *',
+  fQtyIn:'Số lượng nhập *', fQtyOut:'Số lượng bán *',
+  fSupply:'Giá nhập (VND)', fSalePrice:'Giá bán (VND)',
+  fExpiry:'Hạn sử dụng', fStaff:'Nhân viên', fCustomer:'Khách hàng / Đối tác',
+  fPay:'Thanh toán', fNote:'Ghi chú',
+  fChannel:'Kênh bán *', chBaedalk:'배달K (App)', chSeller:'Người bán lẻ',
+  fSellerSelect:'Chọn người bán *',
+  payCash:'Tiền mặt', payTransfer:'Chuyển khoản', payOther:'Khác',
+  saleSummaryTitle:'Tóm tắt doanh thu',
+  ssTotal:'Tổng doanh thu', ssHQ:'Nộp về công ty', ssSellerProfit:'Lợi nhuận người bán',
+  navStock:'Tồn kho', navIn:'Nhập', navOut:'Bán', navSettle:'Quyết toán', navMgmt:'Quản lý',
+  tabDaily:'Ngày', tabWeekly:'Tuần', tabMonthly:'Tháng', tabSeller:'Người bán',
+  tabIn:'Nhập hàng', tabOut:'Bán hàng',
+  settleTitle:'Chi tiết quyết toán',
+  dailyTitle:'Quyết toán ngày', weeklyTitle:'Quyết toán tuần', monthlyTitle:'Quyết toán tháng',
+  sellerSettleTitle:'Quyết toán theo người bán',
+  sTotalSale:'Tổng doanh thu', sHQTotal:'Tổng nộp công ty', sBaedalkSale:'Doanh thu 배달K',
+  sSellerSale:'Doanh thu người bán lẻ', sSellerProfit:'Tổng lợi nhuận người bán',
+  sHQFromBaedalk:'배달K → Công ty', sHQFromSeller:'Người bán → Công ty (giá nhập)',
+  sCnt:'Đơn', sQty:'SL',
+  sellerMgmtTitle:'🧑‍💼 Quản lý người bán lẻ', addSellerBtn:'+ Thêm người bán',
+  prodMgmtTitle:'🥬 Danh sách sản phẩm', addProdBtn:'+ Thêm sản phẩm',
+  histTitle:'📋 Lịch sử nhập/xuất',
+  settingsTitle:'🔧 Cài đặt', saveNameBtn:'Lưu tên', resetBtn:'Đặt lại cấu hình Firebase',
+  pmName:'Tên sản phẩm *', pmSize:'Quy cách *', pmUnit:'Đơn vị', pmMin:'Tồn kho tối thiểu',
+  slName:'Tên người bán *', slPhone:'Số điện thoại', slNote:'Ghi chú',
+  adjTitle:'📦 Điều chỉnh tồn kho', adjQtyLabel:'Số lượng tồn kho hiện tại',
+  adjExpLabel:'Số lượng sắp hết hạn', adjExpHint:'Sản phẩm hết hạn trong 7 ngày',
+  adjSave:'Xác nhận', saveBtn:'Lưu',
+  addProdModalTitle:'Thêm sản phẩm', editProdModalTitle:'Chỉnh sửa sản phẩm',
+  addSellerModalTitle:'Thêm người bán', editSellerModalTitle:'Chỉnh sửa người bán',
+  badgeOk:'✓ Bình thường', badgeWarn:'△ Sắp hết', badgeDanger:'⚠ Cần đặt', badgeZero:'Hết hàng',
+  safeMin:'Tồn tối thiểu', expTag:'Sắp hết hạn',
+  margin:'Lợi nhuận', minStk:'Tồn tối thiểu', unit:'Đơn vị',
+  editBtn:'✏️ Sửa', delBtn:'🗑 Xóa',
+  noData:'Không có dữ liệu', noProd:'Chưa có sản phẩm', noSeller:'Chưa có người bán',
+  supplyRef:'Giá nhập tham chiếu', saleRef:'Giá bán tham chiếu',
+  inSaved:'Nhập hàng thành công', saleSaved:'Bán hàng thành công',
+  saved:'Đã lưu', deleted:'Đã xóa', stockUpdated:'Đã cập nhật tồn kho',
+  userSaved:'Đã lưu tên', saveFail:'Lưu thất bại',
+  errDate:'Vui lòng nhập ngày', errProduct:'Vui lòng chọn sản phẩm', errQty:'Vui lòng nhập số lượng',
+  errName:'Vui lòng nhập tên', errProdName:'Nhập tên và quy cách sản phẩm',
+  errUrl:'URL không hợp lệ', errInput:'Vui lòng nhập URL và API Key',
+  errSeller:'Vui lòng chọn người bán',
+  overStock:'Vượt quá tồn kho hiện tại. Tiếp tục?',
+  delConfirm:'Xóa bản ghi này?\nTồn kho cũng sẽ được điều chỉnh.',
+  delProdConfirm:'Xóa sản phẩm này?',
+  delSellerConfirm:'Xóa người bán này?',
+  reset1:'⚠️ Đặt lại cấu hình', reset2:'Chỉ xóa cài đặt trên điện thoại này. Dữ liệu máy chủ không bị xóa. Tiếp tục?',
+  monthNames:['Th.1','Th.2','Th.3','Th.4','Th.5','Th.6','Th.7','Th.8','Th.9','Th.10','Th.11','Th.12'],
+  weekLabel:'tuần',
+  noSettleData:'Không có dữ liệu trong kỳ này',
+  baedalkTag:'배달K', sellerTag:'Bán lẻ',
+}};
 
-// ════════════════════════════════════════
-// LANG ENGINE
-// ════════════════════════════════════════
-let currentLang = localStorage.getItem('kimchi_lang') || 'ko';
-
-function t(key){ return (T[currentLang]||T.ko)[key] || T.ko[key] || key; }
+// ═══════════════════════════════════════════
+// LANG
+// ═══════════════════════════════════════════
+let lang = localStorage.getItem('kimchi_lang')||'ko';
+function t(k){ return (T[lang]||T.ko)[k]||T.ko[k]||k; }
 
 function applyLang(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key = el.dataset.i18n;
-    const val = t(key);
-    if(val === undefined) return;
-    // preserve child elements like <span class="req">
-    if(el.querySelector('.req')){
-      const req = el.querySelector('.req').outerHTML;
-      el.innerHTML = val + ' ' + req;
-    } else if(key === 'configDesc'){
-      el.innerHTML = val;
-    } else {
-      el.textContent = val;
-    }
+  document.querySelectorAll('[data-i]').forEach(el=>{
+    const k=el.dataset.i, v=t(k);
+    if(!v) return;
+    if(k==='cfgDesc'||k==='appTitle') el.innerHTML=v;
+    else el.textContent=v;
   });
-  // update toggle buttons text
-  const payBtns = document.querySelectorAll('#pay-group .toggle-btn');
-  const payKeys = ['payCash','payTransfer','payOther'];
-  payBtns.forEach((b,i)=>{ b.textContent = t(payKeys[i]); });
-  const delBtns = document.querySelectorAll('#del-group .toggle-btn');
-  const delKeys = ['delPickup','delDelivery'];
-  delBtns.forEach((b,i)=>{ b.textContent = t(delKeys[i]); });
-}
-
-function setLang(lang, btn, source){
-  currentLang = lang;
-  localStorage.setItem('kimchi_lang', lang);
-  // update config screen buttons
-  document.querySelectorAll('.config-lang-btn').forEach(b=>b.classList.remove('active'));
-  // update header buttons
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-  if(source === 'header'){
-    document.querySelectorAll('.lang-btn').forEach(b=>{
-      if((lang==='ko'&&b.textContent==='한')||(lang==='en'&&b.textContent==='EN')||(lang==='vi'&&b.textContent==='VI'))
-        b.classList.add('active');
-    });
-  }
-  if(btn) btn.classList.add('active');
-  applyLang();
-  // re-render dynamic content
+  document.querySelectorAll('[data-i-pay]').forEach(el=>{
+    el.textContent=t(el.dataset.iPay);
+  });
+  syncLangBtns();
+  renderProductSelects();
   renderStockList();
   renderProductList();
-  renderProductSelects();
+  renderSellerList();
 }
 
-function syncHeaderLangBtns(){
-  document.querySelectorAll('.lang-btn').forEach(b=>{
-    const match = (currentLang==='ko'&&b.textContent==='한')||(currentLang==='en'&&b.textContent==='EN')||(currentLang==='vi'&&b.textContent==='VI');
-    b.classList.toggle('active', match);
+function setLang(l,btn,src){
+  lang=l; localStorage.setItem('kimchi_lang',l);
+  applyLang();
+  if(src==='hdr') syncLangBtns();
+}
+function syncLangBtns(){
+  document.querySelectorAll('.lang-btn,.cfg-lang-btn').forEach(b=>{
+    const isKo=b.textContent.includes('한')||b.textContent==='한국어';
+    b.classList.toggle('active',(lang==='ko'&&isKo)||(lang==='vi'&&!isKo));
   });
 }
 
-// ════════════════════════════════════════
-// CONFIG & FIREBASE
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
+// FIREBASE & STATE
+// ═══════════════════════════════════════════
 let db, currentUser='담당자';
-let products={}, stockData={}, histTab='in';
-let editingProductId=null;
+let products={}, stockData={}, sellers={};
+let salesCache={}, inboundCache={};
+let currentChannel='baedalk';
+let settleTab='daily', histTab='in';
+let editingProdId=null, editingSellerID=null;
 
-function getConfig(){ try{ return JSON.parse(localStorage.getItem('kimchi_cfg')||'null'); } catch(e){ return null; } }
-function saveConfig(cfg){ localStorage.setItem('kimchi_cfg', JSON.stringify(cfg)); }
+// settle date state
+let dailyDate=today(), weeklyDate=today(), monthlyMonth=new Date().getMonth()+1, monthlyYear=new Date().getFullYear();
+
+function getConfig(){ try{return JSON.parse(localStorage.getItem('kimchi_cfg')||'null')}catch{return null} }
+function saveConfig(c){ localStorage.setItem('kimchi_cfg',JSON.stringify(c)); }
 
 function initApp(){
   applyLang();
-  const cfg = getConfig();
-  if(!cfg || !cfg.dbUrl || !cfg.apiKey){
-    document.getElementById('config-screen').style.display='flex';
-    return;
+  const cfg=getConfig();
+  if(!cfg||!cfg.dbUrl||!cfg.apiKey){
+    document.getElementById('config-screen').style.display='flex'; return;
   }
-  currentUser = cfg.username || '담당자';
+  currentUser=cfg.username||'담당자';
   document.getElementById('config-screen').style.display='none';
   document.getElementById('app-header').style.display='flex';
   document.getElementById('app-body').style.display='block';
   document.getElementById('bottom-nav').style.display='flex';
-  document.getElementById('mgmt-username').value = currentUser;
-  syncHeaderLangBtns();
+  document.getElementById('mgmt-user').value=currentUser;
+  syncLangBtns();
 
-  const firebaseConfig = { apiKey: cfg.apiKey, databaseURL: cfg.dbUrl, projectId: 'kimchi-app' };
-  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-
-  setDateToday();
-  updateHeaderDate();
+  if(!firebase.apps.length) firebase.initializeApp({apiKey:cfg.apiKey,databaseURL:cfg.dbUrl,projectId:'kimchi'});
+  db=firebase.database();
+  setDatesToday();
+  updateHdrDate();
   setupListeners();
   initDefaultProducts();
 }
 
-document.getElementById('btn-save-config').onclick = function(){
-  const url = document.getElementById('cfg-url').value.trim();
-  const key = document.getElementById('cfg-key').value.trim();
-  const user = document.getElementById('cfg-user').value.trim();
-  if(!url||!key){ showToast(t('errInput')); return; }
-  if(!url.includes('firebaseio.com')&&!url.includes('firebasedatabase.app')){ showToast(t('errUrl')); return; }
-  saveConfig({dbUrl:url, apiKey:key, username:user});
+document.getElementById('btn-save-cfg').onclick=function(){
+  const url=document.getElementById('cfg-url').value.trim();
+  const key=document.getElementById('cfg-key').value.trim();
+  const user=document.getElementById('cfg-user').value.trim();
+  if(!url||!key){showToast(t('errInput'));return;}
+  if(!url.includes('firebaseio.com')&&!url.includes('firebasedatabase.app')){showToast(t('errUrl'));return;}
+  saveConfig({dbUrl:url,apiKey:key,username:user});
   location.reload();
 };
 
 function resetConfig(){
-  if(!confirm(t('resetConfirm1'))) return;
-  if(!confirm(t('resetConfirm2'))) return;
-  localStorage.removeItem('kimchi_cfg');
-  location.reload();
+  if(!confirm(t('reset1'))) return;
+  if(!confirm(t('reset2'))) return;
+  localStorage.removeItem('kimchi_cfg'); location.reload();
 }
 function saveUsername(){
-  const u = document.getElementById('mgmt-username').value.trim();
-  if(!u){ showToast(t('errUser')); return; }
-  currentUser = u;
-  const cfg = getConfig(); cfg.username = u; saveConfig(cfg);
+  const u=document.getElementById('mgmt-user').value.trim();
+  if(!u){showToast(t('errName'));return;}
+  currentUser=u; const c=getConfig(); c.username=u; saveConfig(c);
   showToast(t('userSaved'));
 }
 
-// ════════════════════════════════════════
-// DATE
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
+// DATE UTILS
+// ═══════════════════════════════════════════
 function today(){ return new Date().toISOString().slice(0,10); }
-function setDateToday(){
-  document.getElementById('in-date').value = today();
-  document.getElementById('out-date').value = today();
+function setDatesToday(){
+  document.getElementById('in-date').value=today();
+  document.getElementById('out-date').value=today();
 }
-function updateHeaderDate(){
-  const d = new Date();
-  document.getElementById('hdr-date').textContent = `${d.getMonth()+1}/${d.getDate()}`;
+function updateHdrDate(){
+  const d=new Date();
+  document.getElementById('hdr-date').textContent=`${d.getMonth()+1}/${d.getDate()}`;
 }
+function getWeekRange(dateStr){
+  const d=new Date(dateStr);
+  const day=d.getDay(), diff=d.getDate()-day+(day===0?-6:1);
+  const mon=new Date(d.setDate(diff));
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  return {mon:mon.toISOString().slice(0,10), sun:sun.toISOString().slice(0,10)};
+}
+function fmtDate(s){ return s?s.slice(5).replace('-','/'):''; }
+function fmtNum(n){ return (n||0).toLocaleString('ko-KR'); }
+function fmtK(n){ if(!n)return '0'; if(n>=1000000)return (n/1000000).toFixed(1)+'M'; if(n>=1000)return Math.round(n/1000)+'K'; return n; }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // FIREBASE LISTENERS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function setupListeners(){
-  db.ref('products').on('value', snap=>{
-    products = snap.val()||{};
-    renderProductSelects(); renderProductList();
+  db.ref('products').on('value',s=>{ products=s.val()||{}; renderProductSelects(); renderProductList(); });
+  db.ref('sellers').on('value',s=>{ sellers=s.val()||{}; renderSellerList(); renderSellerSelect(); });
+  db.ref('stock').on('value',s=>{ stockData=s.val()||{}; renderStockList(); updateSummary(); });
+  db.ref('inbound').orderByChild('timestamp').on('value',s=>{
+    inboundCache=s.val()||{}; renderHist('in',inboundCache);
   });
-  db.ref('stock').on('value', snap=>{
-    stockData = snap.val()||{};
-    renderStockList(); updateSummary();
-  });
-  db.ref('inbound').orderByChild('timestamp').on('value', snap=>{ renderHistory('in', snap.val()||{}); });
-  db.ref('sales').orderByChild('timestamp').on('value', snap=>{
-    renderHistory('out', snap.val()||{});
-    countTodaySales(snap.val()||{});
+  db.ref('sales').orderByChild('timestamp').on('value',s=>{
+    salesCache=s.val()||{}; renderHist('out',salesCache); countToday();
+    if(document.getElementById('sc-settle').classList.contains('active')) refreshSettle();
   });
 }
 
 function initDefaultProducts(){
-  db.ref('products').once('value', snap=>{
-    if(snap.val()) return;
-    const defaults = [
+  db.ref('products').once('value',s=>{
+    if(s.val()) return;
+    const def=[
       {name:'포기김치',size:'1kg',unit:'개',supplyPrice:50000,salePrice:70000,minStock:10},
       {name:'포기김치',size:'2kg',unit:'개',supplyPrice:95000,salePrice:130000,minStock:5},
       {name:'깍두기',size:'500g',unit:'개',supplyPrice:35000,salePrice:50000,minStock:10},
@@ -861,16 +905,16 @@ function initDefaultProducts(){
       {name:'총각김치',size:'500g',unit:'개',supplyPrice:35000,salePrice:50000,minStock:10},
       {name:'파김치',size:'300g',unit:'개',supplyPrice:28000,salePrice:40000,minStock:10},
     ];
-    defaults.forEach((p,i)=>{
-      const id='KM-'+(String(i+1).padStart(3,'0'));
+    def.forEach((p,i)=>{
+      const id='KM-'+String(i+1).padStart(3,'0');
       db.ref('products/'+id).set({...p,id,active:true});
     });
   });
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // NAVIGATION
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function showScreen(name,btn){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('sc-'+name).classList.add('active');
@@ -879,42 +923,10 @@ function showScreen(name,btn){
   document.getElementById('app-body').scrollTop=0;
 }
 
-// ════════════════════════════════════════
-// STOCK DASHBOARD
-// ════════════════════════════════════════
-function renderStockList(){
-  const el = document.getElementById('stock-list');
-  const pids = Object.keys(products).sort();
-  if(!pids.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">🥬</div><div class="empty-text">${t('noProducts')}</div></div>`;
-    return;
-  }
-  el.innerHTML = pids.map(id=>{
-    const p=products[id], s=stockData[id]||{quantity:0,expiringCount:0};
-    const qty=s.quantity||0, min=p.minStock||10;
-    let badge,cls;
-    if(qty===0){badge=t('badgeZero');cls='badge-zero';}
-    else if(qty<min){badge=t('badgeDanger');cls='badge-danger';}
-    else if(qty<min*1.5){badge=t('badgeWarn');cls='badge-warn';}
-    else{badge=t('badgeOk');cls='badge-ok';}
-    const exp = s.expiringCount>0
-      ? `<div style="font-size:10px;color:var(--warning);margin-top:2px">⏰ ${t('expiring')} ${s.expiringCount}${p.unit}</div>`:'';
-    return `<div class="stock-item" onclick="openStockAdj('${id}')">
-      <div class="stock-icon">${getKimchiEmoji(p.name)}</div>
-      <div class="stock-info">
-        <div class="stock-name">${p.name} ${p.size}</div>
-        <div class="stock-detail">${t('safeStock')}: ${min}${p.unit}</div>${exp}
-      </div>
-      <div class="stock-right">
-        <div class="stock-qty" style="color:${qty===0?'var(--gray-400)':qty<min?'var(--danger)':'var(--gray-800)'}">${qty}</div>
-        <div class="stock-unit">${p.unit}</div>
-        <div class="badge ${cls}">${badge}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function getKimchiEmoji(name){
+// ═══════════════════════════════════════════
+// STOCK SCREEN
+// ═══════════════════════════════════════════
+function getEmoji(name){
   if(name.includes('깍두기')) return '🟥';
   if(name.includes('백김치')) return '⬜';
   if(name.includes('열무')) return '🥬';
@@ -923,58 +935,129 @@ function getKimchiEmoji(name){
   return '🥗';
 }
 
+function renderStockList(){
+  const el=document.getElementById('stock-list');
+  const pids=Object.keys(products).sort();
+  if(!pids.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">🥬</div><div class="empty-text">${t('noProd')}</div></div>`; return; }
+  el.innerHTML=pids.map(id=>{
+    const p=products[id], s=stockData[id]||{quantity:0,expiringCount:0};
+    const qty=s.quantity||0, mn=p.minStock||10;
+    let badge,cls;
+    if(qty===0){badge=t('badgeZero');cls='badge-zero';}
+    else if(qty<mn){badge=t('badgeDanger');cls='badge-danger';}
+    else if(qty<mn*1.5){badge=t('badgeWarn');cls='badge-warn';}
+    else{badge=t('badgeOk');cls='badge-ok';}
+    const exp=s.expiringCount>0?`<div style="font-size:10px;color:var(--warning);margin-top:2px">⏰ ${t('expTag')} ${s.expiringCount}${p.unit}</div>`:'';
+    return `<div class="stock-item" onclick="openAdj('${id}')">
+      <div class="stock-icon">${getEmoji(p.name)}</div>
+      <div class="stock-info">
+        <div class="stock-name">${p.name} ${p.size}</div>
+        <div class="stock-detail">${t('safeMin')}: ${mn}${p.unit}</div>${exp}
+      </div>
+      <div class="stock-right">
+        <div class="stock-qty" style="color:${qty===0?'var(--gray-400)':qty<mn?'var(--danger)':'var(--gray-800)'}">${qty}</div>
+        <div class="stock-unit">${p.unit}</div>
+        <div class="badge ${cls}">${badge}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function updateSummary(){
-  const pids=Object.keys(products); let alert=0,expiring=0;
+  const pids=Object.keys(products); let alrt=0,exp=0;
   pids.forEach(id=>{
-    const s=stockData[id]||{quantity:0}, min=(products[id]||{}).minStock||10;
-    if((s.quantity||0)<min) alert++;
-    expiring+=s.expiringCount||0;
+    const s=stockData[id]||{}, mn=(products[id]||{}).minStock||10;
+    if((s.quantity||0)<mn) alrt++;
+    exp+=s.expiringCount||0;
   });
   document.getElementById('sum-total').textContent=pids.length;
-  document.getElementById('sum-alert').textContent=alert;
-  document.getElementById('sum-expiring').textContent=expiring;
+  document.getElementById('sum-alert').textContent=alrt;
+  document.getElementById('sum-exp').textContent=exp;
   const badge=document.getElementById('badge-stock'), dot=document.getElementById('alert-dot');
-  if(alert>0){ badge.style.display='flex'; badge.textContent=alert; dot.style.display='block'; }
-  else{ badge.style.display='none'; dot.style.display='none'; }
+  if(alrt>0){badge.style.display='flex';badge.textContent=alrt;dot.style.display='block';}
+  else{badge.style.display='none';dot.style.display='none';}
 }
 
-function countTodaySales(data){
-  const t2=today(); let count=0;
-  Object.values(data).forEach(r=>{ if(r.date===t2) count++; });
-  document.getElementById('sum-today-sale').textContent=count;
+function countToday(){
+  const td=today(); let cnt=0;
+  Object.values(salesCache).forEach(r=>{if(r.date===td) cnt++;});
+  document.getElementById('sum-today').textContent=cnt;
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // PRODUCT SELECTS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function renderProductSelects(){
-  const placeholder=`<option value="">${t('fldProduct')}...</option>`;
+  const ph=`<option value="">${t('fProduct')}...</option>`;
   const opts=Object.keys(products).sort().map(id=>{
-    const p=products[id];
-    return `<option value="${id}">${p.name} ${p.size}</option>`;
+    const p=products[id]; return `<option value="${id}">${p.name} ${p.size}</option>`;
   }).join('');
-  document.getElementById('in-product').innerHTML=placeholder+opts;
-  document.getElementById('out-product').innerHTML=placeholder+opts;
-
-  document.getElementById('in-product').onchange=function(){
+  const inSel=document.getElementById('in-product');
+  const outSel=document.getElementById('out-product');
+  inSel.innerHTML=ph+opts;
+  outSel.innerHTML=ph+opts;
+  inSel.onchange=function(){
     const p=products[this.value];
-    if(p){
-      document.getElementById('in-price').value=p.supplyPrice||'';
-      document.getElementById('in-price-hint').textContent=`${t('supplyRef')}: ${fmtNum(p.supplyPrice)} VND`;
-    } else document.getElementById('in-price-hint').textContent='';
+    if(p){document.getElementById('in-price').value=p.supplyPrice||'';
+      document.getElementById('in-price-hint').textContent=`${t('supplyRef')}: ${fmtNum(p.supplyPrice)} VND`;}
+    else document.getElementById('in-price-hint').textContent='';
   };
-  document.getElementById('out-product').onchange=function(){
+  outSel.onchange=function(){
     const p=products[this.value];
-    if(p){
-      document.getElementById('out-price').value=p.salePrice||'';
-      document.getElementById('out-price-hint').textContent=`${t('saleRef')}: ${fmtNum(p.salePrice)} VND`;
-    } else document.getElementById('out-price-hint').textContent='';
+    if(p){document.getElementById('out-price').value=p.salePrice||'';
+      document.getElementById('out-price-hint').textContent=`${t('saleRef')}: ${fmtNum(p.salePrice)} VND`;}
+    else document.getElementById('out-price-hint').textContent='';
+    updateSaleSummary();
   };
+  document.getElementById('out-qty').oninput=updateSaleSummary;
+  document.getElementById('out-price').oninput=updateSaleSummary;
 }
 
-// ════════════════════════════════════════
+function renderSellerSelect(){
+  const sel=document.getElementById('out-seller');
+  const ph=`<option value="">${t('fSellerSelect')}...</option>`;
+  const opts=Object.keys(sellers).map(id=>{
+    return `<option value="${id}">${sellers[id].name}</option>`;
+  }).join('');
+  sel.innerHTML=ph+opts;
+}
+
+// ═══════════════════════════════════════════
+// CHANNEL
+// ═══════════════════════════════════════════
+function setChannel(ch,btn){
+  currentChannel=ch;
+  document.querySelectorAll('.channel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('seller-select-group').style.display=ch==='seller'?'block':'none';
+  updateSaleSummary();
+}
+
+function updateSaleSummary(){
+  const pid=document.getElementById('out-product').value;
+  const qty=parseInt(document.getElementById('out-qty').value)||0;
+  const price=parseInt(document.getElementById('out-price').value)||0;
+  const box=document.getElementById('sale-summary-box');
+  if(!pid||!qty||!price){box.style.display='none';return;}
+  const p=products[pid]||{};
+  const total=qty*price;
+  const supplyTotal=qty*(p.supplyPrice||0);
+  box.style.display='block';
+  document.getElementById('ss-total').textContent=fmtNum(total)+' ₫';
+  if(currentChannel==='baedalk'){
+    document.getElementById('ss-hq').textContent=fmtNum(total)+' ₫';
+    document.getElementById('ss-seller-row').style.display='none';
+  } else {
+    const profit=total-supplyTotal;
+    document.getElementById('ss-hq').textContent=fmtNum(supplyTotal)+' ₫';
+    document.getElementById('ss-seller-row').style.display='flex';
+    document.getElementById('ss-seller').textContent=fmtNum(profit>=0?profit:0)+' ₫';
+  }
+}
+
+// ═══════════════════════════════════════════
 // SAVE INBOUND
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function saveInbound(){
   const date=document.getElementById('in-date').value;
   const pid=document.getElementById('in-product').value;
@@ -983,47 +1066,37 @@ function saveInbound(){
   const expiry=document.getElementById('in-expiry').value;
   const staff=document.getElementById('in-staff').value||currentUser;
   const note=document.getElementById('in-note').value;
-
   if(!date){showToast(t('errDate'));return;}
   if(!pid){showToast(t('errProduct'));return;}
   if(qty<1){showToast(t('errQty'));return;}
-
   const p=products[pid];
   db.ref('inbound').push().set({
     date,productId:pid,productName:`${p.name} ${p.size}`,
-    quantity:qty,unitPrice:price,total:qty*price,
-    expiry,note,staff,timestamp:Date.now()
+    quantity:qty,unitPrice:price,total:qty*price,expiry,note,staff,timestamp:Date.now()
   }).then(()=>{
-    db.ref('stock/'+pid).transaction(curr=>{
-      curr=curr||{quantity:0,expiringCount:0};
-      curr.quantity=(curr.quantity||0)+qty; curr.lastUpdated=Date.now(); return curr;
+    db.ref('stock/'+pid).transaction(c=>{
+      c=c||{quantity:0,expiringCount:0}; c.quantity=(c.quantity||0)+qty; c.lastUpdated=Date.now(); return c;
     });
     showToast(`${t('inSaved')}: ${p.name} ${p.size} ${qty}${p.unit}`);
     ['in-qty','in-expiry','in-note'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('in-product').value='';
     document.getElementById('in-price').value='';
     document.getElementById('in-price-hint').textContent='';
-  }).catch(e=>showToast(t('saveFail')+': '+e.message));
+  }).catch(e=>showToast(t('saveFail')));
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // SAVE SALE
-// ════════════════════════════════════════
-function setToggle(groupId,btn){
-  document.querySelectorAll('#'+groupId+' .toggle-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+// ═══════════════════════════════════════════
+function getActiveToggle(gid){
+  const a=document.querySelector('#'+gid+' .toggle-btn.active');
+  return a?a.dataset.pay||a.textContent.trim():'';
 }
-function getToggle(groupId){
-  const a=document.querySelector('#'+groupId+' .toggle-btn.active');
-  return a?a.textContent.trim():'';
-}
-
-// Attach toggle handlers dynamically
-document.querySelectorAll('#pay-group .toggle-btn').forEach(btn=>{
-  btn.onclick=()=>setToggle('pay-group',btn);
-});
-document.querySelectorAll('#del-group .toggle-btn').forEach(btn=>{
-  btn.onclick=()=>setToggle('del-group',btn);
+document.querySelectorAll('#pay-group .toggle-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#pay-group .toggle-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  };
 });
 
 function saveSale(){
@@ -1032,230 +1105,426 @@ function saveSale(){
   const qty=parseInt(document.getElementById('out-qty').value)||0;
   const price=parseInt(document.getElementById('out-price').value)||0;
   const customer=document.getElementById('out-customer').value;
-  const payMethod=getToggle('pay-group');
-  const delivery=getToggle('del-group');
+  const payMethod=getActiveToggle('pay-group');
   const note=document.getElementById('out-note').value;
-
   if(!date){showToast(t('errDate'));return;}
   if(!pid){showToast(t('errProduct'));return;}
   if(qty<1){showToast(t('errQty'));return;}
 
+  let sellerId='', sellerName='';
+  if(currentChannel==='seller'){
+    sellerId=document.getElementById('out-seller').value;
+    if(!sellerId){showToast(t('errSeller'));return;}
+    sellerName=(sellers[sellerId]||{}).name||'';
+  }
+
   const curStock=(stockData[pid]||{}).quantity||0;
-  if(qty>curStock){ if(!confirm(t('overStockConfirm'))) return; }
+  if(qty>curStock){if(!confirm(t('overStock'))) return;}
 
   const p=products[pid];
+  const supplyTotal=qty*(p.supplyPrice||0);
+  const saleTotal=qty*price;
+  const hqAmount=currentChannel==='baedalk'?saleTotal:supplyTotal;
+  const sellerProfit=currentChannel==='seller'?Math.max(0,saleTotal-supplyTotal):0;
+
   db.ref('sales').push().set({
     date,productId:pid,productName:`${p.name} ${p.size}`,
-    quantity:qty,unitPrice:price,total:qty*price,
-    customer,payMethod,delivery,note,staff:currentUser,timestamp:Date.now()
+    quantity:qty,unitPrice:price,total:saleTotal,
+    supplyPrice:p.supplyPrice||0,supplyTotal,
+    channel:currentChannel,
+    sellerId,sellerName,
+    hqAmount,sellerProfit,
+    customer,payMethod,note,staff:currentUser,timestamp:Date.now()
   }).then(()=>{
-    db.ref('stock/'+pid).transaction(curr=>{
-      curr=curr||{quantity:0,expiringCount:0};
-      curr.quantity=Math.max(0,(curr.quantity||0)-qty); curr.lastUpdated=Date.now(); return curr;
+    db.ref('stock/'+pid).transaction(c=>{
+      c=c||{quantity:0}; c.quantity=Math.max(0,(c.quantity||0)-qty); c.lastUpdated=Date.now(); return c;
     });
     showToast(`${t('saleSaved')}: ${p.name} ${p.size} ${qty}${p.unit}`);
     ['out-qty','out-customer','out-note'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('out-product').value='';
     document.getElementById('out-price').value='';
     document.getElementById('out-price-hint').textContent='';
-  }).catch(e=>showToast(t('saveFail')+': '+e.message));
+    document.getElementById('sale-summary-box').style.display='none';
+  }).catch(e=>showToast(t('saveFail')));
 }
 
-// ════════════════════════════════════════
-// HISTORY
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
+// HISTORY (in mgmt tab)
+// ═══════════════════════════════════════════
 function setHistTab(tab){
   histTab=tab;
-  document.querySelectorAll('.tab-item').forEach((el,i)=>{
-    el.classList.toggle('active',['in','out','monthly'][i]===tab);
+  document.querySelectorAll('#sc-mgmt .tab-item').forEach((el,i)=>{
+    el.classList.toggle('active',['in','out'][i]===tab);
   });
-  document.getElementById('hist-in-list').style.display=tab==='in'?'block':'none';
-  document.getElementById('hist-out-list').style.display=tab==='out'?'block':'none';
-  document.getElementById('hist-monthly').style.display=tab==='monthly'?'block':'none';
-  if(tab==='monthly') renderMonthly();
+  document.getElementById('hist-in').style.display=tab==='in'?'block':'none';
+  document.getElementById('hist-out').style.display=tab==='out'?'block':'none';
 }
 
-function renderHistory(type,data){
-  const el=document.getElementById(type==='in'?'hist-in-list':'hist-out-list');
-  const items=Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp);
+function renderHist(type,data){
+  const el=document.getElementById('hist-'+type);
+  const items=Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp).slice(0,50);
   if(!items.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">${type==='in'?'📥':'📤'}</div><div class="empty-text">${t('noHistory')}</div></div>`;
-    return;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">${type==='in'?'📥':'📤'}</div><div class="empty-text">${t('noData')}</div></div>`; return;
   }
   el.innerHTML=items.map(([id,r])=>{
-    const sign=type==='in'?'+':'-', cls=type==='in'?'in':'out';
-    const lbl=type==='in'?t('histIn'):t('histOut');
-    const meta=type==='in'
-      ?`${r.date} · ${t('staff')}: ${r.staff||'-'}${r.expiry?' · '+t('expiryLabel')+':'+r.expiry:''}`
-      :`${r.date} · ${r.customer||t('customer')} · ${r.payMethod||''}`;
+    const isSale=type==='out';
+    const ch=r.channel||'baedalk';
+    const typeCls=isSale?(ch==='baedalk'?'baedalk':'seller'):'in';
+    const lbl=isSale?(ch==='baedalk'?t('baedalkTag'):t('sellerTag')):'IN';
+    const amtCls=typeCls;
+    const sign=isSale?'-':'+';
+    const meta=isSale
+      ?`${fmtDate(r.date)} · ${ch==='seller'&&r.sellerName?r.sellerName:r.customer||'-'} · ${r.payMethod||''}`
+      :`${fmtDate(r.date)} · ${r.staff||'-'}${r.expiry?' · '+fmtDate(r.expiry):''}`;
     return `<div class="hist-item">
-      <div class="hist-type ${cls}">${lbl}</div>
+      <div class="hist-type ${typeCls}">${lbl}</div>
       <div class="hist-info">
         <div class="hist-name">${r.productName}</div>
         <div class="hist-meta">${meta}</div>
-        ${r.note?`<div class="hist-meta" style="color:var(--gray-400)">${r.note}</div>`:''}
+        ${r.note?`<div class="hist-meta" style="color:var(--gray-300)">${r.note}</div>`:''}
       </div>
       <div class="hist-right">
-        <div class="hist-amount ${cls}">${sign}${r.quantity}</div>
-        <div style="font-size:11px;color:var(--gray-400)">${fmtNum(r.total)} ₫</div>
+        <div class="hist-amount ${amtCls}">${sign}${r.quantity}</div>
+        <div style="font-size:10px;color:var(--gray-400)">${fmtNum(r.total)} ₫</div>
       </div>
-      <button class="hist-delete" onclick="deleteRecord('${type}','${id}','${r.productId}',${r.quantity})">×</button>
+      <button class="hist-delete" onclick="delRecord('${type}','${id}','${r.productId||''}',${r.quantity||0})">×</button>
     </div>`;
   }).join('');
 }
 
-function deleteRecord(type,id,pid,qty){
-  if(!confirm(t('deleteConfirm'))) return;
+function delRecord(type,id,pid,qty){
+  if(!confirm(t('delConfirm'))) return;
   const ref=type==='in'?'inbound':'sales';
   db.ref(ref+'/'+id).remove().then(()=>{
-    db.ref('stock/'+pid).transaction(curr=>{
-      curr=curr||{quantity:0};
-      if(type==='in') curr.quantity=Math.max(0,(curr.quantity||0)-qty);
-      else curr.quantity=(curr.quantity||0)+qty;
-      return curr;
+    if(pid) db.ref('stock/'+pid).transaction(c=>{
+      c=c||{quantity:0};
+      if(type==='in') c.quantity=Math.max(0,(c.quantity||0)-qty);
+      else c.quantity=(c.quantity||0)+qty;
+      return c;
     });
-    showToast(t('deleteOk'));
+    showToast(t('deleted'));
   });
 }
 
-function renderMonthly(){
-  const el=document.getElementById('hist-monthly');
-  Promise.all([db.ref('inbound').once('value'),db.ref('sales').once('value')]).then(([inSnap,outSnap])=>{
-    const inData=inSnap.val()||{}, outData=outSnap.val()||{};
-    const months={};
-    for(let m=1;m<=12;m++){ const k=String(m).padStart(2,'0'); months[k]={in:0,out:0}; }
-    Object.values(inData).forEach(r=>{ const m=(r.date||'').slice(5,7); if(months[m]) months[m].in+=r.total||0; });
-    Object.values(outData).forEach(r=>{ const m=(r.date||'').slice(5,7); if(months[m]) months[m].out+=r.total||0; });
-    const maxVal=Math.max(...Object.values(months).map(m=>Math.max(m.in,m.out)),1);
-    const mLabels=t('monthLabels');
-    el.innerHTML=`<div class="card"><div class="card-header"><div class="card-title">${t('monthlyTitle')}</div></div>
-    <div class="card-body">
-    ${Object.entries(months).map(([k,v],i)=>`
-      <div class="month-row">
-        <div class="month-label">${mLabels[i]}</div>
-        <div class="month-bars">
-          <div class="month-in" style="width:${Math.round(v.in/maxVal*100)}%;min-width:${v.in?4:0}px"></div>
-          <div class="month-out" style="width:${Math.round(v.out/maxVal*100)}%;min-width:${v.out?4:0}px"></div>
-        </div>
-        <div class="month-nums">
-          <div style="color:var(--primary)">${t('legendIn')} ${fmtK(v.in)}</div>
-          <div style="color:var(--success)">${t('legendOut')} ${fmtK(v.out)}</div>
-        </div>
-      </div>`).join('')}
-    <div style="display:flex;gap:16px;margin-top:12px;font-size:11px">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:8px;background:var(--primary);border-radius:2px;display:inline-block"></span>${t('legendIn')}</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:8px;background:var(--success);border-radius:2px;display:inline-block"></span>${t('legendOut')}</span>
-    </div></div></div>`;
+// ═══════════════════════════════════════════
+// SETTLEMENT
+// ═══════════════════════════════════════════
+function initSettleTab(){ setSettleTab('daily'); }
+
+function setSettleTab(tab){
+  settleTab=tab;
+  const tabs=['daily','weekly','monthly','seller'];
+  document.querySelectorAll('#sc-settle .tab-item').forEach((el,i)=>{
+    el.classList.toggle('active',tabs[i]===tab);
   });
+  tabs.forEach(t2=>{ document.getElementById('settle-'+t2).style.display=t2===tab?'block':'none'; });
+  refreshSettle();
 }
 
-// ════════════════════════════════════════
+function refreshSettle(){
+  if(settleTab==='daily') renderSettleDaily();
+  else if(settleTab==='weekly') renderSettleWeekly();
+  else if(settleTab==='monthly') renderSettleMonthly();
+  else if(settleTab==='seller') renderSettleSeller();
+}
+
+function calcSettle(records){
+  let totalSale=0,hqTotal=0,baedalkSale=0,baedalkHQ=0,sellerSale=0,sellerHQ=0,sellerProfit=0,cnt=0,qty=0;
+  records.forEach(r=>{
+    cnt++;qty+=r.quantity||0;
+    const sale=r.total||0,hq=r.hqAmount||0,sp=r.sellerProfit||0;
+    totalSale+=sale;hqTotal+=hq;
+    if(r.channel==='baedalk'){baedalkSale+=sale;baedalkHQ+=hq;}
+    else{sellerSale+=sale;sellerHQ+=hq;sellerProfit+=sp;}
+  });
+  return{totalSale,hqTotal,baedalkSale,baedalkHQ,sellerSale,sellerHQ,sellerProfit,cnt,qty};
+}
+
+function settleHTML(c,title){
+  if(c.cnt===0) return `<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">${t('noSettleData')}</div></div>`;
+  return `
+  <div class="settle-section">
+    <div class="settle-title">${title}</div>
+    <div class="settle-row total"><div class="s-label">${t('sTotalSale')}</div><div class="s-val">${fmtNum(c.totalSale)} ₫</div></div>
+    <div class="settle-row hq"><div class="s-label">✅ ${t('sHQTotal')}</div><div class="s-val">${fmtNum(c.hqTotal)} ₫</div></div>
+    <div class="settle-row seller-profit"><div class="s-label">💜 ${t('sSellerProfit')}</div><div class="s-val">${fmtNum(c.sellerProfit)} ₫</div></div>
+  </div>
+  <div class="settle-section">
+    <div class="settle-title">🛵 배달K</div>
+    <div class="settle-row"><div class="s-label">${t('sBaedalkSale')}</div><div class="s-val c-pink">${fmtNum(c.baedalkSale)} ₫</div></div>
+    <div class="settle-row"><div class="s-label">${t('sHQFromBaedalk')}</div><div class="s-val" style="color:var(--success)">${fmtNum(c.baedalkHQ)} ₫</div></div>
+  </div>
+  <div class="settle-section">
+    <div class="settle-title">🧑‍💼 ${t('chSeller')}</div>
+    <div class="settle-row"><div class="s-label">${t('sSellerSale')}</div><div class="s-val" style="color:var(--purple)">${fmtNum(c.sellerSale)} ₫</div></div>
+    <div class="settle-row"><div class="s-label">${t('sHQFromSeller')}</div><div class="s-val" style="color:var(--success)">${fmtNum(c.sellerHQ)} ₫</div></div>
+    <div class="settle-row"><div class="s-label">${t('sSellerProfit')}</div><div class="s-val" style="color:var(--purple)">${fmtNum(c.sellerProfit)} ₫</div></div>
+  </div>
+  <div class="settle-row" style="background:#fff"><div class="s-label" style="font-size:11px;color:var(--gray-500)">${t('sCnt')}: ${c.cnt}건 · ${t('sQty')}: ${c.qty}개</div><div></div></div>`;
+}
+
+/* DAILY */
+function renderSettleDaily(){
+  const el=document.getElementById('settle-daily');
+  const recs=Object.values(salesCache).filter(r=>r.date===dailyDate);
+  const c=calcSettle(recs);
+  el.innerHTML=`
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="shiftDaily(-1)">‹</button>
+    <div class="date-nav-label">${dailyDate}</div>
+    <button class="date-nav-btn" onclick="shiftDaily(1)">›</button>
+  </div>
+  ${settleHTML(c,t('dailyTitle'))}`;
+}
+function shiftDaily(d){ const dt=new Date(dailyDate); dt.setDate(dt.getDate()+d); dailyDate=dt.toISOString().slice(0,10); renderSettleDaily(); }
+
+/* WEEKLY */
+function renderSettleWeekly(){
+  const el=document.getElementById('settle-weekly');
+  const wr=getWeekRange(weeklyDate);
+  const recs=Object.values(salesCache).filter(r=>r.date>=wr.mon&&r.date<=wr.sun);
+  const c=calcSettle(recs);
+  el.innerHTML=`
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="shiftWeekly(-7)">‹</button>
+    <div class="date-nav-label">${fmtDate(wr.mon)} ~ ${fmtDate(wr.sun)}</div>
+    <button class="date-nav-btn" onclick="shiftWeekly(7)">›</button>
+  </div>
+  ${settleHTML(c,t('weeklyTitle'))}`;
+}
+function shiftWeekly(d){ const dt=new Date(weeklyDate); dt.setDate(dt.getDate()+d); weeklyDate=dt.toISOString().slice(0,10); renderSettleWeekly(); }
+
+/* MONTHLY */
+function renderSettleMonthly(){
+  const el=document.getElementById('settle-monthly');
+  const mm=String(monthlyMonth).padStart(2,'0');
+  const prefix=`${monthlyYear}-${mm}`;
+  const recs=Object.values(salesCache).filter(r=>(r.date||'').startsWith(prefix));
+  const c=calcSettle(recs);
+  const mLabel=t('monthNames')[monthlyMonth-1];
+  el.innerHTML=`
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="shiftMonth(-1)">‹</button>
+    <div class="date-nav-label">${monthlyYear}년 ${mLabel}</div>
+    <button class="date-nav-btn" onclick="shiftMonth(1)">›</button>
+  </div>
+  ${settleHTML(c,t('monthlyTitle'))}`;
+}
+function shiftMonth(d){
+  monthlyMonth+=d;
+  if(monthlyMonth>12){monthlyMonth=1;monthlyYear++;}
+  if(monthlyMonth<1){monthlyMonth=12;monthlyYear--;}
+  renderSettleMonthly();
+}
+
+/* PER SELLER */
+function renderSettleSeller(){
+  const el=document.getElementById('settle-seller');
+  const mm=String(monthlyMonth).padStart(2,'0');
+  const prefix=`${monthlyYear}-${mm}`;
+
+  // month nav shared with monthly
+  let nav=`<div class="date-nav">
+    <button class="date-nav-btn" onclick="shiftMonth(-1);renderSettleSeller()">‹</button>
+    <div class="date-nav-label">${monthlyYear}년 ${t('monthNames')[monthlyMonth-1]}</div>
+    <button class="date-nav-btn" onclick="shiftMonth(1);renderSettleSeller()">›</button>
+  </div>`;
+
+  const monthRecs=Object.values(salesCache).filter(r=>(r.date||'').startsWith(prefix));
+  if(!monthRecs.length){
+    el.innerHTML=nav+`<div class="empty"><div class="empty-icon">🧑‍💼</div><div class="empty-text">${t('noSettleData')}</div></div>`; return;
+  }
+
+  // group by seller
+  const byChannel={baedalk:[],seller:{}};
+  monthRecs.forEach(r=>{
+    if(r.channel==='seller'){
+      const sid=r.sellerId||'unknown';
+      if(!byChannel.seller[sid]) byChannel.seller[sid]=[];
+      byChannel.seller[sid].push(r);
+    } else byChannel.baedalk.push(r);
+  });
+
+  let html=nav;
+
+  // baedalk summary
+  if(byChannel.baedalk.length){
+    const c=calcSettle(byChannel.baedalk);
+    html+=`<div class="seller-settle-card" style="border-left:4px solid #c2185b">
+      <div class="ss-header"><div class="ss-name">🛵 배달K</div><div class="ss-cnt">${c.cnt}건 · ${c.qty}개</div></div>
+      <div class="ss-rows">
+        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val">${fmtNum(c.totalSale)} ₫</span></div>
+        <div class="ss-row sr-hq"><span class="sr-lbl">${t('sHQTotal')}</span><span class="sr-val">${fmtNum(c.hqTotal)} ₫</span></div>
+      </div>
+    </div>`;
+  }
+
+  // per seller
+  Object.entries(byChannel.seller).forEach(([sid,recs])=>{
+    const sname=(sellers[sid]||{}).name||sid;
+    const c=calcSettle(recs);
+    html+=`<div class="seller-settle-card" style="border-left:4px solid var(--purple)">
+      <div class="ss-header"><div class="ss-name">🧑‍💼 ${sname}</div><div class="ss-cnt">${c.cnt}건 · ${c.qty}개</div></div>
+      <div class="ss-rows">
+        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val">${fmtNum(c.totalSale)} ₫</span></div>
+        <div class="ss-row sr-hq"><span class="sr-lbl">${t('sHQFromSeller')}</span><span class="sr-val">${fmtNum(c.sellerHQ)} ₫</span></div>
+        <div class="ss-row sr-profit"><span class="sr-lbl">${t('sSellerProfit')}</span><span class="sr-val">${fmtNum(c.sellerProfit)} ₫</span></div>
+      </div>
+    </div>`;
+  });
+
+  // monthly total
+  const total=calcSettle(monthRecs);
+  html+=`<div class="settle-row total" style="margin-top:4px">
+    <div class="s-label">${t('sHQTotal')}</div>
+    <div class="s-val">${fmtNum(total.hqTotal)} ₫</div>
+  </div>`;
+
+  el.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+// SELLER MANAGEMENT
+// ═══════════════════════════════════════════
+function renderSellerList(){
+  const el=document.getElementById('seller-list');
+  const sids=Object.keys(sellers);
+  if(!sids.length){ el.innerHTML=`<div class="empty"><div class="empty-text">${t('noSeller')}</div></div>`; return; }
+  el.innerHTML=sids.map(id=>{
+    const s=sellers[id];
+    return `<div class="seller-item">
+      <div class="seller-row">
+        <div class="seller-name">🧑‍💼 ${s.name}</div>
+        <div class="badge badge-seller">${t('chSeller')}</div>
+      </div>
+      <div class="seller-meta">${s.phone||''} ${s.note?'· '+s.note:''}</div>
+      <div class="seller-actions">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editSeller('${id}')">${t('editBtn')}</button>
+        <button class="btn btn-danger btn-sm" style="flex:1" onclick="deleteSeller('${id}')">${t('delBtn')}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddSeller(){
+  editingSellerID=null;
+  document.getElementById('seller-modal-title').textContent=t('addSellerModalTitle');
+  ['sl-name','sl-phone','sl-note','sl-id'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modal-seller').classList.add('open');
+}
+function editSeller(id){
+  editingSellerID=id;
+  const s=sellers[id];
+  document.getElementById('seller-modal-title').textContent=t('editSellerModalTitle');
+  document.getElementById('sl-name').value=s.name||'';
+  document.getElementById('sl-phone').value=s.phone||'';
+  document.getElementById('sl-note').value=s.note||'';
+  document.getElementById('sl-id').value=id;
+  document.getElementById('modal-seller').classList.add('open');
+}
+function saveSeller(){
+  const name=document.getElementById('sl-name').value.trim();
+  if(!name){showToast(t('errName'));return;}
+  const data={name,phone:document.getElementById('sl-phone').value.trim(),note:document.getElementById('sl-note').value.trim()};
+  const id=editingSellerID||db.ref('sellers').push().key;
+  db.ref('sellers/'+id).set(data).then(()=>{
+    showToast(t('saved')); closeModal('modal-seller'); renderSellerSelect();
+  });
+}
+function deleteSeller(id){
+  if(!confirm(t('delSellerConfirm'))) return;
+  db.ref('sellers/'+id).remove().then(()=>showToast(t('deleted')));
+}
+
+// ═══════════════════════════════════════════
 // PRODUCT MANAGEMENT
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function renderProductList(){
   const el=document.getElementById('prod-list');
   const pids=Object.keys(products).sort();
-  if(!pids.length){ el.innerHTML=`<div class="empty"><div class="empty-text">${t('noProducts')}</div></div>`; return; }
+  if(!pids.length){ el.innerHTML=`<div class="empty"><div class="empty-text">${t('noProd')}</div></div>`; return; }
   el.innerHTML=pids.map(id=>{
     const p=products[id];
-    const margin=p.supplyPrice&&p.salePrice?Math.round((p.salePrice-p.supplyPrice)/p.salePrice*100)+'%':'-';
-    return `<div class="prod-item">
-      <div class="prod-header"><div class="prod-name">${getKimchiEmoji(p.name)} ${p.name} ${p.size}</div></div>
-      <div class="prod-meta">
-        ${t('fldSupplyPrice')}: ${fmtNum(p.supplyPrice)} ₫ · ${t('fldSalePrice')}: ${fmtNum(p.salePrice)} ₫ · ${t('margin')}: ${margin}<br>
-        ${t('minStockLabel')}: ${p.minStock||10}${p.unit} · ${t('unit')}: ${p.unit}
+    const mg=p.supplyPrice&&p.salePrice?Math.round((p.salePrice-p.supplyPrice)/p.salePrice*100)+'%':'-';
+    return `<div class="prod-item" style="background:#fff;border-radius:var(--radius-sm);padding:13px 14px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px">${getEmoji(p.name)} ${p.name} ${p.size}</div>
+      <div style="font-size:11px;color:var(--gray-500)">
+        ${t('fSupply')}: ${fmtNum(p.supplyPrice)} · ${t('fSalePrice')}: ${fmtNum(p.salePrice)} · ${t('margin')}: ${mg}<br>
+        ${t('minStk')}: ${p.minStock||10}${p.unit} · ${t('unit')}: ${p.unit}
       </div>
-      <div class="prod-actions">
+      <div style="display:flex;gap:7px;margin-top:8px">
         <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editProduct('${id}')">${t('editBtn')}</button>
-        <button class="btn btn-danger btn-sm" style="flex:1" onclick="deleteProduct('${id}')">${t('deleteBtn')}</button>
+        <button class="btn btn-danger btn-sm" style="flex:1" onclick="deleteProduct('${id}')">${t('delBtn')}</button>
       </div>
     </div>`;
   }).join('');
 }
 
 function openAddProduct(){
-  editingProductId=null;
-  document.getElementById('prod-modal-title').textContent=t('addProductBtn');
-  ['pm-name','pm-size','pm-supply','pm-sale','pm-edit-id'].forEach(id=>document.getElementById(id).value='');
+  editingProdId=null;
+  document.getElementById('prod-modal-title').textContent=t('addProdModalTitle');
+  ['pm-name','pm-size','pm-supply','pm-sale','pm-id'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('pm-unit').value='개';
   document.getElementById('pm-min').value='10';
   document.getElementById('modal-product').classList.add('open');
 }
-
 function editProduct(id){
-  const p=products[id]; editingProductId=id;
-  document.getElementById('prod-modal-title').textContent=t('editProduct');
+  editingProdId=id; const p=products[id];
+  document.getElementById('prod-modal-title').textContent=t('editProdModalTitle');
   document.getElementById('pm-name').value=p.name;
   document.getElementById('pm-size').value=p.size;
   document.getElementById('pm-unit').value=p.unit;
   document.getElementById('pm-supply').value=p.supplyPrice||'';
   document.getElementById('pm-sale').value=p.salePrice||'';
   document.getElementById('pm-min').value=p.minStock||10;
-  document.getElementById('pm-edit-id').value=id;
+  document.getElementById('pm-id').value=id;
   document.getElementById('modal-product').classList.add('open');
 }
-
 function saveProduct(){
   const name=document.getElementById('pm-name').value.trim();
   const size=document.getElementById('pm-size').value.trim();
-  const unit=document.getElementById('pm-unit').value;
-  const supply=parseInt(document.getElementById('pm-supply').value)||0;
-  const sale=parseInt(document.getElementById('pm-sale').value)||0;
-  const minStock=parseInt(document.getElementById('pm-min').value)||10;
-  if(!name||!size){showToast(t('errName'));return;}
-  const data={name,size,unit,supplyPrice:supply,salePrice:sale,minStock,active:true};
-  let id=editingProductId;
+  if(!name||!size){showToast(t('errProdName'));return;}
+  const data={name,size,unit:document.getElementById('pm-unit').value,
+    supplyPrice:parseInt(document.getElementById('pm-supply').value)||0,
+    salePrice:parseInt(document.getElementById('pm-sale').value)||0,
+    minStock:parseInt(document.getElementById('pm-min').value)||10,active:true};
+  let id=editingProdId;
   if(!id){
-    const existingNums=Object.keys(products).filter(k=>k.startsWith('KM-')).map(k=>parseInt(k.split('-')[1])||0);
-    const nextNum=(existingNums.length?Math.max(...existingNums):0)+1;
-    id='KM-'+(String(nextNum).padStart(3,'0')); data.id=id;
+    const nums=Object.keys(products).filter(k=>k.startsWith('KM-')).map(k=>parseInt(k.split('-')[1])||0);
+    id='KM-'+String((nums.length?Math.max(...nums):0)+1).padStart(3,'0'); data.id=id;
   }
-  db.ref('products/'+id).set(data).then(()=>{
-    showToast(editingProductId?t('prodUpdated'):t('prodAdded'));
-    closeModal('modal-product');
-  });
+  db.ref('products/'+id).set(data).then(()=>{ showToast(t('saved')); closeModal('modal-product'); });
 }
-
 function deleteProduct(id){
-  const p=products[id];
-  if(!confirm(`"${p.name} ${p.size}" ${t('prodDeleteConfirm')}`)) return;
-  db.ref('products/'+id).remove().then(()=>{
-    db.ref('stock/'+id).remove();
-    showToast(t('prodDeleted'));
-  });
+  if(!confirm(t('delProdConfirm'))) return;
+  db.ref('products/'+id).remove().then(()=>{ db.ref('stock/'+id).remove(); showToast(t('deleted')); });
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // STOCK ADJUSTMENT
-// ════════════════════════════════════════
-function openStockAdj(id){
+// ═══════════════════════════════════════════
+function openAdj(id){
   const p=products[id], s=stockData[id]||{quantity:0,expiringCount:0};
-  document.getElementById('adj-product-name').textContent=`${p.name} ${p.size}`;
+  document.getElementById('adj-prod-name').textContent=`${p.name} ${p.size}`;
   document.getElementById('adj-qty').value=s.quantity||0;
-  document.getElementById('adj-expiring').value=s.expiringCount||0;
-  document.getElementById('adj-product-id').value=id;
-  document.getElementById('modal-stock-adj').classList.add('open');
+  document.getElementById('adj-exp').value=s.expiringCount||0;
+  document.getElementById('adj-pid').value=id;
+  document.getElementById('modal-adj').classList.add('open');
 }
-function adjStock(delta){
-  const el=document.getElementById('adj-qty');
-  el.value=Math.max(0,(parseInt(el.value)||0)+delta);
-}
-function saveStockAdj(){
-  const id=document.getElementById('adj-product-id').value;
+function adjStock(d){ const el=document.getElementById('adj-qty'); el.value=Math.max(0,(parseInt(el.value)||0)+d); }
+function saveAdj(){
+  const id=document.getElementById('adj-pid').value;
   const qty=parseInt(document.getElementById('adj-qty').value)||0;
-  const exp=parseInt(document.getElementById('adj-expiring').value)||0;
+  const exp=parseInt(document.getElementById('adj-exp').value)||0;
   db.ref('stock/'+id).set({quantity:qty,expiringCount:exp,lastUpdated:Date.now()}).then(()=>{
-    showToast(t('stockUpdated'));
-    closeModal('modal-stock-adj');
+    showToast(t('stockUpdated')); closeModal('modal-adj');
   });
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 // UTILS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════════
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-function fmtNum(n){ return (n||0).toLocaleString('ko-KR'); }
-function fmtK(n){ if(!n)return '0'; if(n>=1000000)return (n/1000000).toFixed(1)+'M'; if(n>=1000)return (n/1000).toFixed(0)+'K'; return n; }
 function showToast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
