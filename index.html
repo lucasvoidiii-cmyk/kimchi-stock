@@ -691,6 +691,16 @@ ko:{
   monthNames:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
   weekLabel:'주',
   noSettleData:'해당 기간 판매 내역 없음',
+  sDetailTitle:'판매 내역 상세',
+  sDetailHQ:'본사입금',
+  sDetailSellerProfit:'판매자수익',
+  sDetailSupply:'공급가',
+  sDetailSalePrice:'판매가',
+  sDetailQty:'수량',
+  sDetailTotal:'판매총액',
+  sTotalSaleAll:'전체 판매합계',
+  sHQNote:'※ 배달K: 판매금액 100% / 개인판매자: (판매가-공급가)×수량',
+  sSellerNote:'※ 판매자 수익 = 공급가×수량',
   baedalkTag:'배달K', sellerTag:'개인',
 },
 vi:{
@@ -755,6 +765,16 @@ vi:{
   monthNames:['Th.1','Th.2','Th.3','Th.4','Th.5','Th.6','Th.7','Th.8','Th.9','Th.10','Th.11','Th.12'],
   weekLabel:'tuần',
   noSettleData:'Không có dữ liệu trong kỳ này',
+  sDetailTitle:'Chi tiết bán hàng',
+  sDetailHQ:'Nộp công ty',
+  sDetailSellerProfit:'Lợi nhuận người bán',
+  sDetailSupply:'Giá nhập',
+  sDetailSalePrice:'Giá bán',
+  sDetailQty:'SL',
+  sDetailTotal:'Tổng doanh thu',
+  sTotalSaleAll:'Tổng toàn bộ',
+  sHQNote:'※ 배달K: 100% nộp công ty / Người bán: (giá bán-giá nhập)×SL',
+  sSellerNote:'※ Lợi nhuận người bán = giá nhập × SL',
   baedalkTag:'배달K', sellerTag:'Bán lẻ',
 }};
 
@@ -1124,8 +1144,9 @@ function saveSale(){
   const p=products[pid];
   const supplyTotal=qty*(p.supplyPrice||0);
   const saleTotal=qty*price;
-  const hqAmount=currentChannel==='baedalk'?saleTotal:supplyTotal;
-  const sellerProfit=currentChannel==='seller'?Math.max(0,saleTotal-supplyTotal):0;
+  // 배달K: 본사=판매금액 100% / 개인판매자: 본사=공급단가×수량, 판매자수익=(판매가-공급가)×수량
+  const hqAmount = currentChannel==='baedalk' ? saleTotal : supplyTotal;
+  const sellerProfit = currentChannel==='seller' ? Math.max(0, saleTotal - supplyTotal) : 0;
 
   db.ref('sales').push().set({
     date,productId:pid,productName:`${p.name} ${p.size}`,
@@ -1229,38 +1250,159 @@ function refreshSettle(){
 }
 
 function calcSettle(records){
-  let totalSale=0,hqTotal=0,baedalkSale=0,baedalkHQ=0,sellerSale=0,sellerHQ=0,sellerProfit=0,cnt=0,qty=0;
+  // 항상 원시 데이터에서 재계산 (저장된 hqAmount 필드에 의존하지 않음)
+  let totalSale=0,hqTotal=0,baedalkSale=0,baedalkHQ=0,
+      sellerSale=0,sellerHQ=0,sellerProfit=0,cnt=0,qty=0;
   records.forEach(r=>{
-    cnt++;qty+=r.quantity||0;
-    const sale=r.total||0,hq=r.hqAmount||0,sp=r.sellerProfit||0;
-    totalSale+=sale;hqTotal+=hq;
-    if(r.channel==='baedalk'){baedalkSale+=sale;baedalkHQ+=hq;}
-    else{sellerSale+=sale;sellerHQ+=hq;sellerProfit+=sp;}
+    cnt++; qty += r.quantity||0;
+    const sale = r.total||0;
+    const supply = r.supplyTotal || ((r.supplyPrice||0)*(r.quantity||0));
+    if(r.channel==='baedalk'){
+      // 배달K: 판매금액 100% 본사 입금
+      baedalkSale += sale; baedalkHQ += sale;
+      totalSale += sale; hqTotal += sale;
+    } else {
+      // 개인판매자: 공급단가×수량 → 본사 / (판매가-공급가)×수량 → 판매자 수익
+      const hq = supply;
+      const sp = Math.max(0, sale - supply);
+      sellerSale += sale; sellerHQ += hq; sellerProfit += sp;
+      totalSale += sale; hqTotal += hq;
+    }
   });
   return{totalSale,hqTotal,baedalkSale,baedalkHQ,sellerSale,sellerHQ,sellerProfit,cnt,qty};
 }
 
-function settleHTML(c,title){
+function settleHTML(c, title, records){
   if(c.cnt===0) return `<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">${t('noSettleData')}</div></div>`;
-  return `
-  <div class="settle-section">
-    <div class="settle-title">${title}</div>
-    <div class="settle-row total"><div class="s-label">${t('sTotalSale')}</div><div class="s-val">${fmtNum(c.totalSale)} ₫</div></div>
-    <div class="settle-row hq"><div class="s-label">✅ ${t('sHQTotal')}</div><div class="s-val">${fmtNum(c.hqTotal)} ₫</div></div>
-    <div class="settle-row seller-profit"><div class="s-label">💜 ${t('sSellerProfit')}</div><div class="s-val">${fmtNum(c.sellerProfit)} ₫</div></div>
-  </div>
-  <div class="settle-section">
-    <div class="settle-title">🛵 배달K</div>
-    <div class="settle-row"><div class="s-label">${t('sBaedalkSale')}</div><div class="s-val c-pink">${fmtNum(c.baedalkSale)} ₫</div></div>
-    <div class="settle-row"><div class="s-label">${t('sHQFromBaedalk')}</div><div class="s-val" style="color:var(--success)">${fmtNum(c.baedalkHQ)} ₫</div></div>
-  </div>
-  <div class="settle-section">
-    <div class="settle-title">🧑‍💼 ${t('chSeller')}</div>
-    <div class="settle-row"><div class="s-label">${t('sSellerSale')}</div><div class="s-val" style="color:var(--purple)">${fmtNum(c.sellerSale)} ₫</div></div>
-    <div class="settle-row"><div class="s-label">${t('sHQFromSeller')}</div><div class="s-val" style="color:var(--success)">${fmtNum(c.sellerHQ)} ₫</div></div>
-    <div class="settle-row"><div class="s-label">${t('sSellerProfit')}</div><div class="s-val" style="color:var(--purple)">${fmtNum(c.sellerProfit)} ₫</div></div>
-  </div>
-  <div class="settle-row" style="background:#fff"><div class="s-label" style="font-size:11px;color:var(--gray-500)">${t('sCnt')}: ${c.cnt}건 · ${t('sQty')}: ${c.qty}개</div><div></div></div>`;
+
+  // ── 요약 카드
+  let html = `
+  <div style="background:var(--primary);border-radius:var(--radius-sm);padding:14px;margin-bottom:8px">
+    <div style="color:rgba(255,255,255,.75);font-size:11px;margin-bottom:6px;font-weight:600">${title} · ${t('sCnt')}: ${c.cnt}건</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="color:rgba(255,255,255,.85);font-size:12px">${t('sTotalSale')}</div>
+      <div style="color:#fff;font-size:20px;font-weight:800">${fmtNum(c.totalSale)} ₫</div>
+    </div>
+  </div>`;
+
+  // ── 본사입금 / 판매자수익 합계
+  html += `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="background:var(--success-light);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1.5px solid #a7f3d0">
+      <div style="font-size:10px;font-weight:700;color:var(--success);margin-bottom:4px">✅ ${t('sHQTotal')}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--success)">${fmtNum(c.hqTotal)}</div>
+      <div style="font-size:10px;color:var(--success)">₫</div>
+    </div>
+    <div style="background:var(--purple-light);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1.5px solid #ddd6fe">
+      <div style="font-size:10px;font-weight:700;color:var(--purple);margin-bottom:4px">💜 ${t('sSellerProfit')}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--purple)">${fmtNum(c.sellerProfit)}</div>
+      <div style="font-size:10px;color:var(--purple)">₫</div>
+    </div>
+  </div>`;
+
+  // ── 배달K 섹션
+  if(c.baedalkSale > 0){
+    html += `
+    <div style="background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="background:#fff0f6;padding:9px 14px;border-left:4px solid #c2185b;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:700;color:#c2185b">🛵 배달K</div>
+        <div style="font-size:11px;color:#c2185b">${t('sCnt')}: ${Object.values(records||{}).filter(r=>r.channel==='baedalk').length}건</div>
+      </div>
+      <div style="padding:10px 14px">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+          <span style="font-size:12px;color:var(--gray-600)">${t('sBaedalkSale')}</span>
+          <span style="font-size:13px;font-weight:700;color:#c2185b">${fmtNum(c.baedalkSale)} ₫</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0">
+          <span style="font-size:12px;color:var(--gray-600)">✅ ${t('sHQFromBaedalk')}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--success)">${fmtNum(c.baedalkHQ)} ₫</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── 개인판매자 섹션
+  if(c.sellerSale > 0){
+    html += `
+    <div style="background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="background:var(--purple-light);padding:9px 14px;border-left:4px solid var(--purple);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:700;color:var(--purple)">🧑‍💼 ${t('chSeller')}</div>
+        <div style="font-size:11px;color:var(--purple)">${t('sCnt')}: ${Object.values(records||{}).filter(r=>r.channel==='seller').length}건</div>
+      </div>
+      <div style="padding:10px 14px">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+          <span style="font-size:12px;color:var(--gray-600)">${t('sSellerSale')}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--purple)">${fmtNum(c.sellerSale)} ₫</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+          <span style="font-size:12px;color:var(--gray-600)">✅ ${t('sHQFromSeller')} <span style="font-size:10px;color:var(--gray-400)">(판매가-공급가)</span></span>
+          <span style="font-size:13px;font-weight:800;color:var(--success)">${fmtNum(c.sellerHQ)} ₫</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0">
+          <span style="font-size:12px;color:var(--gray-600)">💜 ${t('sSellerProfit')} <span style="font-size:10px;color:var(--gray-400)">(공급가×수량)</span></span>
+          <span style="font-size:13px;font-weight:800;color:var(--purple)">${fmtNum(c.sellerProfit)} ₫</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── 판매 내역 상세 테이블
+  if(records && Object.keys(records).length > 0){
+    const sorted = Object.values(records).sort((a,b)=>b.timestamp-a.timestamp);
+    html += `
+    <div style="background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;font-weight:700;color:var(--gray-700)">📋 ${t('sDetailTitle')}</div>
+        <div style="font-size:10px;color:var(--gray-400)">${sorted.length}건</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr style="background:var(--gray-50)">
+              <th style="padding:7px 8px;text-align:left;color:var(--gray-500);font-weight:600;white-space:nowrap">날짜</th>
+              <th style="padding:7px 8px;text-align:left;color:var(--gray-500);font-weight:600;white-space:nowrap">제품</th>
+              <th style="padding:7px 4px;text-align:center;color:var(--gray-500);font-weight:600">채널</th>
+              <th style="padding:7px 6px;text-align:right;color:var(--gray-500);font-weight:600;white-space:nowrap">${t('sDetailQty')}</th>
+              <th style="padding:7px 6px;text-align:right;color:var(--gray-500);font-weight:600;white-space:nowrap">${t('sDetailSalePrice')}</th>
+              <th style="padding:7px 6px;text-align:right;color:var(--gray-500);font-weight:600;white-space:nowrap">${t('sDetailSupply')}</th>
+              <th style="padding:7px 6px;text-align:right;color:var(--success);font-weight:700;white-space:nowrap">${t('sDetailHQ')}</th>
+              <th style="padding:7px 6px;text-align:right;color:var(--purple);font-weight:700;white-space:nowrap">${t('sDetailSellerProfit')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sorted.map((r,i)=>{
+              const isBaedalk = r.channel==='baedalk';
+              const supply = r.supplyTotal || ((r.supplyPrice||0)*(r.quantity||0));
+              const hq = isBaedalk ? (r.total||0) : supply;
+              const sp = isBaedalk ? 0 : Math.max(0,(r.total||0)-supply);
+              const bg = i%2===0?'#fff':'var(--gray-50)';
+              const chLabel = isBaedalk?`<span style="background:#fff0f6;color:#c2185b;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">배달K</span>`
+                                       :`<span style="background:var(--purple-light);color:var(--purple);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">${r.sellerName||'개인'}</span>`;
+              return `<tr style="background:${bg};border-top:1px solid var(--gray-100)">
+                <td style="padding:7px 8px;white-space:nowrap;color:var(--gray-700)">${fmtDate(r.date)}</td>
+                <td style="padding:7px 8px;color:var(--gray-800);font-weight:600">${r.productName||'-'}</td>
+                <td style="padding:7px 4px;text-align:center">${chLabel}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--gray-700)">${r.quantity||0}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--gray-700)">${fmtNum(r.unitPrice||0)}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--gray-500)">${fmtNum(r.supplyPrice||0)}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--success);font-weight:700">${fmtNum(hq)}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--purple);font-weight:700">${fmtNum(sp)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:var(--gray-100);border-top:2px solid var(--gray-200)">
+              <td colspan="6" style="padding:8px;font-size:11px;font-weight:700;color:var(--gray-700)">합 계</td>
+              <td style="padding:8px 6px;text-align:right;color:var(--success);font-weight:800;font-size:12px">${fmtNum(c.hqTotal)} ₫</td>
+              <td style="padding:8px 6px;text-align:right;color:var(--purple);font-weight:800;font-size:12px">${fmtNum(c.sellerProfit)} ₫</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  return html;
 }
 
 /* DAILY */
@@ -1274,7 +1416,7 @@ function renderSettleDaily(){
     <div class="date-nav-label">${dailyDate}</div>
     <button class="date-nav-btn" onclick="shiftDaily(1)">›</button>
   </div>
-  ${settleHTML(c,t('dailyTitle'))}`;
+  ${settleHTML(c,t('dailyTitle'),Object.fromEntries(Object.entries(salesCache).filter(([,r])=>r.date===dailyDate)))}`;
 }
 function shiftDaily(d){ const dt=new Date(dailyDate); dt.setDate(dt.getDate()+d); dailyDate=dt.toISOString().slice(0,10); renderSettleDaily(); }
 
@@ -1290,7 +1432,7 @@ function renderSettleWeekly(){
     <div class="date-nav-label">${fmtDate(wr.mon)} ~ ${fmtDate(wr.sun)}</div>
     <button class="date-nav-btn" onclick="shiftWeekly(7)">›</button>
   </div>
-  ${settleHTML(c,t('weeklyTitle'))}`;
+  ${settleHTML(c,t('weeklyTitle'),Object.fromEntries(Object.entries(salesCache).filter(([,r])=>r.date>=wr.mon&&r.date<=wr.sun)))}`;
 }
 function shiftWeekly(d){ const dt=new Date(weeklyDate); dt.setDate(dt.getDate()+d); weeklyDate=dt.toISOString().slice(0,10); renderSettleWeekly(); }
 
@@ -1308,7 +1450,7 @@ function renderSettleMonthly(){
     <div class="date-nav-label">${monthlyYear}년 ${mLabel}</div>
     <button class="date-nav-btn" onclick="shiftMonth(1)">›</button>
   </div>
-  ${settleHTML(c,t('monthlyTitle'))}`;
+  ${settleHTML(c,t('monthlyTitle'),Object.fromEntries(Object.entries(salesCache).filter(([,r])=>(r.date||'').startsWith(prefix))))}`;
 }
 function shiftMonth(d){
   monthlyMonth+=d;
