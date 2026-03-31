@@ -258,7 +258,7 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 }
 .stock-adj{display:flex;align-items:center;gap:8px}
 .adj-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--gray-200);background:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-700);flex-shrink:0}
-.adj-input{flex:1;text-align:center;padding:8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:16px;font-weight:700;font-family:var(--font);outline:none}
+.adj-input{flex:1;min-width:0;width:0;text-align:center;padding:8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:16px;font-weight:700;font-family:var(--font);outline:none}
 .adj-input:focus{border-color:var(--primary)}
 </style>
 </head>
@@ -584,7 +584,7 @@ const T = {
     errName:'제품명과 규격을 입력하세요', errUrl:'올바른 Database URL을 입력하세요',
     errInput:'URL과 API Key를 입력하세요', errUser:'이름을 입력하세요',
     overStockConfirm:'현재 재고보다 많습니다. 계속 저장하겠습니까?',
-    resetConfirm:'Firebase 설정을 초기화하겠습니까?',
+    resetConfirm1:'⚠️ Firebase 설정 초기화',resetConfirm2:'이 폰의 연결 설정만 삭제됩니다. 서버 데이터(재고·입출고 기록)는 삭제되지 않습니다. 계속하겠습니까?',
     monthlyTitle:'📊 월별 입고/판매 요약',
     monthLabels:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
     legendIn:'입고', legendOut:'판매',
@@ -635,7 +635,7 @@ const T = {
     errName:'Please enter product name and size', errUrl:'Invalid Database URL',
     errInput:'Please enter URL and API Key', errUser:'Please enter your name',
     overStockConfirm:'Quantity exceeds current stock. Continue saving?',
-    resetConfirm:'Reset Firebase configuration?',
+    resetConfirm1:'⚠️ Reset Firebase Config',resetConfirm2:'Only the connection settings on this phone will be deleted. Server data (stock & records) will NOT be deleted. Continue?',
     monthlyTitle:'📊 Monthly Inbound / Sales Summary',
     monthLabels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     legendIn:'Inbound', legendOut:'Sales',
@@ -686,7 +686,7 @@ const T = {
     errName:'Vui lòng nhập tên và quy cách sản phẩm', errUrl:'URL cơ sở dữ liệu không hợp lệ',
     errInput:'Vui lòng nhập URL và API Key', errUser:'Vui lòng nhập tên của bạn',
     overStockConfirm:'Số lượng vượt quá tồn kho hiện tại. Tiếp tục lưu?',
-    resetConfirm:'Đặt lại cấu hình Firebase?',
+    resetConfirm1:'⚠️ Đặt lại cấu hình Firebase',resetConfirm2:'Chỉ xóa cài đặt kết nối trên điện thoại này. Dữ liệu máy chủ (tồn kho & lịch sử) sẽ KHÔNG bị xóa. Tiếp tục?',
     monthlyTitle:'📊 Tổng kết nhập/bán theo tháng',
     monthLabels:['Th.1','Th.2','Th.3','Th.4','Th.5','Th.6','Th.7','Th.8','Th.9','Th.10','Th.11','Th.12'],
     legendIn:'Nhập hàng', legendOut:'Bán hàng',
@@ -803,7 +803,8 @@ document.getElementById('btn-save-config').onclick = function(){
 };
 
 function resetConfig(){
-  if(!confirm(t('resetConfirm'))) return;
+  if(!confirm(t('resetConfirm1'))) return;
+  if(!confirm(t('resetConfirm2'))) return;
   localStorage.removeItem('kimchi_cfg');
   location.reload();
 }
