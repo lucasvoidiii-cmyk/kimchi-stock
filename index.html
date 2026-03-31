@@ -1061,17 +1061,18 @@ function updateSaleSummary(){
   if(!pid||!qty||!price){box.style.display='none';return;}
   const p=products[pid]||{};
   const total=qty*price;
-  const supplyTotal=qty*(p.supplyPrice||0);
+  const supplyUnit2 = p.supplyPrice||0;
+  const supplyTotal=qty*supplyUnit2;
   box.style.display='block';
   document.getElementById('ss-total').textContent=fmtNum(total)+' ₫';
   if(currentChannel==='baedalk'){
     document.getElementById('ss-hq').textContent=fmtNum(total)+' ₫';
     document.getElementById('ss-seller-row').style.display='none';
   } else {
-    const profit=total-supplyTotal;
-    document.getElementById('ss-hq').textContent=fmtNum(supplyTotal)+' ₫';
+    const profit=Math.max(0,total-supplyTotal);
+    document.getElementById('ss-hq').textContent=(supplyUnit2===0?'⚠ 공급단가 미설정':fmtNum(supplyTotal)+' ₫');
     document.getElementById('ss-seller-row').style.display='flex';
-    document.getElementById('ss-seller').textContent=fmtNum(profit>=0?profit:0)+' ₫';
+    document.getElementById('ss-seller').textContent=fmtNum(profit)+' ₫';
   }
 }
 
@@ -1142,8 +1143,13 @@ function saveSale(){
   if(qty>curStock){if(!confirm(t('overStock'))) return;}
 
   const p=products[pid];
-  const supplyTotal=qty*(p.supplyPrice||0);
-  const saleTotal=qty*price;
+  // 공급단가는 항상 제품마스터에서 가져옴 (0인 경우 경고)
+  const supplyUnit = p.supplyPrice || 0;
+  if(currentChannel==='seller' && supplyUnit===0){
+    if(!confirm('⚠️ 이 제품의 공급단가가 0원입니다.\n제품관리에서 공급단가를 먼저 입력하세요.\n\n계속 저장하겠습니까?')) return;
+  }
+  const supplyTotal = qty * supplyUnit;
+  const saleTotal = qty * price;
   // 배달K: 본사=판매금액 100% / 개인판매자: 본사=공급단가×수량, 판매자수익=(판매가-공급가)×수량
   const hqAmount = currentChannel==='baedalk' ? saleTotal : supplyTotal;
   const sellerProfit = currentChannel==='seller' ? Math.max(0, saleTotal - supplyTotal) : 0;
@@ -1151,7 +1157,7 @@ function saveSale(){
   db.ref('sales').push().set({
     date,productId:pid,productName:`${p.name} ${p.size}`,
     quantity:qty,unitPrice:price,total:saleTotal,
-    supplyPrice:p.supplyPrice||0,supplyTotal,
+    supplyPrice:supplyUnit,supplyTotal,
     channel:currentChannel,
     sellerId,sellerName,
     hqAmount,sellerProfit,
@@ -1256,7 +1262,10 @@ function calcSettle(records){
   records.forEach(r=>{
     cnt++; qty += r.quantity||0;
     const sale = r.total||0;
-    const supply = r.supplyTotal || ((r.supplyPrice||0)*(r.quantity||0));
+    // 공급가: 저장값 → 제품마스터 순으로 조회 (0이어도 마스터에서 재조회)
+    const prod = products[r.productId] || {};
+    const supplyUnit = r.supplyPrice || prod.supplyPrice || 0;
+    const supply = supplyUnit * (r.quantity||0);
     if(r.channel==='baedalk'){
       // 배달K: 판매금액 100% 본사 입금
       baedalkSale += sale; baedalkHQ += sale;
@@ -1335,11 +1344,11 @@ function settleHTML(c, title, records){
           <span style="font-size:13px;font-weight:700;color:var(--purple)">${fmtNum(c.sellerSale)} ₫</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100)">
-          <span style="font-size:12px;color:var(--gray-600)">✅ ${t('sHQFromSeller')} <span style="font-size:10px;color:var(--gray-400)">(판매가-공급가)</span></span>
+          <span style="font-size:12px;color:var(--gray-600)">✅ ${t('sHQFromSeller')} <span style="font-size:10px;color:var(--gray-400)">(공급단가×수량)</span></span>
           <span style="font-size:13px;font-weight:800;color:var(--success)">${fmtNum(c.sellerHQ)} ₫</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:6px 0">
-          <span style="font-size:12px;color:var(--gray-600)">💜 ${t('sSellerProfit')} <span style="font-size:10px;color:var(--gray-400)">(공급가×수량)</span></span>
+          <span style="font-size:12px;color:var(--gray-600)">💜 ${t('sSellerProfit')} <span style="font-size:10px;color:var(--gray-400)">(판매가-공급가)×수량</span></span>
           <span style="font-size:13px;font-weight:800;color:var(--purple)">${fmtNum(c.sellerProfit)} ₫</span>
         </div>
       </div>
@@ -1372,7 +1381,9 @@ function settleHTML(c, title, records){
           <tbody>
             ${sorted.map((r,i)=>{
               const isBaedalk = r.channel==='baedalk';
-              const supply = r.supplyTotal || ((r.supplyPrice||0)*(r.quantity||0));
+              const prodM = products[r.productId] || {};
+              const supplyUnitD = r.supplyPrice || prodM.supplyPrice || 0;
+              const supply = supplyUnitD * (r.quantity||0);
               const hq = isBaedalk ? (r.total||0) : supply;
               const sp = isBaedalk ? 0 : Math.max(0,(r.total||0)-supply);
               const bg = i%2===0?'#fff':'var(--gray-50)';
@@ -1384,7 +1395,7 @@ function settleHTML(c, title, records){
                 <td style="padding:7px 4px;text-align:center">${chLabel}</td>
                 <td style="padding:7px 6px;text-align:right;color:var(--gray-700)">${r.quantity||0}</td>
                 <td style="padding:7px 6px;text-align:right;color:var(--gray-700)">${fmtNum(r.unitPrice||0)}</td>
-                <td style="padding:7px 6px;text-align:right;color:var(--gray-500)">${fmtNum(r.supplyPrice||0)}</td>
+                <td style="padding:7px 6px;text-align:right;color:var(--gray-500)">${fmtNum(supplyUnitD)}</td>
                 <td style="padding:7px 6px;text-align:right;color:var(--success);font-weight:700">${fmtNum(hq)}</td>
                 <td style="padding:7px 6px;text-align:right;color:var(--purple);font-weight:700">${fmtNum(sp)}</td>
               </tr>`;
