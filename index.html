@@ -468,6 +468,14 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <button class="btn btn-primary btn-sm" onclick="saveName()">이름 저장</button>
         <div style="height:16px"></div>
         <button class="btn btn-outline" onclick="resetCfg()">Firebase 설정 초기화</button>
+        <div style="margin-top:10px;padding:10px 12px;background:#FFF8E1;border-radius:8px;border-left:3px solid #FFB300;">
+          <p style="font-size:12px;color:#5D4037;line-height:1.7;margin:0;">
+            연결 오류가 지속될 때 사용합니다.<br>
+            설정 초기화를 눌러도 서버의 데이터는 삭제되지 않습니다.<br>
+            단, 내 폰에 있는 접속용 데이터만 삭제되기 때문에<br>
+            새로 시작할 때 URL 주소와 API Key를 다시 입력하시고 사용하면 됩니다.
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -542,7 +550,17 @@ async function loadAll(){
   }catch(e){toast('로드 실패:'+e.message);}
 }
 function renderAll(){renderHome();popSels();}
-function setLang(l){lang=l;document.getElementById('btn-ko').classList.toggle('active',l==='ko');document.getElementById('btn-vi').classList.toggle('active',l==='vi');renderAll();}
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-ko').classList.toggle('active',l==='ko');
+  document.getElementById('btn-vi').classList.toggle('active',l==='vi');
+  renderAll();
+  // 현재 열린 페이지 콘텐츠도 재렌더링
+  if(document.getElementById('page-settle').classList.contains('active'))renderST();
+  if(document.getElementById('page-report').classList.contains('active'))renderRpt();
+  // 관리 패널이 열려있으면 재렌더링
+  if(document.getElementById('mgmt-ov').classList.contains('open'))setMT(mgmtTab);
+}
 function setPage(p){
   document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.nav-btn').forEach(function(el){el.classList.remove('active');});
@@ -624,7 +642,7 @@ function renderInv(){
     else if(mn&&qty<=mn){bc='ib-danger';bx='재발주 필요';}
     else if(mn&&qty<=mn*1.5){bc='ib-warn';bx='여유 부족';}
     var tQ=Object.values(sales).filter(function(r){return r.date===tod&&r.productId===id;}).reduce(function(a,r){return a+(r.quantity||0);},0);
-    h+='<div class="inv-item" onclick="openAdj(\'+id+\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+p.name+'</div><div class="inv-spec">'+p.size+' · 오늘 판매 '+tQ+'개</div><span class="inv-badge '+bc+'">'+bx+'</span></div><div class="inv-right"><div class="inv-qty">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">판매가능 '+qty+'개</div></div></div>';
+    h+='<div class="inv-item" onclick="openAdj(\''+id+'\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+p.name+'</div><div class="inv-spec">'+p.size+' · 오늘 판매 '+tQ+'개</div><span class="inv-badge '+bc+'">'+bx+'</span></div><div class="inv-right"><div class="inv-qty" style="'+(bc==='ib-danger'?'color:var(--danger-dark);':bc==='ib-zero'?'color:var(--gray-400);':'')+'">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">판매가능 '+qty+'개</div></div></div>';
   });
   el.innerHTML=h;
 }
@@ -901,10 +919,22 @@ function rCh(){
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var recs=Object.values(sales).filter(function(r){return(r.date||'').startsWith(pfx);});
   var cb=cS(recs.filter(function(r){return r.channel==='baedalk';}));
-  var cs=cS(recs.filter(function(r){return r.channel==='seller';}));
+  // 개인판매자별 개별 집계
+  var bySeller={};
+  recs.filter(function(r){return r.channel==='seller';}).forEach(function(r){
+    var sid=r.sellerId||'unknown';
+    if(!bySeller[sid])bySeller[sid]={name:(sellers[sid]||{}).name||(r.sellerName||'판매자 '+sid),recs:[]};
+    bySeller[sid].recs.push(r);
+  });
   var byP={};recs.forEach(function(r){if(!byP[r.productId])byP[r.productId]={name:r.productName||'',q:0,s:0};byP[r.productId].q+=r.quantity||0;byP[r.productId].s+=r.total||0;});
   var pr=Object.values(byP).sort(function(a,b){return b.s-a.s;}).map(function(v){return'<div class="rpt-row"><span>'+v.name+'</span><strong>'+v.q+'개 · '+N(v.s)+' ₫</strong></div>';}).join('');
-  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);rCh()','shM(1);rCh()')+'<div class="rpt-sec"><div class="rpt-title">🛵 배달K</div><div class="rpt-row"><span>매출</span><strong>'+N(cb.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cb.cnt+'건 · '+cb.qty+'개</strong></div><div class="rpt-row"><span>배달비</span><strong style="color:var(--warn-dark)">'+N(cb.dl)+' ₫</strong></div></div><div class="rpt-sec"><div class="rpt-title">🧑‍💼 개인판매자</div><div class="rpt-row"><span>매출</span><strong>'+N(cs.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cs.cnt+'건 · '+cs.qty+'개</strong></div><div class="rpt-row"><span>본사입금(도매)</span><strong style="color:var(--success-dark)">'+N(cs.hq)+' ₫</strong></div><div class="rpt-row"><span>판매자 수익</span><strong style="color:var(--purple)">'+N(cs.sp)+' ₫</strong></div></div>'+(pr?'<div class="rpt-sec"><div class="rpt-title">📦 품목별</div>'+pr+'</div>':'');
+  var sellerSecs='';
+  Object.values(bySeller).forEach(function(sv){
+    var cs=cS(sv.recs);
+    sellerSecs+='<div class="rpt-sec"><div class="rpt-title">🧑‍💼 개인판매자 · <span style="color:var(--purple)">'+sv.name+'</span></div><div class="rpt-row"><span>매출</span><strong>'+N(cs.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cs.cnt+'건 · '+cs.qty+'개</strong></div><div class="rpt-row"><span>본사입금(도매)</span><strong style="color:var(--success-dark)">'+N(cs.hq)+' ₫</strong></div><div class="rpt-row"><span>판매자 수익</span><strong style="color:var(--purple)">'+N(cs.sp)+' ₫</strong></div></div>';
+  });
+  if(!sellerSecs)sellerSecs='<div class="rpt-sec"><div class="rpt-title">🧑‍💼 개인판매자</div><div class="rpt-row"><span style="color:var(--gray-400)">해당 기간 판매 없음</span></div></div>';
+  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);rCh()','shM(1);rCh()')+'<div class="rpt-sec"><div class="rpt-title">🛵 배달K</div><div class="rpt-row"><span>매출</span><strong>'+N(cb.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cb.cnt+'건 · '+cb.qty+'개</strong></div><div class="rpt-row"><span>배달비</span><strong style="color:var(--warn-dark)">'+N(cb.dl)+' ₫</strong></div></div>'+sellerSecs+(pr?'<div class="rpt-sec"><div class="rpt-title">📦 품목별</div>'+pr+'</div>':'');
 }
 /* MGMT */
 function openMgmt(){document.getElementById('mgmt-ov').classList.add('open');setMT(mgmtTab);}
