@@ -356,6 +356,48 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 .si-unit{font-size:9px;color:var(--gray-500)}
 .si-avail{font-size:10px;margin-top:1px}
 .si-status .badge{font-size:9px}
+
+/* ── SALE DETAIL / EDIT ── */
+.detail-panel{background:var(--gray-50);border-top:1px solid var(--gray-200);
+  padding:10px 12px;display:none}
+.detail-panel.open{display:block}
+.detail-record{background:#fff;border-radius:var(--radius-sm);padding:11px 12px;
+  margin-bottom:7px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1.5px solid transparent;
+  transition:.15s}
+.detail-record:last-child{margin-bottom:0}
+.dr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dr-prod{font-size:13px;font-weight:700;color:var(--gray-800)}
+.dr-date{font-size:10px;color:var(--gray-400)}
+.dr-amounts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px}
+.dr-amt-box{background:var(--gray-50);border-radius:6px;padding:6px 8px;text-align:center}
+.dr-amt-label{font-size:9px;font-weight:700;color:var(--gray-500);margin-bottom:2px}
+.dr-amt-val{font-size:12px;font-weight:800}
+.dr-amt-val.sale{color:var(--gray-800)}
+.dr-amt-val.hq{color:var(--success)}
+.dr-amt-val.profit{color:var(--purple)}
+.dr-amt-val.delivery{color:#c2185b}
+.dr-edit-btn{display:flex;align-items:center;justify-content:center;gap:5px;
+  width:100%;padding:7px;border:1.5px solid var(--gray-200);border-radius:6px;
+  background:#fff;font-size:12px;font-weight:700;color:var(--gray-600);
+  cursor:pointer;font-family:var(--font);transition:.15s}
+.dr-edit-btn:active{background:var(--gray-100)}
+.ss-cnt-btn{cursor:pointer;color:var(--primary);font-weight:700;
+  text-decoration:underline;text-decoration-style:dotted;padding:2px 6px;
+  border-radius:12px;background:var(--primary-light);font-size:11px;
+  border:none;font-family:var(--font)}
+.ss-cnt-btn:active{background:#d0e2ff}
+.edit-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.edit-input-group label{font-size:11px;font-weight:700;color:var(--gray-600);
+  display:block;margin-bottom:3px}
+.edit-input-group input{width:100%;padding:9px 10px;border:1.5px solid var(--gray-200);
+  border-radius:6px;font-size:14px;font-weight:700;font-family:var(--font);
+  outline:none;text-align:right}
+.edit-input-group input:focus{border-color:var(--primary)}
+.edit-recalc-preview{background:var(--gray-50);border-radius:6px;padding:10px;
+  margin-bottom:10px;font-size:11px}
+.edit-recalc-row{display:flex;justify-content:space-between;padding:3px 0;
+  border-bottom:1px solid var(--gray-100)}
+.edit-recalc-row:last-child{border-bottom:none;font-weight:800;font-size:12px}
 </style>
 </head>
 <body>
@@ -766,6 +808,71 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
   </div>
 </div>
 
+
+<!-- MODAL: 판매 기록 수정 -->
+<div class="modal-overlay" id="modal-sale-edit">
+  <div class="modal" style="padding-bottom:40px">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('modal-sale-edit')">×</button>
+    <div class="modal-title" data-i="editSaleTitle"></div>
+
+    <!-- 제품/날짜 정보 (읽기전용) -->
+    <div id="edit-prod-info" style="background:var(--gray-50);border-radius:var(--radius-sm);
+      padding:10px 12px;margin-bottom:14px;font-size:13px;color:var(--gray-700);font-weight:600"></div>
+
+    <div class="edit-form-grid">
+      <div class="edit-input-group">
+        <label data-i="editSaleQty"></label>
+        <input type="number" id="edit-qty" min="1" oninput="recalcEditPreview()">
+      </div>
+      <div class="edit-input-group">
+        <label data-i="editSaleUnitPrice"></label>
+        <input type="number" id="edit-unit-price" min="0" oninput="recalcEditPreview()">
+      </div>
+      <div class="edit-input-group">
+        <label data-i="editSupplyPrice"></label>
+        <input type="number" id="edit-supply-price" min="0" oninput="recalcEditPreview()">
+      </div>
+      <div class="edit-input-group" id="edit-delivery-group">
+        <label data-i="editDeliveryFee"></label>
+        <input type="number" id="edit-delivery-fee" min="0" oninput="recalcEditPreview()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i="editNote"></label>
+      <input type="text" class="form-control" id="edit-note" style="font-size:14px">
+    </div>
+
+    <!-- 재계산 미리보기 -->
+    <div class="edit-recalc-preview">
+      <div style="font-size:10px;font-weight:700;color:var(--gray-500);margin-bottom:6px" data-i="editRecalcTitle"></div>
+      <div class="edit-recalc-row">
+        <span style="color:var(--gray-600)" data-i="editSaleTotal"></span>
+        <span id="prev-total" style="color:var(--gray-800)"></span>
+      </div>
+      <div class="edit-recalc-row">
+        <span style="color:var(--success)" data-i="editHQAmt"></span>
+        <span id="prev-hq" style="color:var(--success)"></span>
+      </div>
+      <div class="edit-recalc-row" id="prev-profit-row">
+        <span style="color:var(--purple)" data-i="editSellerPft"></span>
+        <span id="prev-profit" style="color:var(--purple)"></span>
+      </div>
+      <div class="edit-recalc-row" id="prev-delivery-row">
+        <span style="color:#c2185b" data-i="editDeliveryFee"></span>
+        <span id="prev-delivery" style="color:#c2185b"></span>
+      </div>
+    </div>
+
+    <input type="hidden" id="edit-sale-id">
+    <input type="hidden" id="edit-sale-channel">
+    <button class="btn btn-primary" onclick="saveSaleEdit()" style="margin-bottom:10px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M5 13l4 4L19 7"/></svg>
+      <span data-i="editSaveBtn"></span>
+    </button>
+    <button class="btn btn-ghost" onclick="deleteSaleRecord()" style="color:var(--danger)" data-i="editDelBtn"></button>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -833,6 +940,15 @@ ko:{
   safeMin:'안전재고', expTag:'임박',
   margin:'마진', minStk:'안전재고', unit:'단위',
   editBtn:'✏️ 수정', delBtn:'🗑 삭제',
+  editSaleTitle:'판매 기록 수정', editSaleQty:'판매 수량',
+  editSaleUnitPrice:'판매단가 (VND)', editSupplyPrice:'공급단가 (VND)',
+  editDeliveryFee:'배달비 (VND)', editNote:'비고',
+  editRecalcTitle:'수정 후 정산 미리보기',
+  editSaleTotal:'판매총액', editHQAmt:'본사입금', editSellerPft:'판매자수익',
+  editSaveBtn:'수정 저장', editDelBtn:'🗑 이 건 삭제',
+  editSaved:'수정되었습니다', editDelConfirm:'이 판매 기록을 삭제하겠습니까?
+재고가 복구됩니다.',
+  detailClose:'▲ 닫기', detailOpen:'상세 보기 ▼',
   noData:'내역 없음', noProd:'등록된 제품 없음', noSeller:'등록된 판매자 없음',
   supplyRef:'공급단가 기준', saleRef:'판매단가 기준',
   inSaved:'입고 완료', saleSaved:'판매 완료',
@@ -922,6 +1038,14 @@ vi:{
   safeMin:'Tồn tối thiểu', expTag:'Sắp hết hạn',
   margin:'Lợi nhuận', minStk:'Tồn tối thiểu', unit:'Đơn vị',
   editBtn:'✏️ Sửa', delBtn:'🗑 Xóa',
+  editSaleTitle:'Chỉnh sửa bán hàng', editSaleQty:'Số lượng',
+  editSaleUnitPrice:'Giá bán (VND)', editSupplyPrice:'Giá nhập (VND)',
+  editDeliveryFee:'Phí giao (VND)', editNote:'Ghi chú',
+  editRecalcTitle:'Xem trước sau chỉnh sửa',
+  editSaleTotal:'Tổng doanh thu', editHQAmt:'Nộp công ty', editSellerPft:'Lợi nhuận NB',
+  editSaveBtn:'Lưu thay đổi', editDelBtn:'🗑 Xóa bản ghi này',
+  editSaved:'Đã cập nhật', editDelConfirm:'Xóa bản ghi này? Tồn kho sẽ được phục hồi.',
+  detailClose:'▲ Đóng', detailOpen:'Xem chi tiết ▼',
   noData:'Không có dữ liệu', noProd:'Chưa có sản phẩm', noSeller:'Chưa có người bán',
   supplyRef:'Giá nhập tham chiếu', saleRef:'Giá bán tham chiếu',
   inSaved:'Nhập hàng thành công', saleSaved:'Bán hàng thành công',
@@ -1846,64 +1970,264 @@ function renderSettleSeller(){
   const mm=String(monthlyMonth).padStart(2,'0');
   const prefix=`${monthlyYear}-${mm}`;
 
-  // month nav shared with monthly
   let nav=`<div class="date-nav">
     <button class="date-nav-btn" onclick="shiftMonth(-1);renderSettleSeller()">‹</button>
     <div class="date-nav-label">${monthlyYear}년 ${t('monthNames')[monthlyMonth-1]}</div>
     <button class="date-nav-btn" onclick="shiftMonth(1);renderSettleSeller()">›</button>
   </div>`;
 
-  const monthRecs=Object.values(salesCache).filter(r=>(r.date||'').startsWith(prefix));
+  // collect entries with their Firebase keys
+  const monthEntries=Object.entries(salesCache).filter(([,r])=>(r.date||'').startsWith(prefix));
+  const monthRecs=monthEntries.map(([,r])=>r);
   if(!monthRecs.length){
     el.innerHTML=nav+`<div class="empty"><div class="empty-icon">🧑‍💼</div><div class="empty-text">${t('noSettleData')}</div></div>`; return;
   }
 
-  // group by seller
+  // group by channel/seller (keep firebase keys)
   const byChannel={baedalk:[],seller:{}};
-  monthRecs.forEach(r=>{
+  monthEntries.forEach(([fid,r])=>{
+    const rec={...r,_fid:fid};
     if(r.channel==='seller'){
       const sid=r.sellerId||'unknown';
       if(!byChannel.seller[sid]) byChannel.seller[sid]=[];
-      byChannel.seller[sid].push(r);
-    } else byChannel.baedalk.push(r);
+      byChannel.seller[sid].push(rec);
+    } else byChannel.baedalk.push(rec);
   });
 
   let html=nav;
 
-  // baedalk summary
+  // ── 배달K 섹션
   if(byChannel.baedalk.length){
-    const c=calcSettle(byChannel.baedalk);
-    html+=`<div class="seller-settle-card" style="border-left:4px solid #c2185b">
-      <div class="ss-header"><div class="ss-name">🛵 배달K</div><div class="ss-cnt">${c.cnt}건 · ${c.qty}개</div></div>
-      <div class="ss-rows">
-        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val">${fmtNum(c.totalSale)} ₫</span></div>
-        <div class="ss-row sr-hq"><span class="sr-lbl">${t('sHQTotal')}</span><span class="sr-val">${fmtNum(c.hqTotal)} ₫</span></div>
+    const recs=byChannel.baedalk;
+    const c=calcSettle(recs);
+    const panelId='panel-baedalk';
+    html+=`<div class="seller-settle-card" style="border-left:4px solid #c2185b;padding-bottom:0;overflow:hidden">
+      <div class="ss-header" style="padding-bottom:8px">
+        <div class="ss-name" style="color:#c2185b">🛵 배달K</div>
+        <button class="ss-cnt-btn" style="background:#fff0f6;color:#c2185b"
+          onclick="toggleDetailPanel('${panelId}')">${c.cnt}건 · ${c.qty}개 ▼</button>
+      </div>
+      <div class="ss-rows" style="margin-bottom:10px">
+        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val" style="color:#c2185b">${fmtNum(c.totalSale)} ₫</span></div>
+        <div class="ss-row sr-hq"><span class="sr-lbl">✅ ${t('sHQTotal')}</span><span class="sr-val">${fmtNum(c.hqTotal)} ₫</span></div>
+      </div>
+      <div class="detail-panel" id="${panelId}">
+        ${recs.sort((a,b)=>b.timestamp-a.timestamp).map(r=>detailRecordHTML(r,'baedalk')).join('')}
       </div>
     </div>`;
   }
 
-  // per seller
+  // ── 개인판매자별 섹션
   Object.entries(byChannel.seller).forEach(([sid,recs])=>{
     const sname=(sellers[sid]||{}).name||sid;
     const c=calcSettle(recs);
-    html+=`<div class="seller-settle-card" style="border-left:4px solid var(--purple)">
-      <div class="ss-header"><div class="ss-name">🧑‍💼 ${sname}</div><div class="ss-cnt">${c.cnt}건 · ${c.qty}개</div></div>
-      <div class="ss-rows">
-        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val">${fmtNum(c.totalSale)} ₫</span></div>
-        <div class="ss-row sr-hq"><span class="sr-lbl">${t('sHQFromSeller')}</span><span class="sr-val">${fmtNum(c.sellerHQ)} ₫</span></div>
-        <div class="ss-row sr-profit"><span class="sr-lbl">${t('sSellerProfit')}</span><span class="sr-val">${fmtNum(c.sellerProfit)} ₫</span></div>
+    const panelId='panel-'+sid;
+    html+=`<div class="seller-settle-card" style="border-left:4px solid var(--purple);padding-bottom:0;overflow:hidden">
+      <div class="ss-header" style="padding-bottom:8px">
+        <div class="ss-name">🧑‍💼 ${sname}</div>
+        <button class="ss-cnt-btn" onclick="toggleDetailPanel('${panelId}')">${c.cnt}건 · ${c.qty}개 ▼</button>
+      </div>
+      <div class="ss-rows" style="margin-bottom:10px">
+        <div class="ss-row"><span class="sr-lbl">${t('sTotalSale')}</span><span class="sr-val" style="color:var(--purple)">${fmtNum(c.totalSale)} ₫</span></div>
+        <div class="ss-row sr-hq"><span class="sr-lbl">✅ ${t('sHQFromSeller')} <small style="font-weight:400;color:var(--gray-400)">(공급단가×수량)</small></span><span class="sr-val">${fmtNum(c.sellerHQ)} ₫</span></div>
+        <div class="ss-row sr-profit"><span class="sr-lbl">💜 ${t('sSellerProfit')}</span><span class="sr-val">${fmtNum(c.sellerProfit)} ₫</span></div>
+      </div>
+      <div class="detail-panel" id="${panelId}">
+        ${recs.sort((a,b)=>b.timestamp-a.timestamp).map(r=>detailRecordHTML(r,'seller')).join('')}
       </div>
     </div>`;
   });
 
-  // monthly total
+  // ── 본사 입금 합계
   const total=calcSettle(monthRecs);
-  html+=`<div class="settle-row total" style="margin-top:4px">
-    <div class="s-label">${t('sHQTotal')}</div>
-    <div class="s-val">${fmtNum(total.hqTotal)} ₫</div>
+  html+=`<div style="background:var(--primary);border-radius:var(--radius-sm);
+    padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+    <div style="color:rgba(255,255,255,.85);font-size:14px;font-weight:700">✅ ${t('sHQTotal')}</div>
+    <div style="color:#fff;font-size:20px;font-weight:800">${fmtNum(total.hqTotal)} ₫</div>
   </div>`;
 
   el.innerHTML=html;
+}
+
+function detailRecordHTML(r, channel){
+  const prod=products[r.productId]||{};
+  const supplyUnit=r.supplyPrice||prod.supplyPrice||0;
+  const qty=r.quantity||0, unitPrice=r.unitPrice||0;
+  const total=qty*unitPrice;
+  const supply=qty*supplyUnit;
+  const isBaedalk=channel==='baedalk';
+  const hq=isBaedalk?total:supply;
+  const profit=isBaedalk?0:Math.max(0,total-supply);
+  const deliveryFee=r.deliveryFee||0;
+  const paidMark=r.wholesalePaid?'<span style="font-size:9px;background:var(--success-light);color:var(--success);padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px">입금확인</span>':'';
+  const deliveryMark=deliveryFee>0?(r.deliveryPaid?'<span style="font-size:9px;background:var(--success-light);color:var(--success);padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px">배달비완료</span>':'<span style="font-size:9px;background:#fff0f6;color:#c2185b;padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px">배달비미지급</span>'):'';
+
+  return `<div class="detail-record">
+    <div class="dr-header">
+      <div>
+        <div class="dr-prod">${r.productName||'-'}${paidMark}${deliveryMark}</div>
+        <div class="dr-date">${r.date||''} · ${isBaedalk?'배달K':(r.sellerName||'개인')} · ${qty}개</div>
+      </div>
+      <button class="dr-edit-btn" style="width:auto;padding:5px 12px;font-size:11px"
+        onclick="openSaleEdit('${r._fid}')">✏️ 수정</button>
+    </div>
+    <div class="dr-amounts">
+      <div class="dr-amt-box">
+        <div class="dr-amt-label">판매총액</div>
+        <div class="dr-amt-val sale">${fmtNum(total)}</div>
+      </div>
+      <div class="dr-amt-box">
+        <div class="dr-amt-label">본사입금</div>
+        <div class="dr-amt-val hq">${fmtNum(hq)}</div>
+      </div>
+      <div class="dr-amt-box">
+        <div class="dr-amt-label">${isBaedalk?'배달비':'판매자수익'}</div>
+        <div class="dr-amt-val ${isBaedalk?'delivery':'profit'}">${fmtNum(isBaedalk?deliveryFee:profit)}</div>
+      </div>
+    </div>
+    ${r.note?`<div style="font-size:10px;color:var(--gray-400);margin-top:2px">${r.note}</div>`:''}
+  </div>`;
+}
+
+function toggleDetailPanel(id){
+  const panel=document.getElementById(id);
+  if(!panel) return;
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  // update button text
+  const btn=panel.previousElementSibling&&panel.previousElementSibling.previousElementSibling
+    ?null:panel.closest('.seller-settle-card')&&panel.closest('.seller-settle-card').querySelector('.ss-cnt-btn');
+  if(btn){
+    btn.textContent=btn.textContent.replace(isOpen?'▲':'▼',isOpen?'▼':'▲');
+  }
+}
+
+// ── Sale Edit Modal
+let editingFid=null;
+
+function openSaleEdit(fid){
+  const r=salesCache[fid];
+  if(!r){showToast('기록을 찾을 수 없습니다');return;}
+  editingFid=fid;
+  const prod=products[r.productId]||{};
+  const isBaedalk=r.channel==='baedalk';
+
+  document.getElementById('edit-prod-info').innerHTML=
+    `📦 ${r.productName||'-'} &nbsp;·&nbsp; 📅 ${r.date||''} &nbsp;·&nbsp; `+
+    `${isBaedalk?'🛵 배달K':'🧑‍💼 '+(r.sellerName||'개인판매자')}`;
+
+  document.getElementById('edit-qty').value=r.quantity||0;
+  document.getElementById('edit-unit-price').value=r.unitPrice||0;
+  document.getElementById('edit-supply-price').value=r.supplyPrice||prod.supplyPrice||0;
+  document.getElementById('edit-delivery-fee').value=r.deliveryFee||0;
+  document.getElementById('edit-note').value=r.note||'';
+  document.getElementById('edit-sale-channel').value=r.channel||'baedalk';
+  document.getElementById('edit-sale-id').value=fid;
+
+  // show/hide delivery fee row
+  document.getElementById('edit-delivery-group').style.display=isBaedalk?'block':'none';
+  document.getElementById('prev-delivery-row').style.display=isBaedalk?'flex':'none';
+  document.getElementById('prev-profit-row').style.display=isBaedalk?'none':'flex';
+
+  // apply lang to modal
+  document.querySelectorAll('#modal-sale-edit [data-i]').forEach(el=>{
+    const v=t(el.dataset.i); if(v) el.textContent=v;
+  });
+
+  recalcEditPreview();
+  document.getElementById('modal-sale-edit').classList.add('open');
+}
+
+function recalcEditPreview(){
+  const qty=parseInt(document.getElementById('edit-qty').value)||0;
+  const unitPrice=parseInt(document.getElementById('edit-unit-price').value)||0;
+  const supplyPrice=parseInt(document.getElementById('edit-supply-price').value)||0;
+  const deliveryFee=parseInt(document.getElementById('edit-delivery-fee').value)||0;
+  const channel=document.getElementById('edit-sale-channel').value;
+  const isBaedalk=channel==='baedalk';
+
+  const total=qty*unitPrice;
+  const supply=qty*supplyPrice;
+  const hq=isBaedalk?total:supply;
+  const profit=isBaedalk?0:Math.max(0,total-supply);
+
+  document.getElementById('prev-total').textContent=fmtNum(total)+' ₫';
+  document.getElementById('prev-hq').textContent=fmtNum(hq)+' ₫';
+  document.getElementById('prev-profit').textContent=fmtNum(profit)+' ₫';
+  document.getElementById('prev-delivery').textContent=fmtNum(deliveryFee)+' ₫';
+}
+
+function saveSaleEdit(){
+  const fid=document.getElementById('edit-sale-id').value;
+  const r=salesCache[fid];
+  if(!r||!db){showToast('오류가 발생했습니다');return;}
+
+  const qty=parseInt(document.getElementById('edit-qty').value)||0;
+  const unitPrice=parseInt(document.getElementById('edit-unit-price').value)||0;
+  const supplyPrice=parseInt(document.getElementById('edit-supply-price').value)||0;
+  const deliveryFee=parseInt(document.getElementById('edit-delivery-fee').value)||0;
+  const note=document.getElementById('edit-note').value;
+  const channel=r.channel||'baedalk';
+  const isBaedalk=channel==='baedalk';
+
+  if(qty<1){showToast(t('errQty'));return;}
+
+  const total=qty*unitPrice;
+  const supply=qty*supplyPrice;
+  const hqAmount=isBaedalk?total:supply;
+  const sellerProfit=isBaedalk?0:Math.max(0,total-supply);
+
+  // stock adjustment: revert old qty, apply new qty
+  const oldQty=r.quantity||0;
+  const pid=r.productId;
+  const qtyDiff=qty-oldQty; // positive = more sold, negative = less sold
+
+  const updates={
+    quantity:qty, unitPrice, total,
+    supplyPrice, supplyTotal:supply,
+    hqAmount, sellerProfit,
+    deliveryFee:isBaedalk?deliveryFee:0,
+    note
+  };
+
+  db.ref('sales/'+fid).update(updates).then(()=>{
+    // adjust stock if qty changed
+    if(qtyDiff!==0 && pid){
+      db.ref('stock/'+pid).transaction(s=>{
+        s=s||{quantity:0};
+        s.quantity=Math.max(0,(s.quantity||0)-qtyDiff);
+        s.lastUpdated=Date.now();
+        return s;
+      });
+    }
+    showToast(t('editSaved'));
+    closeModal('modal-sale-edit');
+    renderSettleSeller();
+    updateDashboardKPI();
+  }).catch(()=>showToast(t('saveFail')));
+}
+
+function deleteSaleRecord(){
+  const fid=document.getElementById('edit-sale-id').value;
+  const r=salesCache[fid];
+  if(!r||!db) return;
+  if(!confirm(t('editDelConfirm'))) return;
+
+  db.ref('sales/'+fid).remove().then(()=>{
+    // restore stock
+    if(r.productId){
+      db.ref('stock/'+r.productId).transaction(s=>{
+        s=s||{quantity:0};
+        s.quantity=(s.quantity||0)+(r.quantity||0);
+        s.lastUpdated=Date.now();
+        return s;
+      });
+    }
+    showToast(t('deleted'));
+    closeModal('modal-sale-edit');
+    renderSettleSeller();
+    updateDashboardKPI();
+  });
 }
 
 // ═══════════════════════════════════════════
