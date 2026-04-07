@@ -222,7 +222,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <div class="form-hint">Firebase 콘솔 → Realtime Database → 데이터 탭 상단 URL</div></div>
     <div class="form-group"><label class="form-label">Firebase API Key</label>
       <input id="cfg-key" type="text" class="form-control" placeholder="AIzaSy..."></div>
-    <div class="form-group"><label class="form-label">사용자 이름</label>
+    <div class="form-group"><label class="form-label" data-i18n="mgmtUserName">사용자 이름</label>
       <input id="cfg-user" type="text" class="form-control" placeholder="홍길동"></div>
     <button class="btn btn-primary" onclick="saveConfig()">✓ 저장하고 시작</button>
   </div>
@@ -246,40 +246,40 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <div class="content-wrap">
       <div class="kpi-grid">
         <div class="kpi-card green" onclick="setPage('settle')">
-          <div class="kpi-label">📦 오늘 전체 판매</div>
+          <div class="kpi-label" data-i18n="kpiTodaySale">📦 오늘 전체 판매</div>
           <div class="kpi-main" id="kpi-tq">0<span style="font-size:14px;font-weight:500">개</span></div>
           <div class="kpi-sub" id="kpi-ta">0 ₫</div>
         </div>
         <div class="kpi-card red">
-          <div class="kpi-label">⚠️ 재발주 알림</div>
+          <div class="kpi-label" data-i18n="kpiReorder">⚠️ 재발주 알림</div>
           <div class="kpi-main" id="kpi-ro">0<span style="font-size:14px;font-weight:500">품목</span></div>
-          <div class="kpi-sub">안전재고 미달</div>
+          <div class="kpi-sub" data-i18n="kpiReorderSub">안전재고 미달</div>
         </div>
         <div class="kpi-card orange" onclick="setPage('settle');setSettleTab('delivery')">
-          <div class="kpi-label">🛵 미지급 배달비</div>
+          <div class="kpi-label" data-i18n="kpiDelivery">🛵 미지급 배달비</div>
           <div class="kpi-main" id="kpi-dc">0<span style="font-size:14px;font-weight:500">건</span></div>
           <div class="kpi-sub" id="kpi-da">0 ₫</div>
         </div>
         <div class="kpi-card blue" onclick="setPage('settle');setSettleTab('wholesale')">
-          <div class="kpi-label">💰 미수 도매가</div>
+          <div class="kpi-label" data-i18n="kpiWholesale">💰 미수 도매가</div>
           <div class="kpi-main" id="kpi-wc">0<span style="font-size:14px;font-weight:500">건</span></div>
           <div class="kpi-sub" id="kpi-wa">0 ₫</div>
         </div>
       </div>
       <div class="ch-section">
-        <div class="ch-sec-hdr"><div class="ch-sec-title">🛵 배달K <span class="ch-badge badge-b">HQ Direct</span></div></div>
-        <div class="ch-stat-row"><span class="ch-stat-lbl">오늘 총 매출</span><span class="ch-stat-val" id="ch-bs" style="color:var(--pink)">0 ₫</span></div>
-        <div class="ch-stat-row"><span class="ch-stat-lbl">완료 건수</span><span class="ch-stat-val" id="ch-bc">0건</span></div>
-        <div class="ch-stat-row"><span class="ch-stat-lbl">미지급 배달비</span><span class="ch-stat-val" id="ch-bd" style="color:var(--warn-dark)">0 ₫</span></div>
-        <button class="ch-act-btn ch-act-b" onclick="setPage('settle');setSettleTab('delivery')">🛵 배달비 정산 관리 →</button>
+        <div class="ch-sec-hdr"><div class="ch-sec-title">🛵 배달K <span class="ch-badge badge-b" data-i18n="chBaedalkBadge">HQ Direct</span></div></div>
+        <div class="ch-stat-row"><span class="ch-stat-lbl" data-i18n="chTodaySale">오늘 총 매출</span><span class="ch-stat-val" id="ch-bs" style="color:var(--pink)">0 ₫</span></div>
+        <div class="ch-stat-row"><span class="ch-stat-lbl" data-i18n="chDoneCount">완료 건수</span><span class="ch-stat-val" id="ch-bc">0건</span></div>
+        <div class="ch-stat-row"><span class="ch-stat-lbl" data-i18n="chPendDel">미지급 배달비</span><span class="ch-stat-val" id="ch-bd" style="color:var(--warn-dark)">0 ₫</span></div>
+        <button class="ch-act-btn ch-act-b" onclick="setPage('settle');setSettleTab('delivery')" data-i18n="chBaedalkBtn">🛵 배달비 정산 관리 →</button>
       </div>
       <div class="ch-section">
-        <div class="ch-sec-hdr"><div class="ch-sec-title">🧑‍💼 개인판매자 <span class="ch-badge badge-w">Wholesale</span></div></div>
+        <div class="ch-sec-hdr"><div class="ch-sec-title"><span data-i18n="chSellerTitle">🧑‍💼 개인판매자</span> <span class="ch-badge badge-w" data-i18n="chSellerBadge">Wholesale</span></div></div>
         <div id="ch-sr"><div class="ch-stat-row"><span class="ch-stat-lbl" style="color:var(--gray-400)">등록된 판매자 없음</span></div></div>
-        <button class="ch-act-btn ch-act-w" onclick="setPage('settle');setSettleTab('wholesale')">💰 도매 입금 확인 →</button>
+        <button class="ch-act-btn ch-act-w" onclick="setPage('settle');setSettleTab('wholesale')" data-i18n="chSellerBtn">💰 도매 입금 확인 →</button>
       </div>
       <div class="card">
-        <div class="card-title">🥬 품목별 재고 현황</div>
+        <div class="card-title" data-i18n="invTitle">🥬 품목별 재고 현황</div>
         <div id="inv-list"></div>
       </div>
     </div>
@@ -287,53 +287,53 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
   <!-- INBOUND -->
   <div class="page" id="page-in">
     <div class="content-wrap"><div class="card">
-      <div class="card-title">📥 입고 등록</div>
-      <div class="form-group"><label class="form-label">입고일자 *</label><input type="date" class="form-control" id="in-date"></div>
-      <div class="form-group"><label class="form-label">제품 선택 *</label><select class="form-control" id="in-prod"><option value=""></option></select></div>
-      <div class="form-group"><label class="form-label">입고 수량 *</label><input type="number" class="form-control" id="in-qty" min="1"></div>
-      <div class="form-group"><label class="form-label">유통기한</label><input type="date" class="form-control" id="in-expiry"></div>
-      <div class="form-group"><label class="form-label">비고</label><input type="text" class="form-control" id="in-note"></div>
-      <button class="btn btn-success" onclick="saveInbound()">📥 입고 저장</button>
+      <div class="card-title" data-i18n="inTitle">📥 입고 등록</div>
+      <div class="form-group"><label class="form-label" data-i18n="inDate">입고일자 *</label><input type="date" class="form-control" id="in-date"></div>
+      <div class="form-group"><label class="form-label" data-i18n="fProd">제품 선택 *</label><select class="form-control" id="in-prod"><option value=""></option></select></div>
+      <div class="form-group"><label class="form-label" data-i18n="inQty">입고 수량 *</label><input type="number" class="form-control" id="in-qty" min="1"></div>
+      <div class="form-group"><label class="form-label" data-i18n="inExpiry">유통기한</label><input type="date" class="form-control" id="in-expiry"></div>
+      <div class="form-group"><label class="form-label" data-i18n="fNote">비고</label><input type="text" class="form-control" id="in-note"></div>
+      <button class="btn btn-success" onclick="saveInbound()" data-i18n="inSaveBtn">📥 입고 저장</button>
     </div></div>
   </div>
   <!-- SALE -->
   <div class="page" id="page-out">
     <div class="content-wrap"><div class="card">
-      <div class="card-title">📤 판매 등록</div>
-      <div class="form-group"><label class="form-label">판매일자 *</label><input type="date" class="form-control" id="out-date"></div>
-      <div class="form-group"><label class="form-label">판매 채널 *</label>
+      <div class="card-title" data-i18n="outTitle">📤 판매 등록</div>
+      <div class="form-group"><label class="form-label" data-i18n="outDate">판매일자 *</label><input type="date" class="form-control" id="out-date"></div>
+      <div class="form-group"><label class="form-label" data-i18n="outChannel">판매 채널 *</label>
         <div class="ch-group">
-          <div class="ch-btn ab" id="ch-baedalk" onclick="selCh('baedalk')">🛵 배달K</div>
-          <div class="ch-btn" id="ch-seller" onclick="selCh('seller')">🧑‍💼 개인판매자</div>
+          <div class="ch-btn ab" id="ch-baedalk" onclick="selCh('baedalk')" data-i18n="chBaedalkLabel">🛵 배달K</div>
+          <div class="ch-btn" id="ch-seller" onclick="selCh('seller')" data-i18n="chSellerLabel">🧑‍💼 개인판매자</div>
         </div>
       </div>
-      <div class="form-group" id="seller-grp" style="display:none"><label class="form-label">판매자 선택 *</label><select class="form-control" id="out-seller"><option value=""></option></select></div>
-      <div class="form-group"><label class="form-label">제품 선택 *</label><select class="form-control" id="out-prod" onchange="onProdCh()"><option value=""></option></select></div>
-      <div class="form-group"><label class="form-label">판매 수량 *</label><input type="number" class="form-control" id="out-qty" min="1" oninput="updSS()"></div>
-      <div class="form-group"><label class="form-label">판매단가 (VND)</label><input type="number" class="form-control" id="out-price" oninput="updSS()"></div>
-      <div class="form-group" id="del-fee-grp"><label class="form-label">배달비 (VND)</label>
+      <div class="form-group" id="seller-grp" style="display:none"><label class="form-label" data-i18n="outSellerLbl">판매자 선택 *</label><select class="form-control" id="out-seller"><option value=""></option></select></div>
+      <div class="form-group"><label class="form-label" data-i18n="fProd">제품 선택 *</label><select class="form-control" id="out-prod" onchange="onProdCh()"><option value=""></option></select></div>
+      <div class="form-group"><label class="form-label" data-i18n="outQty">판매 수량 *</label><input type="number" class="form-control" id="out-qty" min="1" oninput="updSS()"></div>
+      <div class="form-group"><label class="form-label" data-i18n="outPrice">판매단가 (VND)</label><input type="number" class="form-control" id="out-price" oninput="updSS()"></div>
+      <div class="form-group" id="del-fee-grp"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
         <input type="number" class="form-control" id="out-del" placeholder="0" oninput="updSS()">
-        <div class="form-hint">배달K 채널 배달비</div></div>
-      <div class="form-group"><label class="form-label">비고</label><input type="text" class="form-control" id="out-note"></div>
+        <div class="form-hint" data-i18n="outDelHint">배달K 채널 배달비</div></div>
+      <div class="form-group"><label class="form-label" data-i18n="fNote">비고</label><input type="text" class="form-control" id="out-note"></div>
       <div class="ss-box">
-        <div class="ss-row"><span class="ss-lbl">판매 총액</span><span class="ss-val" id="ss-total">0 ₫</span></div>
-        <div class="ss-row"><span class="ss-lbl">배달비</span><span class="ss-val" id="ss-del">0 ₫</span></div>
-        <div class="ss-row"><span class="ss-lbl">본사 입금액</span><span class="ss-val hq" id="ss-hq">0 ₫</span></div>
-        <div class="ss-row"><span class="ss-lbl">판매자 수익</span><span class="ss-val pr" id="ss-pr">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssTotalLbl">판매 총액</span><span class="ss-val" id="ss-total">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssDelLbl">배달비</span><span class="ss-val" id="ss-del">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssHqLbl">본사 입금액</span><span class="ss-val hq" id="ss-hq">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ss-pr">0 ₫</span></div>
       </div>
       <div style="height:12px"></div>
-      <button class="btn btn-pink" onclick="saveSale()">📤 판매 저장</button>
+      <button class="btn btn-pink" onclick="saveSale()" data-i18n="outSaveBtn">📤 판매 저장</button>
     </div></div>
   </div>
   <!-- SETTLE -->
   <div class="page" id="page-settle">
     <div class="sub-tabs">
-      <button class="sub-tab active" onclick="setSettleTab('daily')">일일</button>
-      <button class="sub-tab" onclick="setSettleTab('weekly')">주간</button>
-      <button class="sub-tab" onclick="setSettleTab('monthly')">월간</button>
-      <button class="sub-tab" onclick="setSettleTab('seller')">판매자별</button>
-      <button class="sub-tab" onclick="setSettleTab('delivery')">배달비 지급</button>
-      <button class="sub-tab" onclick="setSettleTab('wholesale')">도매 입금</button>
+      <button class="sub-tab active" onclick="setSettleTab('daily')" data-i18n="stDaily">일일</button>
+      <button class="sub-tab" onclick="setSettleTab('weekly')" data-i18n="stWeekly">주간</button>
+      <button class="sub-tab" onclick="setSettleTab('monthly')" data-i18n="stMonthly">월간</button>
+      <button class="sub-tab" onclick="setSettleTab('seller')" data-i18n="stSeller">판매자별</button>
+      <button class="sub-tab" onclick="setSettleTab('delivery')" data-i18n="stDelivery">배달비 지급</button>
+      <button class="sub-tab" onclick="setSettleTab('wholesale')" data-i18n="stWholesale">도매 입금</button>
     </div>
     <div class="content-wrap">
       <div id="st-daily"></div>
@@ -347,9 +347,9 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
   <!-- REPORT -->
   <div class="page" id="page-report">
     <div class="sub-tabs">
-      <button class="sub-tab active" onclick="setRptTab('daily')">일별</button>
-      <button class="sub-tab" onclick="setRptTab('monthly')">월별</button>
-      <button class="sub-tab" onclick="setRptTab('channel')">채널별</button>
+      <button class="sub-tab active" onclick="setRptTab('daily')" data-i18n="rptDaily">일별</button>
+      <button class="sub-tab" onclick="setRptTab('monthly')" data-i18n="rptMonthly">월별</button>
+      <button class="sub-tab" onclick="setRptTab('channel')" data-i18n="rptChannel">채널별</button>
     </div>
     <div class="content-wrap">
       <div id="rpt-daily"></div>
@@ -360,114 +360,114 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 </div>
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="setPage('home')"><span class="nav-icon">🏠</span><span>홈</span><span class="nav-badge" id="nav-badge" style="display:none">0</span></button>
-  <button class="nav-btn" id="nav-in" onclick="setPage('in')"><span class="nav-icon">⬇️</span><span>입고</span></button>
-  <button class="nav-btn" id="nav-out" onclick="setPage('out')"><span class="nav-icon">⬆️</span><span>판매</span></button>
-  <button class="nav-btn" id="nav-settle" onclick="setPage('settle')"><span class="nav-icon">💳</span><span>정산</span></button>
-  <button class="nav-btn" id="nav-report" onclick="setPage('report')"><span class="nav-icon">📊</span><span>보고서</span></button>
+  <button class="nav-btn active" id="nav-home" onclick="setPage('home')"><span class="nav-icon">🏠</span><span data-i18n="navHome">홈</span><span class="nav-badge" id="nav-badge" style="display:none">0</span></button>
+  <button class="nav-btn" id="nav-in" onclick="setPage('in')"><span class="nav-icon">⬇️</span><span data-i18n="navIn">입고</span></button>
+  <button class="nav-btn" id="nav-out" onclick="setPage('out')"><span class="nav-icon">⬆️</span><span data-i18n="navOut">판매</span></button>
+  <button class="nav-btn" id="nav-settle" onclick="setPage('settle')"><span class="nav-icon">💳</span><span data-i18n="navSettle">정산</span></button>
+  <button class="nav-btn" id="nav-report" onclick="setPage('report')"><span class="nav-icon">📊</span><span data-i18n="navReport">보고서</span></button>
 </div>
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-prod">
   <div class="modal"><div class="modal-handle"></div>
     <button class="modal-close" onclick="closeMod('modal-prod')">×</button>
     <div class="modal-title" id="pm-title">제품 추가</div>
-    <div class="form-group"><label class="form-label">제품명 *</label><input type="text" class="form-control" id="pm-name"></div>
-    <div class="form-group"><label class="form-label">규격/용량 *</label><input type="text" class="form-control" id="pm-size" placeholder="1kg, 500g"></div>
-    <div class="form-group"><label class="form-label">단위</label><input type="text" class="form-control" id="pm-unit" placeholder="개"></div>
-    <div class="form-group"><label class="form-label">공급단가 (VND)</label><input type="number" class="form-control" id="pm-supply"></div>
-    <div class="form-group"><label class="form-label">판매단가 (VND)</label><input type="number" class="form-control" id="pm-sale"></div>
-    <div class="form-group"><label class="form-label">최소 안전재고</label><input type="number" class="form-control" id="pm-min"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmName">제품명 *</label><input type="text" class="form-control" id="pm-name"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmSize">규격/용량 *</label><input type="text" class="form-control" id="pm-size" placeholder="1kg, 500g"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmUnit">단위</label><input type="text" class="form-control" id="pm-unit" placeholder="개"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmSupply">공급단가 (VND)</label><input type="number" class="form-control" id="pm-supply"></div>
+    <div class="form-group"><label class="form-label" data-i18n="outPrice">판매단가 (VND)</label><input type="number" class="form-control" id="pm-sale"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmMin">최소 안전재고</label><input type="number" class="form-control" id="pm-min"></div>
     <input type="hidden" id="pm-id">
-    <button class="btn btn-primary" onclick="saveProd()">저장</button>
+    <button class="btn btn-primary" onclick="saveProd()" data-i18n="saveBtn">저장</button>
   </div>
 </div>
 <div class="modal-overlay" id="modal-seller">
   <div class="modal"><div class="modal-handle"></div>
     <button class="modal-close" onclick="closeMod('modal-seller')">×</button>
     <div class="modal-title" id="sl-title">판매자 추가</div>
-    <div class="form-group"><label class="form-label">판매자 이름 *</label><input type="text" class="form-control" id="sl-name"></div>
-    <div class="form-group"><label class="form-label">연락처</label><input type="tel" class="form-control" id="sl-phone"></div>
-    <div class="form-group"><label class="form-label">메모</label><input type="text" class="form-control" id="sl-note"></div>
+    <div class="form-group"><label class="form-label" data-i18n="slName">판매자 이름 *</label><input type="text" class="form-control" id="sl-name"></div>
+    <div class="form-group"><label class="form-label" data-i18n="slPhone">연락처</label><input type="tel" class="form-control" id="sl-phone"></div>
+    <div class="form-group"><label class="form-label" data-i18n="slNote">메모</label><input type="text" class="form-control" id="sl-note"></div>
     <input type="hidden" id="sl-id">
-    <button class="btn btn-purple" onclick="saveSeller()">저장</button>
+    <button class="btn btn-purple" onclick="saveSeller()" data-i18n="saveBtn">저장</button>
   </div>
 </div>
 <div class="modal-overlay" id="modal-adj">
   <div class="modal"><div class="modal-handle"></div>
     <button class="modal-close" onclick="closeMod('modal-adj')">×</button>
-    <div class="modal-title">📦 재고 수량 조정</div>
+    <div class="modal-title" data-i18n="adjTitle">📦 재고 수량 조정</div>
     <div id="adj-name" style="font-size:15px;font-weight:700;margin-bottom:16px"></div>
-    <div class="form-group"><label class="form-label">현재 재고 수량</label>
+    <div class="form-group"><label class="form-label" data-i18n="adjQtyLbl">현재 재고 수량</label>
       <div style="display:flex;gap:10px;align-items:center">
         <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(-1)">−</button>
         <input type="number" class="form-control" id="adj-qty" min="0" style="text-align:center;font-size:22px;font-weight:800">
         <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(1)">+</button>
       </div></div>
-    <div class="form-group"><label class="form-label">유통기한 임박 수량</label>
+    <div class="form-group"><label class="form-label" data-i18n="adjExpLbl">유통기한 임박 수량</label>
       <input type="number" class="form-control" id="adj-exp" min="0">
-      <div class="form-hint">7일 이내 유통기한 제품 수량</div></div>
+      <div class="form-hint" data-i18n="adjExpHint">7일 이내 유통기한 제품 수량</div></div>
     <input type="hidden" id="adj-pid">
-    <button class="btn btn-primary" onclick="saveAdj()">재고 수정 완료</button>
+    <button class="btn btn-primary" onclick="saveAdj()" data-i18n="adjSaveBtn">재고 수정 완료</button>
   </div>
 </div>
 <div class="modal-overlay" id="modal-edit">
   <div class="modal"><div class="modal-handle"></div>
     <button class="modal-close" onclick="closeMod('modal-edit')">×</button>
-    <div class="modal-title">📝 판매 내역 수정</div>
+    <div class="modal-title" data-i18n="editTitle">📝 판매 내역 수정</div>
     <div id="edit-info" style="font-size:13px;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);padding:10px;border-radius:8px;line-height:1.6"></div>
-    <div class="form-group"><label class="form-label">판매금액 (VND) *</label>
+    <div class="form-group"><label class="form-label" data-i18n="editAmtLbl">판매금액 (VND) *</label>
       <input type="number" class="form-control" id="edit-amt" oninput="updEditSS()">
-      <div class="form-hint">판매단가 × 수량 합계</div></div>
-    <div class="form-group"><label class="form-label">배달비 (VND)</label>
+      <div class="form-hint" data-i18n="editAmtHint">판매단가 × 수량 합계</div></div>
+    <div class="form-group"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
       <input type="number" class="form-control" id="edit-del" placeholder="0" oninput="updEditSS()"></div>
     <div class="ss-box" style="margin-bottom:14px">
-      <div class="ss-row"><span class="ss-lbl">판매 총액</span><span class="ss-val" id="ess-tot">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl">배달비</span><span class="ss-val" id="ess-del">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl">본사 입금</span><span class="ss-val hq" id="ess-hq">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl">판매자 수익</span><span class="ss-val pr" id="ess-pr">0 ₫</span></div>
+      <div class="ss-row"><span class="ss-lbl" data-i18n="ssTotalLbl">판매 총액</span><span class="ss-val" id="ess-tot">0 ₫</span></div>
+      <div class="ss-row"><span class="ss-lbl" data-i18n="ssDelLbl">배달비</span><span class="ss-val" id="ess-del">0 ₫</span></div>
+      <div class="ss-row"><span class="ss-lbl" data-i18n="editHqLbl">본사 입금</span><span class="ss-val hq" id="ess-hq">0 ₫</span></div>
+      <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ess-pr">0 ₫</span></div>
     </div>
     <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
-    <button class="btn btn-primary" onclick="saveEditSale()">수정 저장</button>
+    <button class="btn btn-primary" onclick="saveEditSale()" data-i18n="editSaveBtn">수정 저장</button>
   </div>
 </div>
 <!-- MGMT PANEL -->
 <div class="mgmt-ov" id="mgmt-ov" onclick="mgmtBg(event)">
   <div class="mgmt-pnl" id="mgmt-pnl">
-    <div class="mgmt-hdr"><span class="mgmt-hdr-title">⚙️ 관리</span><button class="mgmt-close" onclick="closeMgmt()">×</button></div>
+    <div class="mgmt-hdr"><span class="mgmt-hdr-title" data-i18n="mgmtTitle">⚙️ 관리</span><button class="mgmt-close" onclick="closeMgmt()">×</button></div>
     <div class="mgmt-tabs">
-      <button class="mgmt-tab active" id="mt-sl" onclick="setMT('sl')">판매자</button>
-      <button class="mgmt-tab" id="mt-pr" onclick="setMT('pr')">제품</button>
-      <button class="mgmt-tab" id="mt-hi" onclick="setMT('hi')">내역</button>
-      <button class="mgmt-tab" id="mt-se" onclick="setMT('se')">설정</button>
+      <button class="mgmt-tab active" id="mt-sl" onclick="setMT('sl')" data-i18n="mgmtSeller">판매자</button>
+      <button class="mgmt-tab" id="mt-pr" onclick="setMT('pr')" data-i18n="mgmtProd">제품</button>
+      <button class="mgmt-tab" id="mt-hi" onclick="setMT('hi')" data-i18n="mgmtHist">내역</button>
+      <button class="mgmt-tab" id="mt-se" onclick="setMT('se')" data-i18n="mgmtSettings">설정</button>
     </div>
     <div class="mgmt-body">
       <div id="mc-sl">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div style="font-size:15px;font-weight:700">🧑‍💼 판매자 관리</div>
+          <div style="font-size:15px;font-weight:700" data-i18n="mgmtSellerTitle">🧑‍💼 판매자 관리</div>
           <button class="btn btn-sm btn-purple" onclick="openAddSL()">+ 추가</button>
         </div>
         <div id="sl-list"></div>
       </div>
       <div id="mc-pr" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div style="font-size:15px;font-weight:700">🥬 제품 관리</div>
+          <div style="font-size:15px;font-weight:700" data-i18n="mgmtProdTitle">🥬 제품 관리</div>
           <button class="btn btn-sm btn-primary" onclick="openAddProd()">+ 추가</button>
         </div>
         <div id="pr-list"></div>
       </div>
       <div id="mc-hi" style="display:none">
         <div style="display:flex;gap:8px;margin-bottom:12px">
-          <button class="btn btn-sm btn-primary" id="hb-in" onclick="setHT('in')">입고내역</button>
-          <button class="btn btn-sm btn-outline" id="hb-out" onclick="setHT('out')">판매내역</button>
+          <button class="btn btn-sm btn-primary" id="hb-in" onclick="setHT('in')" data-i18n="mgmtHistIn">입고내역</button>
+          <button class="btn btn-sm btn-outline" id="hb-out" onclick="setHT('out')" data-i18n="mgmtHistOut">판매내역</button>
         </div>
         <div id="hi-in"></div><div id="hi-out" style="display:none"></div>
       </div>
       <div id="mc-se" style="display:none">
-        <div class="form-group" style="margin-top:8px"><label class="form-label">사용자 이름</label>
+        <div class="form-group" style="margin-top:8px"><label class="form-label" data-i18n="mgmtUserName">사용자 이름</label>
           <input type="text" class="form-control" id="se-name"></div>
-        <button class="btn btn-primary btn-sm" onclick="saveName()">이름 저장</button>
+        <button class="btn btn-primary btn-sm" onclick="saveName()" data-i18n="mgmtSaveName">이름 저장</button>
         <div style="height:16px"></div>
-        <button class="btn btn-outline" onclick="resetCfg()">Firebase 설정 초기화</button>
+        <button class="btn btn-outline" onclick="resetCfg()" data-i18n="mgmtReset">Firebase 설정 초기화</button>
         <div style="margin-top:10px;padding:10px 12px;background:#FFF8E1;border-radius:8px;border-left:3px solid #FFB300;">
           <p style="font-size:12px;color:#5D4037;line-height:1.7;margin:0;">
             연결 오류가 지속될 때 사용합니다.<br>
@@ -497,16 +497,72 @@ ko:{mn:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','
   overSt:'재고 초과. 계속하겠습니까?',
   dProd:'제품을 삭제하겠습니까?',dSL:'판매자를 삭제하겠습니까?',
   r1:'Firebase 설정 초기화',r2:'이 폰의 연결 설정만 삭제됩니다. 서버 데이터는 유지됩니다. 계속하겠습니까?',
-  tSale:'총 판매금액',hqTot:'본사 입금 합계',hqB:'배달K → 본사',hqS:'개인판매자 → 본사',sPr:'판매자 수익'},
+  tSale:'총 판매금액',hqTot:'본사 입금 합계',hqB:'배달K → 본사',hqS:'개인판매자 → 본사',sPr:'판매자 수익',
+  // UI static text
+  kpiTodaySale:'📦 오늘 전체 판매',kpiReorder:'⚠️ 재발주 알림',kpiReorderSub:'안전재고 미달',
+  kpiDelivery:'🛵 미지급 배달비',kpiWholesale:'💰 미수 도매가',
+  chBaedalkBadge:'HQ Direct',chTodaySale:'오늘 총 매출',chDoneCount:'완료 건수',
+  chPendDel:'미지급 배달비',chBaedalkBtn:'🛵 배달비 정산 관리 →',
+  chSellerTitle:'🧑‍💼 개인판매자',chSellerBadge:'Wholesale',chSellerBtn:'💰 도매 입금 확인 →',
+  invTitle:'🥬 품목별 재고 현황',
+  inTitle:'📥 입고 등록',inDate:'입고일자 *',inQty:'입고 수량 *',inExpiry:'유통기한',inSaveBtn:'📥 입고 저장',
+  outTitle:'📤 판매 등록',outDate:'판매일자 *',outChannel:'판매 채널 *',
+  chBaedalkLabel:'🛵 배달K',chSellerLabel:'🧑‍💼 개인판매자',outSellerLbl:'판매자 선택 *',
+  outQty:'판매 수량 *',outPrice:'판매단가 (VND)',outDelFee:'배달비 (VND)',
+  outDelHint:'배달K 채널 배달비',
+  ssTotalLbl:'판매 총액',ssDelLbl:'배달비',ssHqLbl:'본사 입금액',ssPrLbl:'판매자 수익',
+  outSaveBtn:'📤 판매 저장',
+  stDaily:'일일',stWeekly:'주간',stMonthly:'월간',stSeller:'판매자별',stDelivery:'배달비 지급',stWholesale:'도매 입금',
+  rptDaily:'일별',rptMonthly:'월별',rptChannel:'채널별',
+  navHome:'홈',navIn:'입고',navOut:'판매',navSettle:'정산',navReport:'보고서',
+  mgmtTitle:'⚙️ 관리',mgmtSeller:'판매자',mgmtProd:'제품',mgmtHist:'내역',mgmtSettings:'설정',
+  mgmtSellerTitle:'🧑‍💼 판매자 관리',mgmtProdTitle:'🥬 제품 관리',
+  mgmtHistIn:'입고내역',mgmtHistOut:'판매내역',
+  mgmtUserName:'사용자 이름',mgmtSaveName:'이름 저장',mgmtReset:'Firebase 설정 초기화',
+  pmName:'제품명 *',pmSize:'규격/용량 *',pmUnit:'단위',pmSupply:'공급단가 (VND)',pmSale:'판매단가 (VND)',pmMin:'최소 안전재고',
+  slName:'판매자 이름 *',slPhone:'연락처',slNote:'메모',
+  adjTitle:'📦 재고 수량 조정',adjQtyLbl:'현재 재고 수량',adjExpLbl:'유통기한 임박 수량',
+  adjExpHint:'7일 이내 유통기한 제품 수량',adjSaveBtn:'재고 수정 완료',
+  editTitle:'📝 판매 내역 수정',editAmtLbl:'판매금액 (VND) *',editAmtHint:'판매단가 × 수량 합계',
+  editHqLbl:'본사 입금',editSaveBtn:'수정 저장',
+  fProd:'제품 선택 *',fNote:'비고',saveBtn:'저장'},
 vi:{mn:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
-  noData:'Không có dữ liệu',noProd:'Chưa có SP',noSeller:'Chưa có người bán',noST:'Không có dữ liệu',
-  inOk:'Nhập hàng xong',saleOk:'Bán xong',saved:'Đã lưu',del:'Đã xóa',
-  adjOk:'Đã cập nhật',nameOk:'Đã lưu tên',
-  eDate:'Nhập ngày',eProd:'Chọn SP',eQty:'Nhập SL',eName:'Nhập tên',
-  eProdN:'Nhập tên SP',eUrl:'URL lỗi',eIn:'Nhập URL·Key',eSL:'Chọn người bán',
-  overSt:'Vượt tồn kho?',dProd:'Xóa SP?',dSL:'Xóa người bán?',
-  r1:'Xóa cấu hình',r2:'Chỉ xóa cài đặt trên máy này.',
-  tSale:'Tổng DT',hqTot:'Tổng HQ',hqB:'BK→HQ',hqS:'NB→HQ',sPr:'Lợi nhuận NB'}
+  noData:'Không có dữ liệu',noProd:'Chưa có sản phẩm',noSeller:'Chưa có người bán',noST:'Không có dữ liệu',
+  inOk:'Nhập hàng xong',saleOk:'Bán hàng xong',saved:'Đã lưu',del:'Đã xóa',
+  adjOk:'Đã cập nhật tồn kho',nameOk:'Đã lưu tên',
+  eDate:'Vui lòng nhập ngày',eProd:'Vui lòng chọn sản phẩm',eQty:'Vui lòng nhập số lượng',eName:'Vui lòng nhập tên',
+  eProdN:'Nhập tên và quy cách SP',eUrl:'URL không hợp lệ',eIn:'Nhập URL và API Key',eSL:'Vui lòng chọn người bán',
+  overSt:'Vượt tồn kho. Tiếp tục?',dProd:'Xóa sản phẩm?',dSL:'Xóa người bán?',
+  r1:'Xóa cấu hình Firebase',r2:'Chỉ xóa cài đặt trên máy này. Dữ liệu server vẫn giữ nguyên.',
+  tSale:'Tổng doanh thu',hqTot:'Tổng tiền HQ',hqB:'BaedalcK→HQ',hqS:'Người bán→HQ',sPr:'Lợi nhuận người bán',
+  // UI static text
+  kpiTodaySale:'📦 Tổng bán hôm nay',kpiReorder:'⚠️ Cần đặt hàng',kpiReorderSub:'Dưới tồn kho tối thiểu',
+  kpiDelivery:'🛵 Phí chưa thanh toán',kpiWholesale:'💰 Nợ bán buôn',
+  chBaedalkBadge:'HQ Direct',chTodaySale:'Doanh thu hôm nay',chDoneCount:'Số đơn hoàn thành',
+  chPendDel:'Phí giao chưa thanh toán',chBaedalkBtn:'🛵 Quản lý phí giao hàng →',
+  chSellerTitle:'🧑‍💼 Người bán cá nhân',chSellerBadge:'Bán buôn',chSellerBtn:'💰 Xác nhận thanh toán →',
+  invTitle:'🥬 Tình trạng tồn kho theo sản phẩm',
+  inTitle:'📥 Nhập hàng',inDate:'Ngày nhập *',inQty:'Số lượng nhập *',inExpiry:'Hạn sử dụng',inSaveBtn:'📥 Lưu nhập hàng',
+  outTitle:'📤 Đăng ký bán',outDate:'Ngày bán *',outChannel:'Kênh bán *',
+  chBaedalkLabel:'🛵 Baedalc K',chSellerLabel:'🧑‍💼 Người bán cá nhân',outSellerLbl:'Chọn người bán *',
+  outQty:'Số lượng bán *',outPrice:'Đơn giá bán (VND)',outDelFee:'Phí giao hàng (VND)',
+  outDelHint:'Phí giao hàng kênh Baedalc K',
+  ssTotalLbl:'Tổng tiền bán',ssDelLbl:'Phí giao hàng',ssHqLbl:'Tiền chuyển về HQ',ssPrLbl:'Lợi nhuận người bán',
+  outSaveBtn:'📤 Lưu bán hàng',
+  stDaily:'Ngày',stWeekly:'Tuần',stMonthly:'Tháng',stSeller:'Theo người bán',stDelivery:'Phí giao hàng',stWholesale:'Nộp bán buôn',
+  rptDaily:'Ngày',rptMonthly:'Tháng',rptChannel:'Theo kênh',
+  navHome:'Trang chủ',navIn:'Nhập hàng',navOut:'Bán hàng',navSettle:'Quyết toán',navReport:'Báo cáo',
+  mgmtTitle:'⚙️ Quản lý',mgmtSeller:'Người bán',mgmtProd:'Sản phẩm',mgmtHist:'Lịch sử',mgmtSettings:'Cài đặt',
+  mgmtSellerTitle:'🧑‍💼 Quản lý người bán',mgmtProdTitle:'🥬 Quản lý sản phẩm',
+  mgmtHistIn:'Lịch sử nhập',mgmtHistOut:'Lịch sử bán',
+  mgmtUserName:'Tên người dùng',mgmtSaveName:'Lưu tên',mgmtReset:'Xóa cài đặt Firebase',
+  pmName:'Tên sản phẩm *',pmSize:'Quy cách *',pmUnit:'Đơn vị',pmSupply:'Giá nhập (VND)',pmSale:'Giá bán (VND)',pmMin:'Tồn kho tối thiểu',
+  slName:'Tên người bán *',slPhone:'Số điện thoại',slNote:'Ghi chú',
+  adjTitle:'📦 Điều chỉnh tồn kho',adjQtyLbl:'Số lượng hiện tại',adjExpLbl:'Số lượng gần hết hạn',
+  adjExpHint:'Sản phẩm hết hạn trong 7 ngày',adjSaveBtn:'Lưu điều chỉnh',
+  editTitle:'📝 Sửa đơn hàng',editAmtLbl:'Số tiền bán (VND) *',editAmtHint:'Đơn giá × số lượng',
+  editHqLbl:'Tiền chuyển về HQ',editSaveBtn:'Lưu chỉnh sửa',
+  fProd:'Chọn sản phẩm *',fNote:'Ghi chú',saveBtn:'Lưu'}
 };
 function t(k){return(TT[lang]||TT.ko)[k]||k;}
 function N(n){return Number(n||0).toLocaleString();}
@@ -540,6 +596,7 @@ async function init(){
   document.getElementById('in-date').value=tday();
   document.getElementById('out-date').value=tday();
   document.getElementById('se-name').value=uName;
+  applyLang();
   await loadAll();
 }
 async function loadAll(){
@@ -550,15 +607,22 @@ async function loadAll(){
   }catch(e){toast('로드 실패:'+e.message);}
 }
 function renderAll(){renderHome();popSels();}
+function applyLang(){
+  // data-i18n 속성이 있는 모든 요소의 텍스트를 현재 언어로 업데이트
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key=el.getAttribute('data-i18n');
+    var tx=(TT[lang]||TT.ko)[key];
+    if(tx!==undefined) el.textContent=tx;
+  });
+}
 function setLang(l){
   lang=l;
   document.getElementById('btn-ko').classList.toggle('active',l==='ko');
   document.getElementById('btn-vi').classList.toggle('active',l==='vi');
+  applyLang();
   renderAll();
-  // 현재 열린 페이지 콘텐츠도 재렌더링
   if(document.getElementById('page-settle').classList.contains('active'))renderST();
   if(document.getElementById('page-report').classList.contains('active'))renderRpt();
-  // 관리 패널이 열려있으면 재렌더링
   if(document.getElementById('mgmt-ov').classList.contains('open'))setMT(mgmtTab);
 }
 function setPage(p){
@@ -788,7 +852,7 @@ function stSeller(){
   Object.entries(sales).forEach(function(e){var r=e[1];if(!(r.date||'').startsWith(pfx))return;if(r.channel==='seller'){var v=r.sellerId||'?';if(!byCh.s[v])byCh.s[v]=[];byCh.s[v].push(r);}else byCh.b.push(r);});
   var h=nav;
   if(byCh.b.length){var c=cS(byCh.b);var ex=expSL['__b__']||false;
-    h+='<div class="s-sec" style="border-left:4px solid var(--pink)"><div class="s-hdr"><div class="s-name">🛵 배달K</div><button class="s-cnt-btn" onclick="togExp(\'__b__\')">'+c.cnt+'건·'+c.qty+'개 '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사 입금</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div>'+(ex?buildDL(byCh.b,'b'):'')+'</div>';}
+    h+='<div class="s-sec" style="border-left:4px solid var(--pink)"><div class="s-hdr"><div class="s-name" data-i18n="chBaedalkLabel">🛵 배달K</div><button class="s-cnt-btn" onclick="togExp(\'__b__\')">'+c.cnt+'건·'+c.qty+'개 '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사 입금</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div>'+(ex?buildDL(byCh.b,'b'):'')+'</div>';}
   Object.entries(byCh.s).forEach(function(e){
     var vid=e[0],recs=e[1];var sname=(sellers[vid]||{}).name||vid;
     var c=cS(recs);var ex=expSL[vid]||false;
@@ -933,8 +997,8 @@ function rCh(){
     var cs=cS(sv.recs);
     sellerSecs+='<div class="rpt-sec"><div class="rpt-title">🧑‍💼 개인판매자 · <span style="color:var(--purple)">'+sv.name+'</span></div><div class="rpt-row"><span>매출</span><strong>'+N(cs.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cs.cnt+'건 · '+cs.qty+'개</strong></div><div class="rpt-row"><span>본사입금(도매)</span><strong style="color:var(--success-dark)">'+N(cs.hq)+' ₫</strong></div><div class="rpt-row"><span>판매자 수익</span><strong style="color:var(--purple)">'+N(cs.sp)+' ₫</strong></div></div>';
   });
-  if(!sellerSecs)sellerSecs='<div class="rpt-sec"><div class="rpt-title">🧑‍💼 개인판매자</div><div class="rpt-row"><span style="color:var(--gray-400)">해당 기간 판매 없음</span></div></div>';
-  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);rCh()','shM(1);rCh()')+'<div class="rpt-sec"><div class="rpt-title">🛵 배달K</div><div class="rpt-row"><span>매출</span><strong>'+N(cb.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cb.cnt+'건 · '+cb.qty+'개</strong></div><div class="rpt-row"><span>배달비</span><strong style="color:var(--warn-dark)">'+N(cb.dl)+' ₫</strong></div></div>'+sellerSecs+(pr?'<div class="rpt-sec"><div class="rpt-title">📦 품목별</div>'+pr+'</div>':'');
+  if(!sellerSecs)sellerSecs='<div class="rpt-sec"><div class="rpt-title" data-i18n="chSellerLabel">🧑‍💼 개인판매자</div><div class="rpt-row"><span style="color:var(--gray-400)">해당 기간 판매 없음</span></div></div>';
+  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);rCh()','shM(1);rCh()')+'<div class="rpt-sec"><div class="rpt-title" data-i18n="chBaedalkLabel">🛵 배달K</div><div class="rpt-row"><span>매출</span><strong>'+N(cb.ts)+' ₫</strong></div><div class="rpt-row"><span>건수</span><strong>'+cb.cnt+'건 · '+cb.qty+'개</strong></div><div class="rpt-row"><span>배달비</span><strong style="color:var(--warn-dark)">'+N(cb.dl)+' ₫</strong></div></div>'+sellerSecs+(pr?'<div class="rpt-sec"><div class="rpt-title">📦 품목별</div>'+pr+'</div>':'');
 }
 /* MGMT */
 function openMgmt(){document.getElementById('mgmt-ov').classList.add('open');setMT(mgmtTab);}
