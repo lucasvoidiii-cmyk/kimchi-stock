@@ -275,6 +275,87 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 .section-label{font-size:11px;font-weight:700;color:var(--gray-500);
   text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px;margin-top:3px}
 .divider{height:1px;background:var(--gray-100);margin:12px 0}
+
+/* ── DASHBOARD SPECIFIC ── */
+.dash-section-title{font-size:11px;font-weight:800;color:var(--gray-500);
+  letter-spacing:.5px;text-transform:uppercase;margin:12px 0 7px;display:flex;
+  align-items:center;gap:6px}
+.dash-section-title::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.kpi-card{background:#fff;border-radius:var(--radius);padding:13px 12px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-card.kc-blue::before{background:var(--primary)}
+.kpi-card.kc-red::before{background:var(--danger)}
+.kpi-card.kc-orange::before{background:var(--warning)}
+.kpi-card.kc-purple::before{background:var(--purple)}
+.kpi-label{font-size:10px;font-weight:700;color:var(--gray-500);margin-bottom:5px;line-height:1.3}
+.kpi-main{font-size:22px;font-weight:800;line-height:1;margin-bottom:2px}
+.kpi-sub{font-size:10px;color:var(--gray-400);font-weight:500}
+.kpi-card.kc-blue .kpi-main{color:var(--primary)}
+.kpi-card.kc-red .kpi-main{color:var(--danger)}
+.kpi-card.kc-orange .kpi-main{color:var(--warning)}
+.kpi-card.kc-purple .kpi-main{color:var(--purple)}
+
+.channel-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);
+  margin-bottom:8px;overflow:hidden}
+.channel-card-hdr{padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.channel-card-hdr.baedalk{background:linear-gradient(135deg,#fff0f6,#ffe0f0)}
+.channel-card-hdr.seller{background:linear-gradient(135deg,var(--purple-light),#ede9fe)}
+.channel-card-title{font-size:14px;font-weight:800}
+.channel-card-title.baedalk{color:#c2185b}
+.channel-card-title.seller{color:var(--purple)}
+.channel-card-stat{text-align:right}
+.channel-card-amount{font-size:18px;font-weight:800}
+.channel-card-amount.baedalk{color:#c2185b}
+.channel-card-amount.seller{color:var(--purple)}
+.channel-card-cnt{font-size:10px;color:var(--gray-500);margin-top:1px}
+.channel-card-body{padding:10px 14px}
+.channel-action-btn{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:700;width:100%;margin-bottom:6px}
+.channel-action-btn:last-child{margin-bottom:0}
+.cab-baedalk{background:#fff0f6;color:#c2185b}
+.cab-seller{background:var(--purple-light);color:var(--purple)}
+.cab-arrow{font-size:16px;font-weight:400}
+
+.seller-payment-row{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 0;border-bottom:1px solid var(--gray-100)}
+.seller-payment-row:last-child{border-bottom:none}
+.spr-name{font-size:13px;font-weight:600;color:var(--gray-800)}
+.spr-amount{font-size:13px;font-weight:700;color:var(--purple)}
+.spr-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--gray-300);
+  background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:.15s;font-size:13px}
+.spr-check.confirmed{background:var(--success);border-color:var(--success);color:#fff}
+
+.delivery-row{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 0;border-bottom:1px solid var(--gray-100)}
+.delivery-row:last-child{border-bottom:none}
+.dr-info{flex:1;min-width:0}
+.dr-name{font-size:12px;font-weight:600;color:var(--gray-800)}
+.dr-meta{font-size:10px;color:var(--gray-500);margin-top:1px}
+.dr-amount{font-size:13px;font-weight:700;color:#c2185b;margin:0 10px;flex-shrink:0}
+.dr-pay-btn{padding:5px 11px;border-radius:16px;border:none;font-size:11px;font-weight:700;
+  font-family:var(--font);cursor:pointer;flex-shrink:0}
+.dr-pay-btn.unpaid{background:#fff0f6;color:#c2185b}
+.dr-pay-btn.paid{background:var(--success-light);color:var(--success)}
+
+.stock-item-v2{background:#fff;border-radius:var(--radius-sm);margin-bottom:7px;
+  padding:11px 13px;display:grid;
+  grid-template-columns:38px 1fr auto auto;
+  align-items:center;gap:8px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.si-icon{width:38px;height:38px;border-radius:9px;background:var(--primary-light);
+  display:flex;align-items:center;justify-content:center;font-size:17px}
+.si-info .si-name{font-size:13px;font-weight:600;color:var(--gray-800)}
+.si-info .si-size{font-size:10px;color:var(--gray-500);margin-top:1px}
+.si-stock{text-align:center}
+.si-qty{font-size:19px;font-weight:800;line-height:1}
+.si-unit{font-size:9px;color:var(--gray-500)}
+.si-avail{font-size:10px;margin-top:1px}
+.si-status .badge{font-size:9px}
 </style>
 </head>
 <body>
@@ -321,13 +402,68 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 
   <!-- ① 재고현황 -->
   <div class="screen active" id="sc-stock">
-    <div class="sum-grid">
-      <div class="sum-card c-primary"><div class="num" id="sum-total">0</div><div class="lbl" data-i="sumTotal"></div></div>
-      <div class="sum-card c-danger"><div class="num" id="sum-alert">0</div><div class="lbl" data-i="sumAlert"></div></div>
-      <div class="sum-card c-success"><div class="num" id="sum-today">0</div><div class="lbl" data-i="sumToday"></div></div>
-      <div class="sum-card c-warning"><div class="num" id="sum-exp">0</div><div class="lbl" data-i="sumExp"></div></div>
+
+    <!-- [A] KPI 4개 카드 -->
+    <div class="kpi-grid">
+      <div class="kpi-card kc-blue">
+        <div class="kpi-label" data-i="dashKpiTodaySale"></div>
+        <div class="kpi-main" id="kpi-today-qty">0<span style="font-size:13px;font-weight:600"> 건</span></div>
+        <div class="kpi-sub" id="kpi-today-amt">0 ₫</div>
+      </div>
+      <div class="kpi-card kc-red">
+        <div class="kpi-label" data-i="dashKpiReorder"></div>
+        <div class="kpi-main" id="kpi-reorder">0<span style="font-size:13px;font-weight:600"> 품목</span></div>
+        <div class="kpi-sub" data-i="sumAlert"></div>
+      </div>
+      <div class="kpi-card kc-orange">
+        <div class="kpi-label" data-i="dashKpiDelivery"></div>
+        <div class="kpi-main" id="kpi-delivery-cnt">0<span style="font-size:13px;font-weight:600"> 건</span></div>
+        <div class="kpi-sub" id="kpi-delivery-amt">0 ₫</div>
+      </div>
+      <div class="kpi-card kc-purple">
+        <div class="kpi-label" data-i="dashKpiWholesale"></div>
+        <div class="kpi-main" id="kpi-wholesale-cnt">0<span style="font-size:13px;font-weight:600"> 건</span></div>
+        <div class="kpi-sub" id="kpi-wholesale-amt">0 ₫</div>
+      </div>
     </div>
-    <div class="section-label" data-i="stockTitle"></div>
+
+    <!-- [B] 채널별 현황 -->
+    <div class="dash-section-title" data-i="dashChBaedalk"></div>
+    <div class="channel-card">
+      <div class="channel-card-hdr baedalk">
+        <div>
+          <div class="channel-card-title baedalk">🛵 배달K</div>
+          <div class="channel-card-cnt" id="baedalk-cnt-today">오늘 0건</div>
+        </div>
+        <div class="channel-card-stat">
+          <div class="channel-card-amount baedalk" id="baedalk-amt-today">0 ₫</div>
+          <div class="channel-card-cnt">오늘 매출</div>
+        </div>
+      </div>
+      <div class="channel-card-body">
+        <button class="channel-action-btn cab-baedalk" onclick="showScreen('settle',document.querySelector('.nav-btn:nth-child(4)'));setTimeout(()=>setSettleTab('delivery'),50)">
+          <span data-i="deliveryMgmtTitle"></span><span class="cab-arrow">›</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dash-section-title" data-i="dashChSeller"></div>
+    <div class="channel-card">
+      <div class="channel-card-hdr seller">
+        <div>
+          <div class="channel-card-title seller">🧑‍💼 개인판매자</div>
+          <div class="channel-card-cnt" id="seller-cnt-today">오늘 0건</div>
+        </div>
+        <div class="channel-card-stat">
+          <div class="channel-card-amount seller" id="seller-amt-today">0 ₫</div>
+          <div class="channel-card-cnt">오늘 매출</div>
+        </div>
+      </div>
+      <div class="channel-card-body" id="seller-payment-preview"></div>
+    </div>
+
+    <!-- [C] 재고 리스트 -->
+    <div class="dash-section-title" data-i="dashStockTitle"></div>
     <div id="stock-list"></div>
   </div>
 
@@ -424,6 +560,11 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
             <button class="toggle-btn" data-pay="기타" data-i-pay="payOther"></button>
           </div>
         </div>
+        <div class="form-group" id="delivery-fee-group" style="display:none">
+          <label class="form-label" data-i="fDeliveryFee"></label>
+          <input type="number" class="form-control" id="out-delivery-fee" min="0" placeholder="0">
+          <div class="form-hint" style="color:var(--warning)">⚠ 배달K 판매 시 기사에게 지급할 배달비</div>
+        </div>
         <div class="form-group">
           <label class="form-label" data-i="fNote"></label>
           <input type="text" class="form-control" id="out-note">
@@ -453,16 +594,18 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 
   <!-- ④ 정산 -->
   <div class="screen" id="sc-settle">
-    <div class="tab-row">
+    <div class="tab-row" style="margin-bottom:10px">
       <div class="tab-item active" onclick="setSettleTab('daily')" data-i="tabDaily"></div>
       <div class="tab-item" onclick="setSettleTab('weekly')" data-i="tabWeekly"></div>
       <div class="tab-item" onclick="setSettleTab('monthly')" data-i="tabMonthly"></div>
       <div class="tab-item" onclick="setSettleTab('seller')" data-i="tabSeller"></div>
+      <div class="tab-item" onclick="setSettleTab('delivery')" data-i="deliveryMgmtTitle" style="font-size:9px"></div>
     </div>
     <div id="settle-daily"></div>
     <div id="settle-weekly" style="display:none"></div>
     <div id="settle-monthly" style="display:none"></div>
     <div id="settle-seller" style="display:none"></div>
+    <div id="settle-delivery" style="display:none"></div>
   </div>
 
   <!-- ⑤ 관리 -->
@@ -515,7 +658,7 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
 <!-- NAV -->
 <div id="bottom-nav" style="display:none">
   <button class="nav-btn active" onclick="showScreen('stock',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span data-i="navStock"></span>
     <div class="nav-badge" id="badge-stock"></div>
   </button>
@@ -528,11 +671,12 @@ select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http:
     <span data-i="navOut"></span>
   </button>
   <button class="nav-btn" onclick="showScreen('settle',this);initSettleTab()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M9 15h3l8.5-8.5a1.5 1.5 0 0 0-3-3L9 12v3"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
     <span data-i="navSettle"></span>
+    <div class="nav-badge" id="badge-settle"></div>
   </button>
   <button class="nav-btn" onclick="showScreen('mgmt',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 1 21 12M12 2a10 10 0 0 1 7.07 2.93"/><path d="M4.93 19.07A10 10 0 0 1 3 12M12 22a10 10 0 0 1-7.07-2.93"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
     <span data-i="navMgmt"></span>
   </button>
 </div>
@@ -649,7 +793,22 @@ ko:{
   payCash:'현금', payTransfer:'계좌이체', payOther:'기타',
   saleSummaryTitle:'판매 금액 요약',
   ssTotal:'판매 총액', ssHQ:'본사 입금액', ssSellerProfit:'판매자 수익',
-  navStock:'재고현황', navIn:'입고', navOut:'판매', navSettle:'정산', navMgmt:'관리',
+  navStock:'홈', navIn:'입고', navOut:'판매', navSettle:'정산', navMgmt:'관리',
+  navReport:'보고서',
+  dashKpiTodaySale:'오늘 전체 판매', dashKpiReorder:'재발주 알림',
+  dashKpiDelivery:'미지급 배달비', dashKpiWholesale:'미수 도매가',
+  dashTodaySaleUnit:'건', dashTodaySaleAmt:'VND',
+  dashChBaedalk:'🛵 배달K 채널', dashChSeller:'🧑 개인판매자 채널',
+  dashDeliveryBtn:'배달비 정산 내역 →', dashPaymentBtn:'도매가 입금 확인 →',
+  dashStockTitle:'품목별 재고 현황',
+  dashAvail:'판매가능', dashReserved:'예약',
+  payConfirmed:'입금확인', payPending:'미확인',
+  payBtnLabel:'지급완료', payBtnPending:'미지급',
+  fDeliveryFee:'배달비 (VND)',
+  deliveryMgmtTitle:'배달비 지급 내역', wholesaleMgmtTitle:'도매가 입금 확인',
+  confirmPayment:'입금 확인 처리하겠습니까?',
+  paymentDone:'입금 확인 처리되었습니다', deliveryPaid:'배달비 지급 처리되었습니다',
+  sumTodayAmt:'오늘 매출',
   tabDaily:'일일', tabWeekly:'주간', tabMonthly:'월간', tabSeller:'판매자별',
   tabIn:'입고내역', tabOut:'판매내역',
   settleTitle:'정산 내역',
@@ -723,7 +882,22 @@ vi:{
   payCash:'Tiền mặt', payTransfer:'Chuyển khoản', payOther:'Khác',
   saleSummaryTitle:'Tóm tắt doanh thu',
   ssTotal:'Tổng doanh thu', ssHQ:'Nộp về công ty', ssSellerProfit:'Lợi nhuận người bán',
-  navStock:'Tồn kho', navIn:'Nhập', navOut:'Bán', navSettle:'Quyết toán', navMgmt:'Quản lý',
+  navStock:'Trang chủ', navIn:'Nhập', navOut:'Bán', navSettle:'Quyết toán', navMgmt:'Quản lý',
+  navReport:'Báo cáo',
+  dashKpiTodaySale:'Bán hôm nay', dashKpiReorder:'Cần đặt hàng',
+  dashKpiDelivery:'Phí giao chưa trả', dashKpiWholesale:'Chưa thu tiền sỉ',
+  dashTodaySaleUnit:'đơn', dashTodaySaleAmt:'VND',
+  dashChBaedalk:'🛵 Kênh 배달K', dashChSeller:'🧑 Người bán lẻ',
+  dashDeliveryBtn:'Thanh toán phí giao →', dashPaymentBtn:'Xác nhận thu tiền sỉ →',
+  dashStockTitle:'Tình trạng tồn kho',
+  dashAvail:'Có thể bán', dashReserved:'Đã đặt',
+  payConfirmed:'Đã xác nhận', payPending:'Chờ xác nhận',
+  payBtnLabel:'Đã trả', payBtnPending:'Chưa trả',
+  fDeliveryFee:'Phí giao hàng (VND)',
+  deliveryMgmtTitle:'Lịch sử phí giao hàng', wholesaleMgmtTitle:'Xác nhận thu tiền sỉ',
+  confirmPayment:'Xác nhận thanh toán tiền sỉ này?',
+  paymentDone:'Đã xác nhận thanh toán', deliveryPaid:'Đã trả phí giao hàng',
+  sumTodayAmt:'Doanh thu hôm nay',
   tabDaily:'Ngày', tabWeekly:'Tuần', tabMonthly:'Tháng', tabSeller:'Người bán',
   tabIn:'Nhập hàng', tabOut:'Bán hàng',
   settleTitle:'Chi tiết quyết toán',
@@ -908,6 +1082,7 @@ function setupListeners(){
   });
   db.ref('sales').orderByChild('timestamp').on('value',s=>{
     salesCache=s.val()||{}; renderHist('out',salesCache); countToday();
+    updateDashboardKPI();
     if(document.getElementById('sc-settle').classList.contains('active')) refreshSettle();
   });
 }
@@ -962,22 +1137,32 @@ function renderStockList(){
   el.innerHTML=pids.map(id=>{
     const p=products[id], s=stockData[id]||{quantity:0,expiringCount:0};
     const qty=s.quantity||0, mn=p.minStock||10;
-    let badge,cls;
-    if(qty===0){badge=t('badgeZero');cls='badge-zero';}
-    else if(qty<mn){badge=t('badgeDanger');cls='badge-danger';}
-    else if(qty<mn*1.5){badge=t('badgeWarn');cls='badge-warn';}
-    else{badge=t('badgeOk');cls='badge-ok';}
-    const exp=s.expiringCount>0?`<div style="font-size:10px;color:var(--warning);margin-top:2px">⏰ ${t('expTag')} ${s.expiringCount}${p.unit}</div>`:'';
-    return `<div class="stock-item" onclick="openAdj('${id}')">
-      <div class="stock-icon">${getEmoji(p.name)}</div>
-      <div class="stock-info">
-        <div class="stock-name">${p.name} ${p.size}</div>
-        <div class="stock-detail">${t('safeMin')}: ${mn}${p.unit}</div>${exp}
+    // 판매가능 = 전체 재고 (추후 예약 차감 확장 가능)
+    const avail=qty;
+    let badge,cls,qtyColor;
+    if(qty===0){badge=t('badgeZero');cls='badge-zero';qtyColor='var(--gray-400)';}
+    else if(qty<mn){badge=t('badgeDanger');cls='badge-danger';qtyColor='var(--danger)';}
+    else if(qty<mn*1.5){badge=t('badgeWarn');cls='badge-warn';qtyColor='var(--warning)';}
+    else{badge=t('badgeOk');cls='badge-ok';qtyColor='var(--gray-800)';}
+    const expWarn=s.expiringCount>0?`<div style="font-size:10px;color:var(--warning);font-weight:600">⏰ ${t('expTag')} ${s.expiringCount}개</div>`:'';
+    return `<div class="stock-item-v2" onclick="openAdj('${id}')">
+      <div class="si-icon">${getEmoji(p.name)}</div>
+      <div class="si-info">
+        <div class="si-name">${p.name} <span style="color:var(--gray-500);font-weight:500">${p.size}</span></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <div class="badge ${cls}" style="margin-top:0">${badge}</div>
+          ${expWarn}
+        </div>
       </div>
-      <div class="stock-right">
-        <div class="stock-qty" style="color:${qty===0?'var(--gray-400)':qty<mn?'var(--danger)':'var(--gray-800)'}">${qty}</div>
-        <div class="stock-unit">${p.unit}</div>
-        <div class="badge ${cls}">${badge}</div>
+      <div class="si-stock" style="text-align:center;min-width:44px">
+        <div style="font-size:10px;color:var(--gray-400);margin-bottom:2px">재고</div>
+        <div class="si-qty" style="color:${qtyColor}">${qty}</div>
+        <div class="si-unit">${p.unit}</div>
+      </div>
+      <div class="si-stock" style="text-align:center;min-width:48px;border-left:1px solid var(--gray-100);padding-left:8px">
+        <div style="font-size:10px;color:var(--gray-400);margin-bottom:2px">${t('dashAvail')}</div>
+        <div class="si-qty" style="color:var(--success)">${avail}</div>
+        <div class="si-unit">${p.unit}</div>
       </div>
     </div>`;
   }).join('');
@@ -990,18 +1175,95 @@ function updateSummary(){
     if((s.quantity||0)<mn) alrt++;
     exp+=s.expiringCount||0;
   });
-  document.getElementById('sum-total').textContent=pids.length;
-  document.getElementById('sum-alert').textContent=alrt;
-  document.getElementById('sum-exp').textContent=exp;
   const badge=document.getElementById('badge-stock'), dot=document.getElementById('alert-dot');
   if(alrt>0){badge.style.display='flex';badge.textContent=alrt;dot.style.display='block';}
   else{badge.style.display='none';dot.style.display='none';}
+  // KPI [A]
+  document.getElementById('kpi-reorder').innerHTML=`${alrt}<span style="font-size:13px;font-weight:600"> 품목</span>`;
+  updateDashboardKPI();
+}
+
+function updateDashboardKPI(){
+  const td=today();
+  const todaySales=Object.values(salesCache).filter(r=>r.date===td);
+  const todayQty=todaySales.length;
+  const todayAmt=todaySales.reduce((s,r)=>s+(r.total||0),0);
+  document.getElementById('kpi-today-qty').innerHTML=`${todayQty}<span style="font-size:13px;font-weight:600"> 건</span>`;
+  document.getElementById('kpi-today-amt').textContent=fmtNum(todayAmt)+' ₫';
+
+  // 배달K 오늘
+  const bdSales=todaySales.filter(r=>r.channel==='baedalk');
+  document.getElementById('baedalk-cnt-today').textContent=`오늘 ${bdSales.length}건`;
+  document.getElementById('baedalk-amt-today').textContent=fmtNum(bdSales.reduce((s,r)=>s+(r.total||0),0))+' ₫';
+
+  // 개인판매자 오늘
+  const slSales=todaySales.filter(r=>r.channel==='seller');
+  document.getElementById('seller-cnt-today').textContent=`오늘 ${slSales.length}건`;
+  document.getElementById('seller-amt-today').textContent=fmtNum(slSales.reduce((s,r)=>s+(r.total||0),0))+' ₫';
+
+  // 미지급 배달비 (전체 기간 미지급)
+  const allSales=Object.values(salesCache);
+  const unpaidDelivery=allSales.filter(r=>r.channel==='baedalk'&&(r.deliveryFee||0)>0&&!r.deliveryPaid);
+  const unpaidDeliveryAmt=unpaidDelivery.reduce((s,r)=>s+(r.deliveryFee||0),0);
+  document.getElementById('kpi-delivery-cnt').innerHTML=`${unpaidDelivery.length}<span style="font-size:13px;font-weight:600"> 건</span>`;
+  document.getElementById('kpi-delivery-amt').textContent=fmtNum(unpaidDeliveryAmt)+' ₫';
+
+  // 미수 도매가 (개인판매자 미입금)
+  const unpaidWholesale=allSales.filter(r=>r.channel==='seller'&&!r.wholesalePaid);
+  const unpaidWholesaleAmt=unpaidWholesale.reduce((s,r)=>s+(r.hqAmount||r.supplyTotal||0),0);
+  document.getElementById('kpi-wholesale-cnt').innerHTML=`${unpaidWholesale.length}<span style="font-size:13px;font-weight:600"> 건</span>`;
+  document.getElementById('kpi-wholesale-amt').textContent=fmtNum(unpaidWholesaleAmt)+' ₫';
+
+  // 정산 탭 배지
+  const totalUrgent=unpaidDelivery.length+unpaidWholesale.length;
+  const sbadge=document.getElementById('badge-settle');
+  if(totalUrgent>0){sbadge.style.display='flex';sbadge.textContent=totalUrgent;}
+  else sbadge.style.display='none';
+
+  // 개인판매자 섹션 - 입금 미확인 목록
+  renderSellerPaymentPreview(slSales);
+}
+
+function renderSellerPaymentPreview(slSales){
+  const el=document.getElementById('seller-payment-preview');
+  if(!el) return;
+  // Group by seller, show unpaid
+  const bySeller={};
+  Object.entries(salesCache).filter(([,r])=>r.channel==='seller').forEach(([id,r])=>{
+    const sid=r.sellerId||'unknown';
+    if(!bySeller[sid]) bySeller[sid]={name:r.sellerName||(sellers[sid]||{}).name||'판매자',total:0,hq:0,paid:0,unpaid:0,unpaidAmt:0};
+    bySeller[sid].total+=r.total||0;
+    bySeller[sid].hq+=r.hqAmount||(r.supplyTotal||0);
+    if(r.wholesalePaid) bySeller[sid].paid++;
+    else{bySeller[sid].unpaid++;bySeller[sid].unpaidAmt+=r.hqAmount||(r.supplyTotal||0);}
+  });
+  const entries=Object.entries(bySeller);
+  if(!entries.length){
+    el.innerHTML=`<div style="padding:8px 0;font-size:12px;color:var(--gray-400);text-align:center">${t('noSeller')}</div>`;
+    return;
+  }
+  el.innerHTML=entries.map(([sid,d])=>`
+    <div class="seller-payment-row">
+      <div>
+        <div class="spr-name">🧑‍💼 ${d.name}</div>
+        <div style="font-size:10px;color:var(--gray-400);margin-top:1px">${t('fSupply')} 미수: ${d.unpaid}건</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="spr-amount">${fmtNum(d.unpaidAmt)} ₫</div>
+      </div>
+    </div>`).join('');
+  // action button
+  el.innerHTML+=`<button class="channel-action-btn cab-seller" style="margin-top:8px" onclick="showScreen('settle',document.querySelector('.nav-btn:nth-child(4)'));setTimeout(()=>setSettleTab('delivery'),50)">
+    <span data-i="wholesaleMgmtTitle"></span><span class="cab-arrow">›</span>
+  </button>`;
+  applyLangEl(el);
+}
+function applyLangEl(el){
+  el.querySelectorAll('[data-i]').forEach(e=>{ const v=t(e.dataset.i); if(v) e.textContent=v; });
 }
 
 function countToday(){
-  const td=today(); let cnt=0;
-  Object.values(salesCache).forEach(r=>{if(r.date===td) cnt++;});
-  document.getElementById('sum-today').textContent=cnt;
+  updateDashboardKPI();
 }
 
 // ═══════════════════════════════════════════
@@ -1050,6 +1312,8 @@ function setChannel(ch,btn){
   document.querySelectorAll('.channel-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('seller-select-group').style.display=ch==='seller'?'block':'none';
+  document.getElementById('delivery-fee-group').style.display=ch==='baedalk'?'block':'none';
+  if(ch!=='baedalk') document.getElementById('out-delivery-fee').value='';
   updateSaleSummary();
 }
 
@@ -1154,6 +1418,8 @@ function saveSale(){
   const hqAmount = currentChannel==='baedalk' ? saleTotal : supplyTotal;
   const sellerProfit = currentChannel==='seller' ? Math.max(0, saleTotal - supplyTotal) : 0;
 
+  const deliveryFee = currentChannel==='baedalk' ? (parseInt(document.getElementById('out-delivery-fee').value)||0) : 0;
+
   db.ref('sales').push().set({
     date,productId:pid,productName:`${p.name} ${p.size}`,
     quantity:qty,unitPrice:price,total:saleTotal,
@@ -1161,13 +1427,14 @@ function saveSale(){
     channel:currentChannel,
     sellerId,sellerName,
     hqAmount,sellerProfit,
+    deliveryFee,deliveryPaid:false,
     customer,payMethod,note,staff:currentUser,timestamp:Date.now()
   }).then(()=>{
     db.ref('stock/'+pid).transaction(c=>{
       c=c||{quantity:0}; c.quantity=Math.max(0,(c.quantity||0)-qty); c.lastUpdated=Date.now(); return c;
     });
     showToast(`${t('saleSaved')}: ${p.name} ${p.size} ${qty}${p.unit}`);
-    ['out-qty','out-customer','out-note'].forEach(id=>document.getElementById(id).value='');
+    ['out-qty','out-customer','out-note','out-delivery-fee'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('out-product').value='';
     document.getElementById('out-price').value='';
     document.getElementById('out-price-hint').textContent='';
@@ -1238,9 +1505,111 @@ function delRecord(type,id,pid,qty){
 // ═══════════════════════════════════════════
 function initSettleTab(){ setSettleTab('daily'); }
 
+function renderSettleDelivery(){
+  const el=document.getElementById('settle-delivery');
+  const allSales=Object.values(salesCache);
+  const deliverySales=allSales.filter(r=>r.channel==='baedalk'&&(r.deliveryFee||0)>0)
+    .sort((a,b)=>b.timestamp-a.timestamp);
+
+  const unpaidAmt=deliverySales.filter(r=>!r.deliveryPaid).reduce((s,r)=>s+(r.deliveryFee||0),0);
+  const paidAmt=deliverySales.filter(r=>r.deliveryPaid).reduce((s,r)=>s+(r.deliveryFee||0),0);
+
+  let html=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:#fff0f6;border-radius:var(--radius-sm);padding:12px;text-align:center;border:1.5px solid #f8bbd9">
+      <div style="font-size:10px;font-weight:700;color:#c2185b;margin-bottom:4px">⏳ 미지급</div>
+      <div style="font-size:18px;font-weight:800;color:#c2185b">${fmtNum(unpaidAmt)}</div>
+      <div style="font-size:10px;color:#c2185b">₫</div>
+    </div>
+    <div style="background:var(--success-light);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1.5px solid #a7f3d0">
+      <div style="font-size:10px;font-weight:700;color:var(--success);margin-bottom:4px">✅ 지급완료</div>
+      <div style="font-size:18px;font-weight:800;color:var(--success)">${fmtNum(paidAmt)}</div>
+      <div style="font-size:10px;color:var(--success)">₫</div>
+    </div>
+  </div>`;
+
+  // 배달K 판매 + 개인판매자 도매가 미수금 통합 관리
+  // Section 1: 배달비 목록
+  html+=`<div style="background:#fff;border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow)">
+    <div style="padding:10px 14px;background:#fff0f6;border-left:4px solid #c2185b;font-size:13px;font-weight:700;color:#c2185b">
+      🛵 ${t('deliveryMgmtTitle')}
+    </div>
+    <div style="padding:6px 14px 14px">`;
+
+  if(!deliverySales.length){
+    html+=`<div class="empty" style="padding:20px 0"><div class="empty-text">${t('noData')}</div></div>`;
+  } else {
+    deliverySales.forEach(r=>{
+      const sid=Object.keys(salesCache).find(k=>salesCache[k]===r)||'';
+      const paid=r.deliveryPaid||false;
+      html+=`<div class="delivery-row">
+        <div class="dr-info">
+          <div class="dr-name">${r.productName||'-'} ×${r.quantity}</div>
+          <div class="dr-meta">${fmtDate(r.date)} · ${r.customer||'-'}</div>
+        </div>
+        <div class="dr-amount">${fmtNum(r.deliveryFee||0)} ₫</div>
+        <button class="dr-pay-btn ${paid?'paid':'unpaid'}" onclick="toggleDeliveryPaid('${sid}',${!paid})">
+          ${paid?t('payBtnLabel'):t('payBtnPending')}
+        </button>
+      </div>`;
+    });
+  }
+  html+=`</div></div>`;
+
+  // Section 2: 도매가 입금확인
+  const wholesaleSales=Object.entries(salesCache)
+    .filter(([,r])=>r.channel==='seller')
+    .sort((a,b)=>b[1].timestamp-a[1].timestamp);
+
+  html+=`<div style="background:#fff;border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow)">
+    <div style="padding:10px 14px;background:var(--purple-light);border-left:4px solid var(--purple);font-size:13px;font-weight:700;color:var(--purple)">
+      🧑‍💼 ${t('wholesaleMgmtTitle')}
+    </div>
+    <div style="padding:6px 14px 14px">`;
+
+  if(!wholesaleSales.length){
+    html+=`<div class="empty" style="padding:20px 0"><div class="empty-text">${t('noData')}</div></div>`;
+  } else {
+    wholesaleSales.forEach(([sid,r])=>{
+      const paid=r.wholesalePaid||false;
+      const hqAmt=r.hqAmount||(r.supplyTotal||0);
+      html+=`<div class="delivery-row">
+        <div class="dr-info">
+          <div class="dr-name">${r.sellerName||'판매자'} · ${r.productName||'-'}</div>
+          <div class="dr-meta">${fmtDate(r.date)} · ${r.quantity}개 · 도매가 ${fmtNum(hqAmt)} ₫</div>
+        </div>
+        <div class="dr-amount" style="color:var(--purple)">${fmtNum(hqAmt)} ₫</div>
+        <button class="dr-pay-btn ${paid?'paid':'unpaid'}" style="${paid?'':'background:var(--purple-light);color:var(--purple)'}"
+          onclick="toggleWholesalePaid('${sid}',${!paid})">
+          ${paid?t('payConfirmed'):t('payPending')}
+        </button>
+      </div>`;
+    });
+  }
+  html+=`</div></div>`;
+  el.innerHTML=html;
+}
+
+function toggleDeliveryPaid(id, paid){
+  if(!db) return;
+  db.ref('sales/'+id+'/deliveryPaid').set(paid).then(()=>{
+    showToast(paid?t('deliveryPaid'):'취소');
+    renderSettleDelivery(); updateDashboardKPI();
+  });
+}
+
+function toggleWholesalePaid(id, paid){
+  if(!db) return;
+  if(paid && !confirm(t('confirmPayment'))) return;
+  db.ref('sales/'+id+'/wholesalePaid').set(paid).then(()=>{
+    showToast(paid?t('paymentDone'):'취소');
+    renderSettleDelivery(); updateDashboardKPI();
+  });
+}
+
 function setSettleTab(tab){
   settleTab=tab;
-  const tabs=['daily','weekly','monthly','seller'];
+  const tabs=['daily','weekly','monthly','seller','delivery'];
   document.querySelectorAll('#sc-settle .tab-item').forEach((el,i)=>{
     el.classList.toggle('active',tabs[i]===tab);
   });
@@ -1253,6 +1622,7 @@ function refreshSettle(){
   else if(settleTab==='weekly') renderSettleWeekly();
   else if(settleTab==='monthly') renderSettleMonthly();
   else if(settleTab==='seller') renderSettleSeller();
+  else if(settleTab==='delivery') renderSettleDelivery();
 }
 
 function calcSettle(records){
