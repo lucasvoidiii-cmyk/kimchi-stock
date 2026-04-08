@@ -1056,7 +1056,7 @@ function buildDL(recs,ct){
       '<div class="sdi-row"><span class="sdi-k">'+t('colDel')+'</span><span class="sdi-v">'+N(r.deliveryFee||0)+' ₫</span></div>'+
       '<div class="sdi-row"><span class="sdi-k">'+t('colHQ')+'</span><span class="sdi-v" style="color:var(--success-dark)">'+N(hq)+' ₫</span></div>'+
       (!isB?'<div class="sdi-row"><span class="sdi-k">'+t('colSellerPr')+'</span><span class="sdi-v" style="color:var(--purple)">'+N(pr)+' ₫</span></div>':'')+
-      '<div class="sdi-act">'+(sid?'<button class="btn btn-sm btn-primary" data-sid="'+sid+'" onclick="openEdit(this.getAttribute(\"data-sid\"))">✏️</button>':'')+'</div>'+
+      '<div class="sdi-act">'+(sid?'<button class="btn btn-sm btn-primary" onclick="openEdit(\''+sid+'\')">✏️</button>':'')+'</div>'+
       '</div>';
   });
   return h+'</div>';
