@@ -310,7 +310,12 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <!-- 주문자 이름 (배달K 전용) -->
       <div class="form-group" id="orderer-grp">
         <label class="form-label" data-i18n="outOrdererLbl">주문자 이름</label>
-        <input type="text" class="form-control" id="out-orderer" placeholder="예: 김연주" data-i18n-placeholder="outOrdererPh">
+        <div style="position:relative">
+          <input type="text" class="form-control" id="out-orderer" placeholder="예: 김연주" autocomplete="off" oninput="chkRegular(this.value)">
+          <div id="regular-badge" style="display:none;margin-top:6px;padding:8px 12px;background:#FFF8E1;border-radius:8px;border-left:3px solid #FFB300;font-size:13px;font-weight:700;color:#E65100;">
+            ⭐ 단골손님입니다! <span id="regular-cnt" style="font-weight:400;color:var(--gray-600)"></span>
+          </div>
+        </div>
       </div>
       <div class="form-group" id="seller-grp" style="display:none"><label class="form-label" data-i18n="outSellerLbl">판매자 선택 *</label><select class="form-control" id="out-seller"><option value=""></option></select></div>
       <!-- 다품목 상품 추가 -->
@@ -367,11 +372,13 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <button class="sub-tab active" onclick="setRptTab('daily')" data-i18n="rptDaily">일별</button>
       <button class="sub-tab" onclick="setRptTab('monthly')" data-i18n="rptMonthly">월별</button>
       <button class="sub-tab" onclick="setRptTab('channel')" data-i18n="rptChannel">채널별</button>
+      <button class="sub-tab" onclick="setRptTab('orderer')" data-i18n="rptOrderer">주문자별</button>
     </div>
     <div class="content-wrap">
       <div id="rpt-daily"></div>
       <div id="rpt-monthly" style="display:none"></div>
       <div id="rpt-channel" style="display:none"></div>
+      <div id="rpt-orderer" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -533,7 +540,7 @@ ko:{mn:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','
   outSaveBtn:'📤 판매 저장',
   eCart:'상품을 1개 이상 추가해주세요',
   stDaily:'일일',stWeekly:'주간',stMonthly:'월간',stSeller:'판매자별',stDelivery:'배달비 지급',stWholesale:'도매 입금',
-  rptDaily:'일별',rptMonthly:'월별',rptChannel:'채널별',
+  rptDaily:'일별',rptMonthly:'월별',rptChannel:'채널별',rptOrderer:'주문자별',
   navHome:'홈',navIn:'입고',navOut:'판매',navSettle:'정산',navReport:'보고서',
   mgmtTitle:'⚙️ 관리',mgmtSeller:'판매자',mgmtProd:'제품',mgmtHist:'내역',mgmtSettings:'설정',
   mgmtSellerTitle:'🧑‍💼 판매자 관리',mgmtProdTitle:'🥬 제품 관리',
@@ -595,7 +602,7 @@ vi:{mn:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
   outSaveBtn:'📤 Lưu bán hàng',
   eCart:'Vui lòng thêm ít nhất 1 sản phẩm',
   stDaily:'Ngày',stWeekly:'Tuần',stMonthly:'Tháng',stSeller:'Theo người bán',stDelivery:'Phí giao hàng',stWholesale:'Nộp bán buôn',
-  rptDaily:'Ngày',rptMonthly:'Tháng',rptChannel:'Theo kênh',
+  rptDaily:'Ngày',rptMonthly:'Tháng',rptChannel:'Theo kênh',rptOrderer:'Theo người đặt',
   navHome:'Trang chủ',navIn:'Nhập hàng',navOut:'Bán hàng',navSettle:'Quyết toán',navReport:'Báo cáo',
   mgmtTitle:'⚙️ Quản lý',mgmtSeller:'Người bán',mgmtProd:'Sản phẩm',mgmtHist:'Lịch sử',mgmtSettings:'Cài đặt',
   mgmtSellerTitle:'🧑‍💼 Quản lý người bán',mgmtProdTitle:'🥬 Quản lý sản phẩm',
@@ -729,7 +736,7 @@ function setSettleTab(tab){
 }
 function setRptTab(tab){
   rptTab=tab;
-  var tabs=['daily','monthly','channel'];
+  var tabs=['daily','monthly','channel','orderer'];
   document.querySelectorAll('#page-report .sub-tab').forEach(function(el,i){el.classList.toggle('active',tabs[i]===tab);});
   tabs.forEach(function(x){document.getElementById('rpt-'+x).style.display=x===tab?'block':'none';});
   renderRpt();
@@ -935,6 +942,7 @@ async function saveSale(){
     document.getElementById('out-del').value='';
     document.getElementById('out-note').value='';
     document.getElementById('out-orderer').value='';
+    document.getElementById('regular-badge').style.display='none';
     updSS();
     if(document.getElementById('page-home').classList.contains('active'))renderHome();
   }catch(e){toast('저장 실패:'+e.message);}
@@ -1169,6 +1177,7 @@ function renderRpt(){
   if(rptTab==='daily')rDay();
   else if(rptTab==='monthly')rMonth();
   else if(rptTab==='channel')rCh();
+  else if(rptTab==='orderer')rOrderer();
 }
 function rDay(){
   var el=document.getElementById('rpt-daily');
@@ -1239,6 +1248,88 @@ function rCh(){
     (pr?'<div class="rpt-sec"><div class="rpt-title">'+t('rptLabelByProd')+'</div>'+pr+'</div>':'');
 }
 
+/* ORDERER REPORT */
+function rOrderer(){
+  var el=document.getElementById('rpt-orderer');
+  // 배달K 채널에서 주문자 이름이 있는 판매 레코드만 집계
+  var baedalRecs=Object.values(sales).filter(function(r){return r.channel==='baedalk'&&(r.ordererName||'').trim();});
+  if(!baedalRecs.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🙋</div><div class="empty-text">주문자 데이터가 없습니다</div></div>';return;
+  }
+  // 주문자별 groupId 기준으로 그룹핑 (같은 주문건 내 다품목은 1건으로 카운트)
+  var byOrderer={};
+  baedalRecs.forEach(function(r){
+    var name=(r.ordererName||'').trim();
+    if(!byOrderer[name])byOrderer[name]={name:name,orders:{},totalAmt:0,totalQty:0};
+    var ov=byOrderer[name];
+    // groupId 기준으로 주문 묶음 관리
+    var gid=r.groupId||r.timestamp+'';
+    if(!ov.orders[gid])ov.orders[gid]={date:r.date,items:[],orderAmt:0,deliveryFee:0};
+    ov.orders[gid].items.push({prod:pName(r.productName||''),qty:r.quantity||0,total:r.total||0});
+    ov.orders[gid].orderAmt+=(r.total||0);
+    ov.orders[gid].deliveryFee+=(r.deliveryFee||0);
+    ov.totalAmt+=(r.total||0);
+    ov.totalQty+=(r.quantity||0);
+  });
+  // 총 주문금액 내림차순 정렬 (단골 순위)
+  var sorted=Object.values(byOrderer).sort(function(a,b){return b.totalAmt-a.totalAmt;});
+  var html='';
+  sorted.forEach(function(ov,rank){
+    var orderList=Object.values(ov.orders).sort(function(a,b){return b.date.localeCompare(a.date);});
+    var orderCnt=orderList.length;
+    var isRegular=orderCnt>=2;
+    var rankLabel=rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':'👤';
+    // 주문 상세 행
+    var detailRows=orderList.map(function(od){
+      var itemStr=od.items.map(function(it){return pName(it.prod)+' '+it.qty+'개';}).join(' / ');
+      var amtStr=N(od.orderAmt)+' ₫';
+      return'<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:13px">'+
+        '<div style="color:var(--gray-500);min-width:80px">'+od.date+'</div>'+
+        '<div style="flex:1;padding:0 8px;color:var(--gray-700)">'+itemStr+'</div>'+
+        '<div style="font-weight:700;white-space:nowrap">'+amtStr+'</div></div>';
+    }).join('');
+    html+='<div class="rpt-sec" style="margin-bottom:14px">'+
+      // 헤더 행: 이름 + 주문 건수 + 단골 배지
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:20px">'+rankLabel+'</span>'+
+          '<div>'+
+            '<div style="font-size:16px;font-weight:800;color:var(--gray-900)">'+ov.name+'</div>'+
+            '<div style="font-size:12px;color:var(--gray-500);margin-top:2px">총 '+orderCnt+'건 주문'+
+              (isRegular?' · <span style="color:#E65100;font-weight:700">⭐ 단골손님</span>':'')+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:18px;font-weight:800;color:var(--primary)">'+N(ov.totalAmt)+' ₫</div>'+
+          '<div style="font-size:11px;color:var(--gray-400)">누적 합계</div>'+
+        '</div>'+
+      '</div>'+
+      // 주문 상세 목록
+      '<div style="border-top:1px solid var(--gray-100);padding-top:4px">'+detailRows+'</div>'+
+    '</div>';
+  });
+  el.innerHTML='<div style="padding:4px 0 12px;font-size:13px;color:var(--gray-500);">배달K 주문자 기준 · 총 <strong style="color:var(--gray-700)">'+sorted.length+'명</strong></div>'+html;
+}
+
+/* 단골손님 감지 */
+function chkRegular(name){
+  var n=(name||'').trim();
+  var badge=document.getElementById('regular-badge');
+  var cntEl=document.getElementById('regular-cnt');
+  if(!n){badge.style.display='none';return;}
+  // 동일 이름의 과거 주문 건수(groupId 기준) 집계
+  var past=Object.values(sales).filter(function(r){return r.channel==='baedalk'&&(r.ordererName||'').trim()===n;});
+  var pastGroups={};
+  past.forEach(function(r){var g=r.groupId||r.timestamp+'';pastGroups[g]=true;});
+  var cnt=Object.keys(pastGroups).length;
+  if(cnt>0){
+    badge.style.display='block';
+    cntEl.textContent='이전 주문 '+cnt+'건';
+  }else{
+    badge.style.display='none';
+  }
+}
 /* MGMT */
 function openMgmt(){document.getElementById('mgmt-ov').classList.add('open');setMT(mgmtTab);}
 function closeMgmt(){document.getElementById('mgmt-ov').classList.remove('open');}
