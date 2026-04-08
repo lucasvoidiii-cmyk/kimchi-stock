@@ -307,15 +307,32 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
           <div class="ch-btn" id="ch-seller" onclick="selCh('seller')" data-i18n="chSellerLabel">🧑‍💼 개인판매자</div>
         </div>
       </div>
+      <!-- 주문자 이름 (배달K 전용) -->
+      <div class="form-group" id="orderer-grp">
+        <label class="form-label" data-i18n="outOrdererLbl">주문자 이름</label>
+        <input type="text" class="form-control" id="out-orderer" placeholder="예: 김연주" data-i18n-placeholder="outOrdererPh">
+      </div>
       <div class="form-group" id="seller-grp" style="display:none"><label class="form-label" data-i18n="outSellerLbl">판매자 선택 *</label><select class="form-control" id="out-seller"><option value=""></option></select></div>
-      <div class="form-group"><label class="form-label" data-i18n="fProd">제품 선택 *</label><select class="form-control" id="out-prod" onchange="onProdCh()"><option value=""></option></select></div>
-      <div class="form-group"><label class="form-label" data-i18n="outQty">판매 수량 *</label><input type="number" class="form-control" id="out-qty" min="1" oninput="updSS()"></div>
-      <div class="form-group"><label class="form-label" data-i18n="outPrice">판매단가 (VND)</label><input type="number" class="form-control" id="out-price" oninput="updSS()"></div>
+      <!-- 다품목 상품 추가 -->
+      <div class="form-group">
+        <label class="form-label" data-i18n="outAddItemLbl">상품 추가</label>
+        <select class="form-control" id="cart-prod" onchange="onCartProdCh()" style="margin-bottom:8px"><option value=""></option></select>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <input type="number" class="form-control" id="cart-qty" min="1" placeholder="수량" style="flex:1;min-width:0">
+          <input type="number" class="form-control" id="cart-price" placeholder="단가(VND)" style="flex:1.5;min-width:0">
+          <button class="btn btn-sm btn-primary" onclick="addCartItem()" style="flex:0 0 auto;padding:0 14px;height:auto" data-i18n="outAddBtn">추가</button>
+        </div>
+        <div class="form-hint" data-i18n="outAddHint">제품 선택 후 수량·단가 입력 → 추가 버튼</div>
+      </div>
+      <!-- 장바구니 목록 -->
+      <div id="cart-list"></div>
+      <!-- 배달비 -->
       <div class="form-group" id="del-fee-grp"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
         <input type="number" class="form-control" id="out-del" placeholder="0" oninput="updSS()">
-        <div class="form-hint" data-i18n="outDelHint">배달K 채널 배달비</div></div>
+        <div class="form-hint" data-i18n="outDelHint">배달K 채널 배달비 (주문 1건당 1회)</div></div>
       <div class="form-group"><label class="form-label" data-i18n="fNote">비고</label><input type="text" class="form-control" id="out-note"></div>
       <div class="ss-box">
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssItemsLbl">품목 수</span><span class="ss-val" id="ss-items">0품목</span></div>
         <div class="ss-row"><span class="ss-lbl" data-i18n="ssTotalLbl">판매 총액</span><span class="ss-val" id="ss-total">0 ₫</span></div>
         <div class="ss-row"><span class="ss-lbl" data-i18n="ssDelLbl">배달비</span><span class="ss-val" id="ss-del">0 ₫</span></div>
         <div class="ss-row"><span class="ss-lbl" data-i18n="ssHqLbl">본사 입금액</span><span class="ss-val hq" id="ss-hq">0 ₫</span></div>
@@ -508,10 +525,13 @@ ko:{mn:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','
   inTitle:'📥 입고 등록',inDate:'입고일자 *',inQty:'입고 수량 *',inExpiry:'유통기한',inSaveBtn:'📥 입고 저장',
   outTitle:'📤 판매 등록',outDate:'판매일자 *',outChannel:'판매 채널 *',
   chBaedalkLabel:'🛵 배달K',chSellerLabel:'🧑‍💼 개인판매자',outSellerLbl:'판매자 선택 *',
+  outOrdererLbl:'주문자 이름',outOrdererPh:'예: 김연주',
+  outAddItemLbl:'상품 추가',outAddBtn:'추가',outAddHint:'제품 선택 후 수량·단가 입력 → 추가 버튼',
   outQty:'판매 수량 *',outPrice:'판매단가 (VND)',outDelFee:'배달비 (VND)',
-  outDelHint:'배달K 채널 배달비',
-  ssTotalLbl:'판매 총액',ssDelLbl:'배달비',ssHqLbl:'본사 입금액',ssPrLbl:'판매자 수익',
+  outDelHint:'배달K 채널 배달비 (주문 1건당 1회)',
+  ssItemsLbl:'품목 수',ssTotalLbl:'판매 총액',ssDelLbl:'배달비',ssHqLbl:'본사 입금액',ssPrLbl:'판매자 수익',
   outSaveBtn:'📤 판매 저장',
+  eCart:'상품을 1개 이상 추가해주세요',
   stDaily:'일일',stWeekly:'주간',stMonthly:'월간',stSeller:'판매자별',stDelivery:'배달비 지급',stWholesale:'도매 입금',
   rptDaily:'일별',rptMonthly:'월별',rptChannel:'채널별',
   navHome:'홈',navIn:'입고',navOut:'판매',navSettle:'정산',navReport:'보고서',
@@ -567,10 +587,13 @@ vi:{mn:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
   inTitle:'📥 Nhập hàng',inDate:'Ngày nhập *',inQty:'Số lượng nhập *',inExpiry:'Hạn sử dụng',inSaveBtn:'📥 Lưu nhập hàng',
   outTitle:'📤 Đăng ký bán',outDate:'Ngày bán *',outChannel:'Kênh bán *',
   chBaedalkLabel:'🛵 Baedalc K',chSellerLabel:'🧑‍💼 Người bán cá nhân',outSellerLbl:'Chọn người bán *',
+  outOrdererLbl:'Tên người đặt hàng',outOrdererPh:'Ví dụ: Kim Yeon-ju',
+  outAddItemLbl:'Thêm sản phẩm',outAddBtn:'Thêm',outAddHint:'Chọn SP → nhập SL & đơn giá → nhấn Thêm',
   outQty:'Số lượng bán *',outPrice:'Đơn giá bán (VND)',outDelFee:'Phí giao hàng (VND)',
-  outDelHint:'Phí giao hàng kênh Baedalc K',
-  ssTotalLbl:'Tổng tiền bán',ssDelLbl:'Phí giao hàng',ssHqLbl:'Tiền chuyển về HQ',ssPrLbl:'Lợi nhuận người bán',
+  outDelHint:'Phí giao hàng kênh Baedalc K (1 lần/đơn)',
+  ssItemsLbl:'Số mặt hàng',ssTotalLbl:'Tổng tiền bán',ssDelLbl:'Phí giao hàng',ssHqLbl:'Tiền chuyển về HQ',ssPrLbl:'Lợi nhuận người bán',
   outSaveBtn:'📤 Lưu bán hàng',
+  eCart:'Vui lòng thêm ít nhất 1 sản phẩm',
   stDaily:'Ngày',stWeekly:'Tuần',stMonthly:'Tháng',stSeller:'Theo người bán',stDelivery:'Phí giao hàng',stWholesale:'Nộp bán buôn',
   rptDaily:'Ngày',rptMonthly:'Tháng',rptChannel:'Theo kênh',
   navHome:'Trang chủ',navIn:'Nhập hàng',navOut:'Bán hàng',navSettle:'Quyết toán',navReport:'Báo cáo',
@@ -778,7 +801,7 @@ function renderInv(){
 }
 function popSels(){
   var po='<option value=""></option>'+Object.entries(prods).map(function(e){return'<option value="'+e[0]+'">'+e[1].name+' '+e[1].size+'</option>';}).join('');
-  document.getElementById('out-prod').innerHTML=po;
+  document.getElementById('cart-prod').innerHTML=po;
   document.getElementById('in-prod').innerHTML=po;
   var so='<option value=""></option>'+Object.entries(sellers).map(function(e){return'<option value="'+e[0]+'">'+e[1].name+'</option>';}).join('');
   document.getElementById('out-seller').innerHTML=so;
@@ -801,53 +824,117 @@ async function saveInbound(){
   }catch(e){toast('저장 실패:'+e.message);}
 }
 /* SALE */
+var cart=[];
 function selCh(ch){
   curCh=ch;
   document.getElementById('ch-baedalk').className='ch-btn'+(ch==='baedalk'?' ab':'');
   document.getElementById('ch-seller').className='ch-btn'+(ch==='seller'?' as':'');
   document.getElementById('seller-grp').style.display=ch==='seller'?'block':'none';
   document.getElementById('del-fee-grp').style.display=ch==='baedalk'?'block':'none';
+  document.getElementById('orderer-grp').style.display=ch==='baedalk'?'block':'none';
   updSS();
 }
-function onProdCh(){var pid=document.getElementById('out-prod').value;if(pid&&prods[pid])document.getElementById('out-price').value=prods[pid].salePrice||'';updSS();}
+function onCartProdCh(){
+  var pid=document.getElementById('cart-prod').value;
+  if(pid&&prods[pid])document.getElementById('cart-price').value=prods[pid].salePrice||'';
+}
+function addCartItem(){
+  var pid=document.getElementById('cart-prod').value;
+  var qty=parseInt(document.getElementById('cart-qty').value)||0;
+  var price=parseInt(document.getElementById('cart-price').value)||0;
+  if(!pid){toast(t('eProd'));return;}
+  if(!qty){toast(t('eQty'));return;}
+  cart.push({pid:pid,qty:qty,price:price});
+  document.getElementById('cart-prod').value='';
+  document.getElementById('cart-qty').value='';
+  document.getElementById('cart-price').value='';
+  renderCart();
+  updSS();
+}
+function removeCartItem(i){
+  cart.splice(i,1);
+  renderCart();
+  updSS();
+}
+function renderCart(){
+  var el=document.getElementById('cart-list');
+  if(!cart.length){el.innerHTML='';return;}
+  el.innerHTML=cart.map(function(item,i){
+    var p=prods[item.pid]||{};
+    var tot=item.qty*item.price;
+    return'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--gray-50);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--primary)">'+
+      '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;margin-bottom:2px">'+pName(p.name+' '+(p.size||''))+'</div>'+
+      '<div style="font-size:12px;color:var(--gray-500)">'+item.qty+'개 × '+N(item.price)+' ₫ = <strong>'+N(tot)+' ₫</strong></div></div>'+
+      '<button onclick="removeCartItem('+i+')" style="background:transparent;border:none;color:var(--danger);font-size:20px;cursor:pointer;padding:0 0 0 10px;flex-shrink:0">✕</button>'+
+      '</div>';
+  }).join('');
+}
 function updSS(){
-  var qty=parseInt(document.getElementById('out-qty').value)||0;
-  var pr=parseInt(document.getElementById('out-price').value)||0;
   var dl=parseInt(document.getElementById('out-del').value)||0;
-  var pid=document.getElementById('out-prod').value;
-  var su=pid&&prods[pid]?(prods[pid].supplyPrice||0):0;
-  var tot=qty*pr;var sup=qty*su;
-  var hq=curCh==='baedalk'?tot:sup;
-  var spr=curCh==='baedalk'?0:Math.max(0,tot-sup);
+  var tot=0,hq=0,spr=0;
+  cart.forEach(function(item){
+    var p=prods[item.pid]||{};
+    var su=p.supplyPrice||0;
+    var itemTot=item.qty*item.price;
+    var itemSup=item.qty*su;
+    tot+=itemTot;
+    if(curCh==='baedalk'){hq+=itemTot;}
+    else{hq+=itemSup;spr+=Math.max(0,itemTot-itemSup);}
+  });
+  var unit=lang==='vi'?' SP':'품목';
+  document.getElementById('ss-items').textContent=cart.length+unit;
   document.getElementById('ss-total').textContent=N(tot)+' ₫';
   document.getElementById('ss-del').textContent=N(dl)+' ₫';
-  document.getElementById('ss-hq').textContent=(su===0&&curCh==='seller')?t('zeroSupplyWarn'):N(hq)+' ₫';
+  document.getElementById('ss-hq').textContent=N(hq)+' ₫';
   document.getElementById('ss-pr').textContent=N(spr)+' ₫';
 }
 async function saveSale(){
   var date=document.getElementById('out-date').value;
-  var pid=document.getElementById('out-prod').value;
-  var qty=parseInt(document.getElementById('out-qty').value)||0;
-  var pr=parseInt(document.getElementById('out-price').value)||0;
-  var dl=parseInt(document.getElementById('out-del').value)||0;
   var sid=document.getElementById('out-seller').value;
-  if(!date){toast(t('eDate'));return;}if(!pid){toast(t('eProd'));return;}if(!qty){toast(t('eQty'));return;}
+  var dl=parseInt(document.getElementById('out-del').value)||0;
+  var orderer=(document.getElementById('out-orderer').value||'').trim();
+  var note=document.getElementById('out-note').value;
+  if(!date){toast(t('eDate'));return;}
+  if(!cart.length){toast(t('eCart'));return;}
   if(curCh==='seller'&&!sid){toast(t('eSL'));return;}
-  var p=prods[pid];var su=p.supplyPrice||0;
-  if(su===0&&curCh==='seller'&&!confirm(t('zeroSupplyConfirm')))return;
-  var cur=(stock[pid]||{}).quantity||0;
-  if(qty>cur&&!confirm(t('overSt')))return;
-  var tot=qty*pr;var sup=qty*su;
-  var hq=curCh==='baedalk'?tot:sup;
-  var spr=curCh==='baedalk'?0:Math.max(0,tot-sup);
-  var rec={date:date,productId:pid,productName:p.name+' '+p.size,quantity:qty,salePrice:pr,supplyPrice:su,supplyTotal:sup,total:tot,deliveryFee:dl,hqAmount:hq,sellerProfit:spr,channel:curCh,sellerId:curCh==='seller'?sid:'',sellerName:curCh==='seller'?(sellers[sid]||{}).name||'':'',deliveryPaid:false,paymentConfirmed:false,staff:uName,note:document.getElementById('out-note').value,timestamp:Date.now()};
+  // 재고 초과 확인
+  for(var i=0;i<cart.length;i++){
+    var item=cart[i];
+    var cur=(stock[item.pid]||{}).quantity||0;
+    var p=prods[item.pid]||{};
+    if(item.qty>cur&&!confirm((p.name||'')+' '+t('overSt')))return;
+  }
+  var groupId=gid();
+  var sellerObj=curCh==='seller'?(sellers[sid]||{}):{};
   try{
-    var nid=await fPush('sales',rec);sales[nid]=rec;
-    await fSet('stock/'+pid,Object.assign({},stock[pid]||{},{quantity:Math.max(0,cur-qty),lastUpdated:Date.now()}));
-    stock[pid]=Object.assign({},stock[pid]||{},{quantity:Math.max(0,cur-qty)});
+    for(var i=0;i<cart.length;i++){
+      var item=cart[i];
+      var p=prods[item.pid];
+      var su=p.supplyPrice||0;
+      if(su===0&&curCh==='seller'&&i===0&&!confirm(t('zeroSupplyConfirm')))return;
+      var tot=item.qty*item.price;
+      var sup=item.qty*su;
+      var hq=curCh==='baedalk'?tot:sup;
+      var spr=curCh==='baedalk'?0:Math.max(0,tot-sup);
+      var itemDel=i===0?dl:0; // 배달비는 첫 번째 품목에만 기록
+      var rec={date:date,productId:item.pid,productName:p.name+' '+p.size,
+        quantity:item.qty,salePrice:item.price,supplyPrice:su,supplyTotal:sup,
+        total:tot,deliveryFee:itemDel,hqAmount:hq,sellerProfit:spr,
+        channel:curCh,sellerId:curCh==='seller'?sid:'',
+        sellerName:curCh==='seller'?(sellerObj.name||''):'',
+        ordererName:orderer,groupId:groupId,
+        deliveryPaid:false,paymentConfirmed:false,
+        staff:uName,note:note,timestamp:Date.now()+i};
+      var nid=await fPush('sales',rec);sales[nid]=rec;
+      var cur=(stock[item.pid]||{}).quantity||0;
+      await fSet('stock/'+item.pid,Object.assign({},stock[item.pid]||{},{quantity:Math.max(0,cur-item.qty),lastUpdated:Date.now()}));
+      stock[item.pid]=Object.assign({},stock[item.pid]||{},{quantity:Math.max(0,cur-item.qty)});
+    }
     toast(t('saleOk'));
-    document.getElementById('out-qty').value='';document.getElementById('out-price').value='';
-    document.getElementById('out-del').value='';document.getElementById('out-note').value='';
+    cart=[];renderCart();
+    document.getElementById('out-del').value='';
+    document.getElementById('out-note').value='';
+    document.getElementById('out-orderer').value='';
     updSS();
     if(document.getElementById('page-home').classList.contains('active'))renderHome();
   }catch(e){toast('저장 실패:'+e.message);}
@@ -1264,11 +1351,12 @@ function renderHOut(){
   if(!recs.length){el.innerHTML='<div class="empty"><div class="empty-text">'+t('noData')+'</div></div>';return;}
   el.innerHTML='<div class="h-wrap"><table class="h-tbl"><thead><tr>'+
     '<th>'+t('histColDate')+'</th><th>'+t('histColProd')+'</th><th>'+t('histColChannel')+'</th>'+
-    '<th>'+t('histColQty')+'</th><th>'+t('histColAmt')+'</th><th>'+t('histColDel')+'</th>'+
+    '<th>주문자</th><th>'+t('histColQty')+'</th><th>'+t('histColAmt')+'</th><th>'+t('histColDel')+'</th>'+
     '</tr></thead><tbody>'+
     recs.map(function(e){var r=e[1];var isB=r.channel==='baedalk';
       return'<tr><td>'+r.date+'</td><td>'+pName(r.productName||'')+'</td>'+
         '<td><span class="ctag '+(isB?'ctag-b':'ctag-s')+'">'+( isB?'BaedalcK':t('rptLabelSeller').slice(0,6))+'</span></td>'+
+        '<td style="font-size:12px;color:var(--gray-600)">'+(isB?(r.ordererName||'-'):( r.sellerName||'-'))+'</td>'+
         '<td>'+(r.quantity||0)+t('invUnit')+'</td><td>'+N(r.total||0)+' ₫</td><td>'+N(r.deliveryFee||0)+' ₫</td></tr>';
     }).join('')+
     '</tbody></table></div>';
