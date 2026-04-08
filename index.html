@@ -525,7 +525,29 @@ ko:{mn:['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','
   adjExpHint:'7일 이내 유통기한 제품 수량',adjSaveBtn:'재고 수정 완료',
   editTitle:'📝 판매 내역 수정',editAmtLbl:'판매금액 (VND) *',editAmtHint:'판매단가 × 수량 합계',
   editHqLbl:'본사 입금',editSaveBtn:'수정 저장',
-  fProd:'제품 선택 *',fNote:'비고',saveBtn:'저장'},
+  fProd:'제품 선택 *',fNote:'비고',saveBtn:'저장',
+  // dynamic render strings
+  invToday:'오늘 판매',invAvail:'판매가능',invUnit:'개',
+  stOk:'정상',stWarn:'여유 부족',stDanger:'재발주 필요',stZero:'품절',
+  unconfirmedDel:'건 미입금',pendWholesale:'미수 도매가',noRegSeller:'등록된 판매자 없음',
+  cntUnit:'건',qtyUnit:'개',
+  stLabelDaily:'일일 정산',stLabelWeekly:'주간 정산',stLabelMonthly:'월간 정산',
+  colDate:'날짜',colProd:'제품',colQty:'수량',colSaleAmt:'판매금액',colDel:'배달비',colHQ:'본사 입금',colSellerPr:'판매자 수익',
+  sSellerTotalSale:'총 매출',sSellerHQIn:'본사 입금',sSellerHQSupply:'본사입금(공급가)',sSellerProfit:'판매자 수익',sHQTotal:'본사 입금 합계',
+  delTotalMonth:'이번달 배달비 합계',delPendTotal:'미지급 합계',delNoData:'배달비 내역 없음',
+  delPaid:'✅ 지급완료',delPend:'⏳ 미지급',
+  wsTotal:'도매 합계',wsConfirmed:'입금 확인',wsPending:'미수금',wsHasPending:'미수금 있음',wsDone:'✅ 정산완료',
+  wsConfirmBtn:'✅ 입금확인',wsUnconfirmBtn:'☐ 미확인',wsNoData:'개인판매자 내역 없음',
+  rptTitleDaily:'📊 일별 리포트',rptTitleMonthly:'📊 월간 합계',
+  rptLabelSale:'총 판매금액',rptLabelHQ:'본사 입금',rptLabelSellerPr:'판매자 수익',
+  rptLabelDel:'배달비',rptLabelCount:'건수',rptLabelBaedalk:'배달K',rptLabelSeller:'개인판매자',
+  rptLabelByDay:'📅 일별 판매',rptLabelByProd:'📦 품목별',rptTitleChannel:'채널 구분',
+  rptLabelRevenue:'매출',rptLabelSellerDel:'배달비',rptLabelHQWholesale:'본사입금(도매)',
+  histColDate:'날짜',histColProd:'제품',histColQty:'수량',histColNote:'비고',
+  histColChannel:'채널',histColAmt:'금액',histColDel:'배달비',
+  mgmtStock:'재고',mgmtSupply:'공급',mgmtSalePrice:'판매',
+  zeroSupplyWarn:'⚠ 공급단가 미설정',zeroSupplyConfirm:'⚠️ 공급단가 0원. 계속하겠습니까?',
+  prodAdd:'+ 추가',sellerAdd:'+ 추가'},
 vi:{mn:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
   noData:'Không có dữ liệu',noProd:'Chưa có sản phẩm',noSeller:'Chưa có người bán',noST:'Không có dữ liệu',
   inOk:'Nhập hàng xong',saleOk:'Bán hàng xong',saved:'Đã lưu',del:'Đã xóa',
@@ -562,8 +584,49 @@ vi:{mn:['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
   adjExpHint:'Sản phẩm hết hạn trong 7 ngày',adjSaveBtn:'Lưu điều chỉnh',
   editTitle:'📝 Sửa đơn hàng',editAmtLbl:'Số tiền bán (VND) *',editAmtHint:'Đơn giá × số lượng',
   editHqLbl:'Tiền chuyển về HQ',editSaveBtn:'Lưu chỉnh sửa',
-  fProd:'Chọn sản phẩm *',fNote:'Ghi chú',saveBtn:'Lưu'}
+  fProd:'Chọn sản phẩm *',fNote:'Ghi chú',saveBtn:'Lưu',
+  // dynamic render strings
+  invToday:'Bán hôm nay',invAvail:'Có thể bán',invUnit:'cái',
+  stOk:'Bình thường',stWarn:'Sắp hết',stDanger:'Cần đặt hàng',stZero:'Hết hàng',
+  unconfirmedDel:'đơn chưa nộp',pendWholesale:'Nợ bán buôn',noRegSeller:'Chưa có người bán',
+  cntUnit:'đơn',qtyUnit:'cái',
+  stLabelDaily:'Quyết toán ngày',stLabelWeekly:'Quyết toán tuần',stLabelMonthly:'Quyết toán tháng',
+  colDate:'Ngày',colProd:'Sản phẩm',colQty:'Số lượng',colSaleAmt:'Tiền bán',colDel:'Phí giao',colHQ:'Tiền HQ',colSellerPr:'Lợi nhuận NB',
+  sSellerTotalSale:'Tổng doanh thu',sSellerHQIn:'Tiền chuyển HQ',sSellerHQSupply:'Tiền HQ (giá nhập)',sSellerProfit:'Lợi nhuận người bán',sHQTotal:'Tổng tiền HQ',
+  delTotalMonth:'Tổng phí giao tháng này',delPendTotal:'Tổng chưa thanh toán',delNoData:'Không có phí giao hàng',
+  delPaid:'✅ Đã trả',delPend:'⏳ Chưa trả',
+  wsTotal:'Tổng bán buôn',wsConfirmed:'Đã xác nhận',wsPending:'Còn nợ',wsHasPending:'Còn nợ chưa trả',wsDone:'✅ Đã quyết toán',
+  wsConfirmBtn:'✅ Xác nhận',wsUnconfirmBtn:'☐ Chưa xác nhận',wsNoData:'Không có đơn bán buôn',
+  rptTitleDaily:'📊 Báo cáo ngày',rptTitleMonthly:'📊 Tổng tháng',
+  rptLabelSale:'Tổng doanh thu',rptLabelHQ:'Tiền chuyển HQ',rptLabelSellerPr:'Lợi nhuận người bán',
+  rptLabelDel:'Phí giao hàng',rptLabelCount:'Số đơn',rptLabelBaedalk:'Baedalc K',rptLabelSeller:'Người bán cá nhân',
+  rptLabelByDay:'📅 Doanh thu theo ngày',rptLabelByProd:'📦 Theo sản phẩm',rptTitleChannel:'Phân kênh bán hàng',
+  rptLabelRevenue:'Doanh thu',rptLabelSellerDel:'Phí giao hàng',rptLabelHQWholesale:'Tiền HQ (bán buôn)',
+  histColDate:'Ngày',histColProd:'Sản phẩm',histColQty:'SL',histColNote:'Ghi chú',
+  histColChannel:'Kênh',histColAmt:'Số tiền',histColDel:'Phí giao',
+  mgmtStock:'Tồn kho',mgmtSupply:'Giá nhập',mgmtSalePrice:'Giá bán',
+  zeroSupplyWarn:'⚠ Chưa có giá nhập',zeroSupplyConfirm:'⚠️ Giá nhập = 0. Tiếp tục?',
+  prodAdd:'+ Thêm',sellerAdd:'+ Thêm'}
 };
+
+// 김치 이름 로마자 변환 (VI 모드)
+var KIMCHI_MAP = {
+  '포기김치':'Pogi Kimchi','깍두기':'Kkakdugi','깍뚜기':'Kkakdugi',
+  '열무김치':'Yeolmu Kimchi','총각김치':'Chonggak Kimchi','쪽파김치':'Jjokpa Kimchi',
+  '맛김치':'Mat Kimchi','실비김치':'Silbi Kimchi','배추김치':'Baechu Kimchi',
+  '백김치':'Baek Kimchi','동치미':'Dongchimi',
+  '깻잎김치':'KKennip Kimchi','깻잎':'KKennip Kimchi',
+  '석박지':'Seokbakji','묵은지':'Shin Kimchi',
+  '오이소박이':'Oisobaki','오이김치':'Oi Kimchi',
+  '대파김치':'Daepa Kimchi','파김치':'Daepa Kimchi',
+  '갓김치':'Gad Kimchi',
+  '부추김치':'Buchu Kimchi','무김치':'Mu Kimchi'
+};
+function pName(name){
+  if(lang!=='vi')return name;
+  for(var k in KIMCHI_MAP){if(name.indexOf(k)!==-1)return name.replace(k,KIMCHI_MAP[k]);}
+  return name;
+}
 function t(k){return(TT[lang]||TT.ko)[k]||k;}
 function N(n){return Number(n||0).toLocaleString();}
 function tday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
@@ -657,24 +720,24 @@ function renderHome(){
   var mRecs=Object.values(sales).filter(function(r){return(r.date||'').startsWith(mp);});
   var tQ=tRecs.reduce(function(s,r){return s+(r.quantity||0);},0);
   var tA=tRecs.reduce(function(s,r){return s+(r.total||0);},0);
-  setKPI('kpi-tq',tQ,'개');setKPI('kpi-ta',null,null,N(tA)+' ₫',true);
+  setKPI('kpi-tq',tQ,t('invUnit'));setKPI('kpi-ta',null,null,N(tA)+' ₫',true);
   var alc=0;Object.entries(prods).forEach(function(e){var id=e[0],p=e[1];var q=(stock[id]||{}).quantity||0;if(p.minStock&&q<=p.minStock)alc++;});
-  setKPI('kpi-ro',alc,'품목');
+  setKPI('kpi-ro',alc,'품목'+(lang==='vi'?' SP':''));
   var badge=document.getElementById('nav-badge');
   if(alc>0){badge.textContent=alc;badge.style.display='block';}else badge.style.display='none';
   var pdR=mRecs.filter(function(r){return r.channel==='baedalk'&&(r.deliveryFee||0)>0&&!r.deliveryPaid;});
   var pdA=pdR.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
-  setKPI('kpi-dc',pdR.length,'건');setKPI('kpi-da',null,null,N(pdA)+' ₫',true);
+  setKPI('kpi-dc',pdR.length,t('cntUnit'));setKPI('kpi-da',null,null,N(pdA)+' ₫',true);
   var pwR=mRecs.filter(function(r){return r.channel==='seller'&&!r.paymentConfirmed;});
   var pwA=pwR.reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+su*(r.quantity||0);},0);
-  setKPI('kpi-wc',pwR.length,'건');setKPI('kpi-wa',null,null,N(pwA)+' ₫',true);
+  setKPI('kpi-wc',pwR.length,t('cntUnit'));setKPI('kpi-wa',null,null,N(pwA)+' ₫',true);
   var tB=tRecs.filter(function(r){return r.channel==='baedalk';});
   document.getElementById('ch-bs').textContent=N(tB.reduce(function(s,r){return s+(r.total||0);},0))+' ₫';
-  document.getElementById('ch-bc').textContent=tB.length+'건';
+  document.getElementById('ch-bc').textContent=tB.length+t('cntUnit');
   document.getElementById('ch-bd').textContent=N(tB.reduce(function(s,r){return s+(r.deliveryFee||0);},0))+' ₫';
   var sids=Object.keys(sellers);
   var srEl=document.getElementById('ch-sr');
-  if(!sids.length){srEl.innerHTML='<div class="ch-stat-row"><span class="ch-stat-lbl" style="color:var(--gray-400)">등록된 판매자 없음</span></div>';}
+  if(!sids.length){srEl.innerHTML='<div class="ch-stat-row"><span class="ch-stat-lbl" style="color:var(--gray-400)">'+t('noRegSeller')+'</span></div>';}
   else{
     var h='';
     sids.forEach(function(sid){
@@ -701,12 +764,12 @@ function renderInv(){
   pids.forEach(function(id){
     var p=prods[id];var s=stock[id]||{quantity:0};
     var qty=s.quantity||0;var mn=p.minStock||0;
-    var bc='ib-ok',bx='정상';
-    if(qty===0){bc='ib-zero';bx='품절';}
-    else if(mn&&qty<=mn){bc='ib-danger';bx='재발주 필요';}
-    else if(mn&&qty<=mn*1.5){bc='ib-warn';bx='여유 부족';}
+    var bc='ib-ok',bx=t('stOk');
+    if(qty===0){bc='ib-zero';bx=t('stZero');}
+    else if(mn&&qty<=mn){bc='ib-danger';bx=t('stDanger');}
+    else if(mn&&qty<=mn*1.5){bc='ib-warn';bx=t('stWarn');}
     var tQ=Object.values(sales).filter(function(r){return r.date===tod&&r.productId===id;}).reduce(function(a,r){return a+(r.quantity||0);},0);
-    h+='<div class="inv-item" onclick="openAdj(\''+id+'\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+p.name+'</div><div class="inv-spec">'+p.size+' · 오늘 판매 '+tQ+'개</div><span class="inv-badge '+bc+'">'+bx+'</span></div><div class="inv-right"><div class="inv-qty" style="'+(bc==='ib-danger'?'color:var(--danger-dark);':bc==='ib-zero'?'color:var(--gray-400);':'')+'">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">판매가능 '+qty+'개</div></div></div>';
+    h+='<div class="inv-item" onclick="openAdj(\''+id+'\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+pName(p.name)+'</div><div class="inv-spec">'+p.size+' · '+t('invToday')+' '+tQ+t('invUnit')+'</div><span class="inv-badge '+bc+'">'+bx+'</span></div><div class="inv-right"><div class="inv-qty" style="'+(bc==='ib-danger'?'color:var(--danger-dark);':bc==='ib-zero'?'color:var(--gray-400);':'')+'">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">'+t('invAvail')+' '+qty+t('invUnit')+'</div></div></div>';
   });
   el.innerHTML=h;
 }
@@ -755,7 +818,7 @@ function updSS(){
   var spr=curCh==='baedalk'?0:Math.max(0,tot-sup);
   document.getElementById('ss-total').textContent=N(tot)+' ₫';
   document.getElementById('ss-del').textContent=N(dl)+' ₫';
-  document.getElementById('ss-hq').textContent=(su===0&&curCh==='seller')?'⚠ 공급단가 미설정':N(hq)+' ₫';
+  document.getElementById('ss-hq').textContent=(su===0&&curCh==='seller')?t('zeroSupplyWarn'):N(hq)+' ₫';
   document.getElementById('ss-pr').textContent=N(spr)+' ₫';
 }
 async function saveSale(){
@@ -768,7 +831,7 @@ async function saveSale(){
   if(!date){toast(t('eDate'));return;}if(!pid){toast(t('eProd'));return;}if(!qty){toast(t('eQty'));return;}
   if(curCh==='seller'&&!sid){toast(t('eSL'));return;}
   var p=prods[pid];var su=p.supplyPrice||0;
-  if(su===0&&curCh==='seller'&&!confirm('⚠️ 공급단가 0원. 계속하겠습니까?'))return;
+  if(su===0&&curCh==='seller'&&!confirm(t('zeroSupplyConfirm')))return;
   var cur=(stock[pid]||{}).quantity||0;
   if(qty>cur&&!confirm(t('overSt')))return;
   var tot=qty*pr;var sup=qty*su;
@@ -810,7 +873,7 @@ function cS(recs){
 function sH(c,title){
   return '<div class="s-sec"><div style="font-size:13px;font-weight:700;color:var(--gray-500);margin-bottom:10px">'+title+'</div>'+
     '<div class="s-row"><span class="s-lbl">'+t('tSale')+'</span><span class="s-val">'+N(c.ts)+' ₫</span></div>'+
-    '<div class="s-row"><span class="s-lbl">건수</span><span class="s-val">'+c.cnt+'건 · '+c.qty+'개</span></div>'+
+    '<div class="s-row"><span class="s-lbl">'+t('rptLabelCount')+'</span><span class="s-val">'+c.cnt+t('cntUnit')+' · '+c.qty+t('invUnit')+'</span></div>'+
     (c.bs?'<div class="s-row"><span class="s-lbl">'+t('hqB')+'</span><span class="s-val hq">'+N(c.bs)+' ₫</span></div>':'')+
     (c.ss?'<div class="s-row"><span class="s-lbl">'+t('hqS')+'</span><span class="s-val hq">'+N(c.hq-c.bs)+' ₫</span></div>':'')+
     (c.sp?'<div class="s-row"><span class="s-lbl">'+t('sPr')+'</span><span class="s-val pr">'+N(c.sp)+' ₫</span></div>':'')+
@@ -821,7 +884,7 @@ function noST(){return'<div class="empty"><div class="empty-icon">📊</div><div
 function stDaily(){
   var el=document.getElementById('st-daily');
   var recs=Object.values(sales).filter(function(r){return r.date===dDay;});
-  el.innerHTML=dn(dDay,'shD(-1)','shD(1)')+(recs.length?sH(cS(recs),'일일 정산'):noST());
+  el.innerHTML=dn(dDay,'shD(-1)','shD(1)')+(recs.length?sH(cS(recs),t('stLabelDaily')):noST());
 }
 function shD(d){var dt=new Date(dDay);dt.setDate(dt.getDate()+d);dDay=dt.toISOString().slice(0,10);stDaily();}
 function stWeekly(){
@@ -832,14 +895,14 @@ function stWeekly(){
   function fm(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
   var ms=fm(mon),ss=fm(sun);
   var recs=Object.values(sales).filter(function(r){return r.date>=ms&&r.date<=ss;});
-  el.innerHTML=dn(ms+' ~ '+ss,'shW(-1)','shW(1)')+(recs.length?sH(cS(recs),'주간 정산'):noST());
+  el.innerHTML=dn(ms+' ~ '+ss,'shW(-1)','shW(1)')+(recs.length?sH(cS(recs),t('stLabelWeekly')):noST());
 }
 function shW(d){wOff+=d;stWeekly();}
 function stMonthly(){
   var el=document.getElementById('st-monthly');
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var recs=Object.values(sales).filter(function(r){return(r.date||'').startsWith(pfx);});
-  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1)','shM(1)')+(recs.length?sH(cS(recs),'월간 정산'):noST());
+  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1)','shM(1)')+(recs.length?sH(cS(recs),t('stLabelMonthly')):noST());
 }
 function shM(d){mM+=d;if(mM>12){mM=1;mY++;}if(mM<1){mM=12;mY--;}renderST();}
 function stSeller(){
@@ -852,11 +915,11 @@ function stSeller(){
   Object.entries(sales).forEach(function(e){var r=e[1];if(!(r.date||'').startsWith(pfx))return;if(r.channel==='seller'){var v=r.sellerId||'?';if(!byCh.s[v])byCh.s[v]=[];byCh.s[v].push(r);}else byCh.b.push(r);});
   var h=nav;
   if(byCh.b.length){var c=cS(byCh.b);var ex=expSL['__b__']||false;
-    h+='<div class="s-sec" style="border-left:4px solid var(--pink)"><div class="s-hdr"><div class="s-name" data-i18n="chBaedalkLabel">🛵 배달K</div><button class="s-cnt-btn" onclick="togExp(\'__b__\')">'+c.cnt+'건·'+c.qty+'개 '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사 입금</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div>'+(ex?buildDL(byCh.b,'b'):'')+'</div>';}
+    h+='<div class="s-sec" style="border-left:4px solid var(--pink)"><div class="s-hdr"><div class="s-name" data-i18n="chBaedalkLabel">🛵 배달K</div><button class="s-cnt-btn" onclick="togExp(\'__b__\')">'+c.cnt+t('cntUnit')+'·'+c.qty+t('invUnit')+' '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사 입금</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div>'+(ex?buildDL(byCh.b,'b'):'')+'</div>';}
   Object.entries(byCh.s).forEach(function(e){
     var vid=e[0],recs=e[1];var sname=(sellers[vid]||{}).name||vid;
     var c=cS(recs);var ex=expSL[vid]||false;
-    h+='<div class="s-sec" style="border-left:4px solid var(--purple)"><div class="s-hdr"><div class="s-name">🧑‍💼 '+sname+'</div><button class="s-cnt-btn" onclick="togExp(\''+vid+'\')">'+c.cnt+'건·'+c.qty+'개 '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사입금(공급가)</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div><div class="s-row"><span class="s-lbl">판매자 수익</span><span class="s-val pr">'+N(c.sp)+' ₫</span></div>'+(ex?buildDL(recs,'s'):'')+'</div>';
+    h+='<div class="s-sec" style="border-left:4px solid var(--purple)"><div class="s-hdr"><div class="s-name">🧑‍💼 '+sname+'</div><button class="s-cnt-btn" onclick="togExp(\''+vid+'\')">'+c.cnt+t('cntUnit')+'·'+c.qty+t('invUnit')+' '+(ex?'▲':'▼')+'</button></div><div class="s-row"><span class="s-lbl">총 매출</span><span class="s-val">'+N(c.ts)+' ₫</span></div><div class="s-row"><span class="s-lbl">본사입금(공급가)</span><span class="s-val hq">'+N(c.hq)+' ₫</span></div><div class="s-row"><span class="s-lbl">판매자 수익</span><span class="s-val pr">'+N(c.sp)+' ₫</span></div>'+(ex?buildDL(recs,'s'):'')+'</div>';
   });
   var tot=cS(mRecs);
   h+='<div class="s-total"><span class="st-lbl">본사 입금 합계</span><span class="st-val">'+N(tot.hq)+' ₫</span></div>';
@@ -881,13 +944,13 @@ function stDelivery(){
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var nav=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);stDelivery()','shM(1);stDelivery()');
   var recs=Object.entries(sales).filter(function(e){var r=e[1];return(r.date||'').startsWith(pfx)&&r.channel==='baedalk'&&(r.deliveryFee||0)>0;}).map(function(e){return Object.assign({_id:e[0]},e[1]);}).sort(function(a,b){return b.timestamp-a.timestamp;});
-  if(!recs.length){el.innerHTML=nav+'<div class="empty"><div class="empty-icon">🛵</div><div class="empty-text">배달비 내역 없음</div></div>';return;}
+  if(!recs.length){el.innerHTML=nav+'<div class="empty"><div class="empty-icon">🛵</div><div class="empty-text">'+t('delNoData')+'</div></div>';return;}
   var totAll=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
   var pend=recs.filter(function(r){return!r.deliveryPaid;}).reduce(function(s,r){return s+(r.deliveryFee||0);},0);
   var h=nav+'<div class="s-sec"><div class="s-row"><span class="s-lbl">이번달 배달비 합계</span><span class="s-val">'+N(totAll)+' ₫</span></div><div class="s-row"><span class="s-lbl" style="color:var(--warn-dark)">미지급 합계</span><span class="s-val" style="color:var(--warn-dark)">'+N(pend)+' ₫</span></div></div><div class="s-sec">';
   recs.forEach(function(r){
     var paid=r.deliveryPaid||false;
-    h+='<div class="pay-row"><div class="pay-info"><div class="pay-name">'+r.date+' · '+(r.productName||'')+'</div><div class="pay-amt">'+(r.quantity||0)+'개 · 배달비 '+N(r.deliveryFee)+' ₫</div></div><div style="display:flex;align-items:center;gap:8px"><button class="cfm-btn '+(paid?'done':'pend')+'" onclick="togDel(\''+r._id+'\','+(!paid)+')">'+( paid?'✅ 지급완료':'⏳ 미지급')+'</button><button class="btn-dsm" onclick="openEdit(\''+r._id+'\')">✏️</button></div></div>';
+    h+='<div class="pay-row"><div class="pay-info"><div class="pay-name">'+r.date+' · '+pName(r.productName||'')+'</div><div class="pay-amt">'+(r.quantity||0)+t('invUnit')+' · '+t('colDel')+' '+N(r.deliveryFee)+' ₫</div></div><div style="display:flex;align-items:center;gap:8px"><button class="cfm-btn '+(paid?'done':'pend')+'" onclick="togDel(\''+r._id+'\','+(!paid)+')">'+( paid?'✅ 지급완료':'⏳ 미지급')+'</button><button class="btn-dsm" onclick="openEdit(\''+r._id+'\')">✏️</button></div></div>';
   });
   h+='</div>';el.innerHTML=h;
 }
@@ -897,7 +960,7 @@ function stWholesale(){
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var nav=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);stWholesale()','shM(1);stWholesale()');
   var srecs=Object.entries(sales).filter(function(e){var r=e[1];return(r.date||'').startsWith(pfx)&&r.channel==='seller';}).map(function(e){return Object.assign({_id:e[0]},e[1]);});
-  if(!srecs.length){el.innerHTML=nav+'<div class="empty"><div class="empty-icon">💰</div><div class="empty-text">개인판매자 내역 없음</div></div>';return;}
+  if(!srecs.length){el.innerHTML=nav+'<div class="empty"><div class="empty-icon">💰</div><div class="empty-text">'+t('wsNoData')+'</div></div>';return;}
   var bySL={};srecs.forEach(function(r){var v=r.sellerId||'?';if(!bySL[v])bySL[v]=[];bySL[v].push(r);});
   var h=nav;
   Object.entries(bySL).forEach(function(e){
@@ -906,10 +969,10 @@ function stWholesale(){
     var totA=recs.reduce(function(s,r){return s+getHQ(r);},0);
     var paidA=recs.filter(function(r){return r.paymentConfirmed;}).reduce(function(s,r){return s+getHQ(r);},0);
     var pendA=totA-paidA;
-    h+='<div class="s-sec"><div class="s-hdr"><div class="s-name">🧑‍💼 '+sname+'</div><span style="font-size:13px;color:'+(pendA>0?'var(--warn-dark)':'var(--success-dark)')+';font-weight:700">'+(pendA>0?'미수금 있음':'✅ 정산완료')+'</span></div><div class="s-row"><span class="s-lbl">도매 합계</span><span class="s-val">'+N(totA)+' ₫</span></div><div class="s-row"><span class="s-lbl" style="color:var(--success-dark)">입금 확인</span><span class="s-val" style="color:var(--success-dark)">'+N(paidA)+' ₫</span></div><div class="s-row"><span class="s-lbl" style="color:var(--warn-dark)">미수금</span><span class="s-val" style="color:var(--warn-dark)">'+N(pendA)+' ₫</span></div><div style="border-top:1px solid var(--gray-100);margin-top:8px;padding-top:8px">';
+    h+='<div class="s-sec"><div class="s-hdr"><div class="s-name">🧑‍💼 '+sname+'</div><span style="font-size:13px;color:'+(pendA>0?'var(--warn-dark)':'var(--success-dark)')+';font-weight:700">'+(pendA>0?t('wsHasPending'):t('wsDone'))+'</span></div><div class="s-row"><span class="s-lbl">도매 합계</span><span class="s-val">'+N(totA)+' ₫</span></div><div class="s-row"><span class="s-lbl" style="color:var(--success-dark)">입금 확인</span><span class="s-val" style="color:var(--success-dark)">'+N(paidA)+' ₫</span></div><div class="s-row"><span class="s-lbl" style="color:var(--warn-dark)">미수금</span><span class="s-val" style="color:var(--warn-dark)">'+N(pendA)+' ₫</span></div><div style="border-top:1px solid var(--gray-100);margin-top:8px;padding-top:8px">';
     recs.slice().sort(function(a,b){return b.timestamp-a.timestamp;}).forEach(function(r){
       var hq=getHQ(r);var conf=r.paymentConfirmed||false;
-      h+='<div class="pay-row"><div class="pay-info"><div class="pay-name">'+r.date+' · '+(r.productName||'')+'</div><div class="pay-amt">'+(r.quantity||0)+'개 · '+N(hq)+' ₫</div></div><button class="cfm-btn '+(conf?'done':'pend')+'" onclick="togWS(\''+r._id+'\','+(!conf)+')">'+( conf?'✅ 입금확인':'☐ 미확인')+'</button></div>';
+      h+='<div class="pay-row"><div class="pay-info"><div class="pay-name">'+r.date+' · '+pName(r.productName||'')+'</div><div class="pay-amt">'+(r.quantity||0)+t('invUnit')+' · '+N(hq)+' ₫</div></div><button class="cfm-btn '+(conf?'done':'pend')+'" onclick="togWS(\''+r._id+'\','+(!conf)+')">'+( conf?'✅ 입금확인':'☐ 미확인')+'</button></div>';
     });
     h+='</div></div>';
   });
@@ -991,7 +1054,7 @@ function rCh(){
     bySeller[sid].recs.push(r);
   });
   var byP={};recs.forEach(function(r){if(!byP[r.productId])byP[r.productId]={name:r.productName||'',q:0,s:0};byP[r.productId].q+=r.quantity||0;byP[r.productId].s+=r.total||0;});
-  var pr=Object.values(byP).sort(function(a,b){return b.s-a.s;}).map(function(v){return'<div class="rpt-row"><span>'+v.name+'</span><strong>'+v.q+'개 · '+N(v.s)+' ₫</strong></div>';}).join('');
+  var pr=Object.values(byP).sort(function(a,b){return b.s-a.s;}).map(function(v){return'<div class="rpt-row"><span>'+pName(v.name)+'</span><strong>'+v.q+'개 · '+N(v.s)+' ₫</strong></div>';}).join('');
   var sellerSecs='';
   Object.values(bySeller).forEach(function(sv){
     var cs=cS(sv.recs);
@@ -1021,7 +1084,7 @@ function renderPR(){
   var el=document.getElementById('pr-list');var pids=Object.keys(prods);
   if(!pids.length){el.innerHTML='<div class="empty"><div class="empty-icon">🥬</div><div class="empty-text">'+t('noProd')+'</div></div>';return;}
   el.innerHTML=pids.map(function(id){var p=prods[id];var s=stock[id]||{quantity:0};
-    return'<div class="p-item"><div class="p-name">'+p.name+' '+p.size+'</div><div class="p-meta">재고:'+(s.quantity||0)+(p.unit||'개')+' | 공급:'+N(p.supplyPrice||0)+'₫ | 판매:'+N(p.salePrice||0)+'₫</div><div class="p-acts"><button class="btn btn-sm btn-outline" onclick="openEdProd(\'+id+\')">✏️ 수정</button><button class="btn btn-sm btn-outline" onclick="openAdj(\'+id+\')">📦 재고</button><button class="btn-dsm" onclick="delProd(\'+id+\')">🗑</button></div></div>';
+    return'<div class="p-item"><div class="p-name">'+p.name+' '+p.size+'</div><div class="p-meta">'+t('mgmtStock')+':'+(s.quantity||0)+(p.unit||t('invUnit'))+' | '+t('mgmtSupply')+':'+N(p.supplyPrice||0)+'₫ | '+t('mgmtSalePrice')+':'+N(p.salePrice||0)+'₫</div><div class="p-acts"><button class="btn btn-sm btn-outline" onclick="openEdProd(\'+id+\')">✏️ 수정</button><button class="btn btn-sm btn-outline" onclick="openAdj(\'+id+\')">📦 재고</button><button class="btn-dsm" onclick="delProd(\'+id+\')">🗑</button></div></div>';
   }).join('');
 }
 function openAddProd(){document.getElementById('pm-title').textContent='제품 추가';['pm-name','pm-size','pm-unit','pm-supply','pm-sale','pm-min','pm-id'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modal-prod').classList.add('open');}
