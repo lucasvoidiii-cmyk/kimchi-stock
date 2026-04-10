@@ -430,8 +430,18 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <div class="form-group"><label class="form-label" data-i18n="adjExpLbl">유통기한 임박 수량</label>
       <input type="number" class="form-control" id="adj-exp" min="0">
       <div class="form-hint" data-i18n="adjExpHint">7일 이내 유통기한 제품 수량</div></div>
+    <div class="form-group">
+      <label class="form-label">📝 수정 사유 (비고)</label>
+      <input type="text" class="form-control" id="adj-note" placeholder="예: 실사 후 정정, 파손 폐기, 입고 오류 등">
+      <div class="form-hint">수정 날짜·담당자는 자동 기록됩니다</div>
+    </div>
     <input type="hidden" id="adj-pid">
     <button class="btn btn-primary" onclick="saveAdj()" data-i18n="adjSaveBtn">재고 수정 완료</button>
+    <!-- 수정 이력 표시 -->
+    <div id="adj-log-wrap" style="display:none;margin-top:20px;border-top:1px solid var(--gray-200);padding-top:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:8px">🕓 수정 이력</div>
+      <div id="adj-log-list"></div>
+    </div>
   </div>
 </div>
 <div class="modal-overlay" id="modal-edit">
@@ -480,11 +490,12 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <div id="pr-list"></div>
       </div>
       <div id="mc-hi" style="display:none">
-        <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
           <button class="btn btn-sm btn-primary" id="hb-in" onclick="setHT('in')" data-i18n="mgmtHistIn">입고내역</button>
           <button class="btn btn-sm btn-outline" id="hb-out" onclick="setHT('out')" data-i18n="mgmtHistOut">판매내역</button>
+          <button class="btn btn-sm btn-outline" id="hb-adj" onclick="setHT('adj')">📦 재고수정</button>
         </div>
-        <div id="hi-in"></div><div id="hi-out" style="display:none"></div>
+        <div id="hi-in"></div><div id="hi-out" style="display:none"></div><div id="hi-adj" style="display:none"></div>
       </div>
       <div id="mc-se" style="display:none">
         <div class="form-group" style="margin-top:8px"><label class="form-label" data-i18n="mgmtUserName">사용자 이름</label>
@@ -507,7 +518,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 <div id="toast"></div>
 <script>
 var lang='ko',DB='',AK='',uName='';
-var prods={},sellers={},stock={},sales={},inbound={};
+var prods={},sellers={},stock={},sales={},inbound={},adjLogs={};
 var curCh='baedalk',stTab='daily',mgmtTab='sl',histTab='in',rptTab='daily';
 var dDay='',wOff=0,mY=new Date().getFullYear(),mM=new Date().getMonth()+1;
 var expSL={};
@@ -694,8 +705,8 @@ async function init(){
 }
 async function loadAll(){
   try{
-    var r=await Promise.all([fGet('products'),fGet('sellers'),fGet('stock'),fGet('sales'),fGet('inbound')]);
-    prods=r[0]||{};sellers=r[1]||{};stock=r[2]||{};sales=r[3]||{};inbound=r[4]||{};
+    var r=await Promise.all([fGet('products'),fGet('sellers'),fGet('stock'),fGet('sales'),fGet('inbound'),fGet('adjLogs')]);
+    prods=r[0]||{};sellers=r[1]||{};stock=r[2]||{};sales=r[3]||{};inbound=r[4]||{};adjLogs=r[5]||{};
     renderAll();
   }catch(e){toast('로드 실패:'+e.message);}
 }
@@ -1343,9 +1354,11 @@ function setHT(tab){
   histTab=tab;
   document.getElementById('hb-in').className='btn btn-sm '+(tab==='in'?'btn-primary':'btn-outline');
   document.getElementById('hb-out').className='btn btn-sm '+(tab==='out'?'btn-primary':'btn-outline');
+  document.getElementById('hb-adj').className='btn btn-sm '+(tab==='adj'?'btn-primary':'btn-outline');
   document.getElementById('hi-in').style.display=tab==='in'?'block':'none';
   document.getElementById('hi-out').style.display=tab==='out'?'block':'none';
-  if(tab==='in')renderHIn();else renderHOut();
+  document.getElementById('hi-adj').style.display=tab==='adj'?'block':'none';
+  if(tab==='in')renderHIn();else if(tab==='out')renderHOut();else renderHAdj();
 }
 function renderPR(){
   var el=document.getElementById('pr-list');var pids=Object.keys(prods);
@@ -1416,15 +1429,84 @@ async function saveSeller(){
   try{await fSet('sellers/'+id,s);sellers[id]=s;toast(t('saved'));closeMod('modal-seller');renderSL();popSels();renderHome();}catch(e){toast('실패:'+e.message);}
 }
 async function delSL(id){if(!confirm(t('dSL')))return;try{await fDel('sellers/'+id);delete sellers[id];toast(t('del'));renderSL();}catch(e){toast('실패');}}
-function openAdj(pid){var s=stock[pid]||{quantity:0,expiringCount:0};var p=prods[pid]||{};document.getElementById('adj-name').textContent=p.name+' '+p.size;document.getElementById('adj-qty').value=s.quantity||0;document.getElementById('adj-exp').value=s.expiringCount||0;document.getElementById('adj-pid').value=pid;document.getElementById('modal-adj').classList.add('open');}
+function openAdj(pid){
+  var s=stock[pid]||{quantity:0,expiringCount:0};
+  var p=prods[pid]||{};
+  document.getElementById('adj-name').textContent=p.name+' '+p.size;
+  document.getElementById('adj-qty').value=s.quantity||0;
+  document.getElementById('adj-exp').value=s.expiringCount||0;
+  document.getElementById('adj-pid').value=pid;
+  document.getElementById('adj-note').value='';
+  // 이 제품의 수정 이력 표시
+  var logs=Object.values(adjLogs).filter(function(l){return l.productId===pid;}).sort(function(a,b){return b.timestamp-a.timestamp;}).slice(0,5);
+  var logWrap=document.getElementById('adj-log-wrap');
+  var logList=document.getElementById('adj-log-list');
+  if(logs.length){
+    logList.innerHTML=logs.map(function(l){
+      var d=new Date(l.timestamp);
+      var ds=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      var diff=l.newQty-l.prevQty;
+      var diffStr=(diff>0?'<span style="color:var(--success-dark);font-weight:700">+'+diff+'</span>':'<span style="color:var(--danger-dark);font-weight:700">'+diff+'</span>');
+      return'<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid var(--warn)">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+          '<span style="font-size:12px;color:var(--gray-500)">'+ds+'</span>'+
+          '<span style="font-size:13px">'+l.prevQty+'개 → '+l.newQty+'개 ('+diffStr+')</span>'+
+        '</div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:12px">'+
+          '<span style="color:var(--gray-600)">📝 '+(l.note||'사유 없음')+'</span>'+
+          '<span style="color:var(--primary);font-weight:700">👤 '+(l.staff||'미입력')+'</span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+    logWrap.style.display='block';
+  }else{
+    logWrap.style.display='none';
+  }
+  document.getElementById('modal-adj').classList.add('open');
+}
 function adjSt(d){var el=document.getElementById('adj-qty');el.value=Math.max(0,(parseInt(el.value)||0)+d);}
 async function saveAdj(){
   var id=document.getElementById('adj-pid').value;
   var qty=parseInt(document.getElementById('adj-qty').value)||0;
   var exp=parseInt(document.getElementById('adj-exp').value)||0;
-  try{await fSet('stock/'+id,{quantity:qty,expiringCount:exp,lastUpdated:Date.now()});stock[id]={quantity:qty,expiringCount:exp,lastUpdated:Date.now()};toast(t('adjOk'));closeMod('modal-adj');renderHome();}catch(e){toast('실패:'+e.message);}
+  var note=document.getElementById('adj-note').value.trim();
+  var prevQty=(stock[id]||{}).quantity||0;
+  var p=prods[id]||{};
+  try{
+    await fSet('stock/'+id,{quantity:qty,expiringCount:exp,lastUpdated:Date.now()});
+    stock[id]={quantity:qty,expiringCount:exp,lastUpdated:Date.now()};
+    // 수정 이력 로그 저장
+    var logRec={productId:id,productName:(p.name||'')+' '+(p.size||''),prevQty:prevQty,newQty:qty,note:note,staff:uName,date:tday(),timestamp:Date.now()};
+    var lid=gid();
+    await fSet('adjLogs/'+lid,logRec);
+    adjLogs[lid]=logRec;
+    toast(t('adjOk'));closeMod('modal-adj');renderHome();
+  }catch(e){toast('실패:'+e.message);}
 }
-function renderHI(){if(histTab==='in')renderHIn();else renderHOut();}
+function renderHI(){if(histTab==='in')renderHIn();else if(histTab==='out')renderHOut();else renderHAdj();}
+function renderHAdj(){
+  var el=document.getElementById('hi-adj');
+  var recs=Object.values(adjLogs).sort(function(a,b){return b.timestamp-a.timestamp;}).slice(0,50);
+  if(!recs.length){el.innerHTML='<div class="empty"><div class="empty-text">'+t('noData')+'</div></div>';return;}
+  el.innerHTML='<div class="h-wrap"><table class="h-tbl"><thead><tr>'+
+    '<th>날짜·시간</th><th>제품</th><th>변경</th><th>사유</th><th>담당자</th>'+
+    '</tr></thead><tbody>'+
+    recs.map(function(r){
+      var d=new Date(r.timestamp);
+      var ds=('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      var diff=r.newQty-r.prevQty;
+      var diffCol=diff>=0?'color:var(--success-dark)':'color:var(--danger-dark)';
+      var diffStr=(diff>=0?'+':'')+diff+'개';
+      return'<tr>'+
+        '<td style="font-size:12px">'+ds+'</td>'+
+        '<td>'+pName(r.productName||'')+'</td>'+
+        '<td style="'+diffCol+';font-weight:700">'+r.prevQty+'→'+r.newQty+' <span style="font-size:11px">('+diffStr+')</span></td>'+
+        '<td style="font-size:12px;color:var(--gray-600)">'+(r.note||'-')+'</td>'+
+        '<td style="font-size:12px;color:var(--primary);font-weight:700">'+(r.staff||'-')+'</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div>';
+}
 function renderHIn(){
   var el=document.getElementById('hi-in');
   var recs=Object.values(inbound).sort(function(a,b){return b.timestamp-a.timestamp;}).slice(0,50);
