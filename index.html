@@ -177,6 +177,11 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 .ctag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
 .ctag-b{background:#FCE4EC;color:var(--pink);}
 .ctag-s{background:#F3E5F5;color:var(--purple);}
+.ctag-cancel{background:#FFEBEE;color:var(--danger-dark);}
+/* CANCELLED SALE */
+.sdi-cancelled{opacity:.55;position:relative;}
+.sdi-cancelled::after{content:'취소';position:absolute;top:8px;right:8px;background:var(--danger);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;}
+.cancel-stripe{background:repeating-linear-gradient(135deg,transparent,transparent 6px,rgba(244,67,54,.07) 6px,rgba(244,67,54,.07) 12px);}
 /* EMPTY */
 .empty{text-align:center;padding:48px 20px;}
 .empty-icon{font-size:44px;margin-bottom:10px;}
@@ -209,7 +214,24 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 /* TOAST */
 #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--gray-900);color:#fff;padding:12px 22px;border-radius:22px;font-size:15px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999;}
 #toast.show{opacity:1;}
+/* EXPORT */
+.export-bar{background:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.export-bar-label{font-size:13px;font-weight:700;color:var(--gray-600);}
+.export-btns{display:flex;gap:8px;}
+.btn-excel{background:#217346;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.btn-pdf{background:#D32F2F;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.btn-excel:active,.btn-pdf:active{opacity:.8;}
+/* EXPORT PROGRESS */
+#export-progress{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;}
+#export-progress.show{display:flex;}
+.export-prog-box{background:#fff;border-radius:16px;padding:28px 32px;text-align:center;min-width:220px;}
+.export-prog-icon{font-size:40px;margin-bottom:10px;}
+.export-prog-text{font-size:15px;font-weight:700;color:var(--gray-700);}
 </style>
+<!-- 엑셀/PDF 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 <!-- CONFIG -->
@@ -449,19 +471,59 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <button class="modal-close" onclick="closeMod('modal-edit')">×</button>
     <div class="modal-title" data-i18n="editTitle">📝 판매 내역 수정</div>
     <div id="edit-info" style="font-size:13px;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);padding:10px;border-radius:8px;line-height:1.6"></div>
-    <div class="form-group"><label class="form-label" data-i18n="editAmtLbl">판매금액 (VND) *</label>
-      <input type="number" class="form-control" id="edit-amt" oninput="updEditSS()">
-      <div class="form-hint" data-i18n="editAmtHint">판매단가 × 수량 합계</div></div>
-    <div class="form-group"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
-      <input type="number" class="form-control" id="edit-del" placeholder="0" oninput="updEditSS()"></div>
-    <div class="ss-box" style="margin-bottom:14px">
-      <div class="ss-row"><span class="ss-lbl" data-i18n="ssTotalLbl">판매 총액</span><span class="ss-val" id="ess-tot">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl" data-i18n="ssDelLbl">배달비</span><span class="ss-val" id="ess-del">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl" data-i18n="editHqLbl">본사 입금</span><span class="ss-val hq" id="ess-hq">0 ₫</span></div>
-      <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ess-pr">0 ₫</span></div>
+    <!-- 취소된 건 안내 배너 -->
+    <div id="edit-cancelled-banner" style="display:none;background:#FFEBEE;border-left:4px solid var(--danger);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--danger-dark);">
+      ❌ 이 판매건은 <strong>취소 처리</strong>되었습니다.<br>
+      <span id="edit-cancelled-reason" style="color:var(--gray-600)"></span>
     </div>
-    <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
-    <button class="btn btn-primary" onclick="saveEditSale()" data-i18n="editSaveBtn">수정 저장</button>
+    <div id="edit-active-fields">
+      <div class="form-group"><label class="form-label" data-i18n="editAmtLbl">판매금액 (VND) *</label>
+        <input type="number" class="form-control" id="edit-amt" oninput="updEditSS()">
+        <div class="form-hint" data-i18n="editAmtHint">판매단가 × 수량 합계</div></div>
+      <div class="form-group"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
+        <input type="number" class="form-control" id="edit-del" placeholder="0" oninput="updEditSS()"></div>
+      <div class="ss-box" style="margin-bottom:14px">
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssTotalLbl">판매 총액</span><span class="ss-val" id="ess-tot">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssDelLbl">배달비</span><span class="ss-val" id="ess-del">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="editHqLbl">본사 입금</span><span class="ss-val hq" id="ess-hq">0 ₫</span></div>
+        <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ess-pr">0 ₫</span></div>
+      </div>
+      <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
+      <button class="btn btn-primary" onclick="saveEditSale()" data-i18n="editSaveBtn" style="margin-bottom:10px">수정 저장</button>
+      <!-- 구분선 -->
+      <div style="border-top:1px solid var(--gray-200);margin:14px 0 12px"></div>
+      <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:10px">⚠️ 주문 취소 / 삭제</div>
+      <!-- 취소 사유 입력 -->
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label" style="font-size:13px">취소 사유</label>
+        <select class="form-control" id="cancel-reason" style="font-size:14px">
+          <option value="">-- 사유 선택 --</option>
+          <option value="주문 취소 (고객 요청)">주문 취소 (고객 요청)</option>
+          <option value="잘못된 입력 오류">잘못된 입력 오류</option>
+          <option value="품절 / 재고 부족">품절 / 재고 부족</option>
+          <option value="배달 불가">배달 불가</option>
+          <option value="중복 입력">중복 입력</option>
+          <option value="기타">기타 (직접 입력)</option>
+        </select>
+      </div>
+      <div class="form-group" id="cancel-reason-etc-grp" style="display:none;margin-bottom:10px">
+        <input type="text" class="form-control" id="cancel-reason-etc" placeholder="취소 사유를 입력하세요">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" style="background:#FFF3E0;color:var(--warn-dark);border:1.5px solid var(--warn);flex:1;font-size:14px" onclick="cancelSale()">🚫 주문 취소 (재고 복원)</button>
+        <button class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);flex:0 0 auto;width:54px;font-size:18px;padding:0" onclick="deleteSale()" title="완전 삭제">🗑</button>
+      </div>
+      <div style="font-size:11px;color:var(--gray-400);margin-top:6px;line-height:1.6">
+        🚫 취소: 재고 복원 후 내역에 취소 표시 (기록 유지)<br>
+        🗑 삭제: 재고 복원 후 데이터 완전 삭제 (복구 불가)
+      </div>
+    </div>
+    <!-- 이미 취소된 건: 복원 버튼 표시 -->
+    <div id="edit-restore-fields" style="display:none">
+      <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
+      <button class="btn btn-outline" onclick="restoreSale()" style="margin-bottom:8px">↩️ 취소 복원 (재고 차감)</button>
+      <button class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);font-size:14px" onclick="deleteSale()">🗑 완전 삭제</button>
+    </div>
   </div>
 </div>
 <!-- MGMT PANEL -->
@@ -513,6 +575,12 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         </div>
       </div>
     </div>
+  </div>
+</div>
+<div id="export-progress">
+  <div class="export-prog-box">
+    <div class="export-prog-icon" id="ep-icon">⏳</div>
+    <div class="export-prog-text" id="ep-text">파일 생성 중...</div>
   </div>
 </div>
 <div id="toast"></div>
@@ -970,6 +1038,7 @@ function renderST(){
 function cS(recs){
   var ts=0,hq=0,sp=0,bs=0,ss=0,cnt=0,qty=0,dl=0;
   recs.forEach(function(r){
+    if(r.cancelled)return; // 취소 건 집계 제외
     var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
     var sup=su*(r.quantity||0);var sale=r.total||((r.salePrice||0)*(r.quantity||0));
     var isB=r.channel==='baedalk';
@@ -1059,15 +1128,19 @@ function buildDL(recs,ct){
     var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
     var sup=su*(r.quantity||0);var sale=r.total||((r.salePrice||0)*(r.quantity||0));
     var isB=ct==='b';var hq=isB?sale:sup;var pr=isB?0:Math.max(0,sale-sup);
-    h+='<div class="sdi '+(isB?'b':'s')+'">'+
+    var isCancelled=r.cancelled||false;
+    var cancelledClass=isCancelled?' sdi-cancelled cancel-stripe':'';
+    var cancelledInfo=isCancelled?'<div class="sdi-row" style="margin-top:4px"><span class="sdi-k">취소 사유</span><span class="sdi-v" style="color:var(--danger-dark)">'+( r.cancelReason||'-')+'</span></div>':'';
+    h+='<div class="sdi '+(isB?'b':'s')+cancelledClass+'">'+
       '<div class="sdi-row"><span class="sdi-k">'+t('colDate')+'</span><span class="sdi-v">'+r.date+'</span></div>'+
       '<div class="sdi-row"><span class="sdi-k">'+t('colProd')+'</span><span class="sdi-v">'+pName(r.productName||'')+'</span></div>'+
       '<div class="sdi-row"><span class="sdi-k">'+t('colQty')+'</span><span class="sdi-v">'+(r.quantity||0)+t('invUnit')+'</span></div>'+
-      '<div class="sdi-row"><span class="sdi-k">'+t('colSaleAmt')+'</span><span class="sdi-v">'+N(sale)+' ₫</span></div>'+
+      '<div class="sdi-row"><span class="sdi-k">'+t('colSaleAmt')+'</span><span class="sdi-v" style="'+(isCancelled?'text-decoration:line-through;color:var(--gray-400)':'')+'">'+N(sale)+' ₫</span></div>'+
       '<div class="sdi-row"><span class="sdi-k">'+t('colDel')+'</span><span class="sdi-v">'+N(r.deliveryFee||0)+' ₫</span></div>'+
-      '<div class="sdi-row"><span class="sdi-k">'+t('colHQ')+'</span><span class="sdi-v" style="color:var(--success-dark)">'+N(hq)+' ₫</span></div>'+
-      (!isB?'<div class="sdi-row"><span class="sdi-k">'+t('colSellerPr')+'</span><span class="sdi-v" style="color:var(--purple)">'+N(pr)+' ₫</span></div>':'')+
-      '<div class="sdi-act">'+(sid?'<button class="btn btn-sm btn-primary" onclick="openEdit(\''+sid+'\')">✏️</button>':'')+'</div>'+
+      (!isCancelled?'<div class="sdi-row"><span class="sdi-k">'+t('colHQ')+'</span><span class="sdi-v" style="color:var(--success-dark)">'+N(hq)+' ₫</span></div>':'')+
+      (!isB&&!isCancelled?'<div class="sdi-row"><span class="sdi-k">'+t('colSellerPr')+'</span><span class="sdi-v" style="color:var(--purple)">'+N(pr)+' ₫</span></div>':'')+
+      cancelledInfo+
+      '<div class="sdi-act">'+(sid?'<button class="btn btn-sm '+(isCancelled?'btn-outline':'btn-primary')+'" onclick="openEdit(\''+sid+'\')">'+(isCancelled?'↩️':'✏️')+'</button>':'')+'</div>'+
       '</div>';
   });
   return h+'</div>';
@@ -1145,14 +1218,39 @@ async function togWS(id,v){try{await fPatch('sales/'+id,{paymentConfirmed:v});sa
 /* EDIT */
 function openEdit(sid){
   var r=sales[sid];if(!r){toast('내역 없음');return;}
+  // 취소 사유 select 리셋
+  document.getElementById('cancel-reason').value='';
+  document.getElementById('cancel-reason-etc').value='';
+  document.getElementById('cancel-reason-etc-grp').style.display='none';
+  // cancel-reason onchange 연결 (중복 방지위해 매번 교체)
+  var sel=document.getElementById('cancel-reason');
+  sel.onchange=function(){document.getElementById('cancel-reason-etc-grp').style.display=this.value==='기타'?'block':'none';};
   var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
   var supT=su*(r.quantity||0);var saleT=r.total||((r.salePrice||0)*(r.quantity||0));
-  document.getElementById('edit-id').value=sid;
-  document.getElementById('edit-ch').value=r.channel||'baedalk';
-  document.getElementById('edit-sup').value=supT;
+  // edit-id가 두 군데 있으므로 모두 설정
+  document.querySelectorAll('#edit-id').forEach(function(el){el.value=sid;});
+  document.querySelectorAll('#edit-ch').forEach(function(el){el.value=r.channel||'baedalk';});
+  document.querySelectorAll('#edit-sup').forEach(function(el){el.value=supT;});
   document.getElementById('edit-amt').value=saleT;
   document.getElementById('edit-del').value=r.deliveryFee||0;
-  document.getElementById('edit-info').innerHTML='<strong>'+r.date+'</strong> | '+(r.productName||'')+' | 수량: '+(r.quantity||0)+'개<br>채널: '+(r.channel==='baedalk'?'🛵 배달K':'🧑‍💼 개인판매자')+(r.sellerName?' | '+r.sellerName:'');
+  var ordInfo=r.ordererName?' | 주문자: '+r.ordererName:'';
+  document.getElementById('edit-info').innerHTML=
+    '<strong>'+r.date+'</strong> | '+(r.productName||'')+' | 수량: '+(r.quantity||0)+'개'+ordInfo+
+    '<br>채널: '+(r.channel==='baedalk'?'🛵 배달K':'🧑‍💼 개인판매자')+(r.sellerName?' | '+r.sellerName:'');
+  var isCancelled=r.cancelled||false;
+  var banner=document.getElementById('edit-cancelled-banner');
+  var activeFields=document.getElementById('edit-active-fields');
+  var restoreFields=document.getElementById('edit-restore-fields');
+  if(isCancelled){
+    banner.style.display='block';
+    document.getElementById('edit-cancelled-reason').textContent='사유: '+(r.cancelReason||'-')+' | 취소일: '+(r.cancelledAt||'-');
+    activeFields.style.display='none';
+    restoreFields.style.display='block';
+  }else{
+    banner.style.display='none';
+    activeFields.style.display='block';
+    restoreFields.style.display='none';
+  }
   updEditSS();
   document.getElementById('modal-edit').classList.add('open');
 }
@@ -1182,6 +1280,263 @@ async function saveEditSale(){
     await fPatch('sales/'+sid,upd);Object.assign(sales[sid],upd);
     toast(t('saved'));closeMod('modal-edit');renderST();renderHome();
   }catch(e){toast('저장 실패:'+e.message);}
+}
+// 취소 사유 가져오기
+function getCancelReason(){
+  var sel=document.getElementById('cancel-reason').value;
+  if(!sel)return null; // 사유 미선택
+  return sel==='기타'?(document.getElementById('cancel-reason-etc').value.trim()||'기타'):sel;
+}
+async function cancelSale(){
+  var sid=document.getElementById('edit-id').value;
+  var r=sales[sid];if(!r)return;
+  var reason=getCancelReason();
+  if(!reason){toast('취소 사유를 선택해주세요');return;}
+  if(!confirm('이 판매 건을 취소하겠습니까?\n재고 '+( r.quantity||0)+'개가 복원됩니다.\n\n사유: '+reason))return;
+  try{
+    // 1. 재고 복원
+    var pid=r.productId;
+    var curQty=(stock[pid]||{}).quantity||0;
+    var newQty=curQty+(r.quantity||0);
+    await fSet('stock/'+pid,Object.assign({},stock[pid]||{},{quantity:newQty,lastUpdated:Date.now()}));
+    stock[pid]=Object.assign({},stock[pid]||{},{quantity:newQty});
+    // 2. 판매 레코드에 취소 플래그 기록
+    var upd={cancelled:true,cancelReason:reason,cancelledAt:tday(),cancelledBy:uName};
+    await fPatch('sales/'+sid,upd);Object.assign(sales[sid],upd);
+    toast('🚫 주문이 취소되었습니다. 재고 복원 완료.');
+    closeMod('modal-edit');renderST();renderHome();
+  }catch(e){toast('취소 실패: '+e.message);}
+}
+async function deleteSale(){
+  var sid=document.getElementById('edit-id').value;
+  var r=sales[sid];if(!r)return;
+  var alreadyCancelled=r.cancelled||false;
+  var confirmMsg=alreadyCancelled
+    ?'이미 취소된 건입니다. 데이터를 완전히 삭제하겠습니까?\n(복구 불가)'
+    :'이 판매 건을 완전히 삭제하겠습니까?\n재고 '+(r.quantity||0)+'개가 복원됩니다.\n\n⚠️ 삭제 후 복구할 수 없습니다.';
+  if(!confirm(confirmMsg))return;
+  if(!confirm('정말 삭제하겠습니까? 마지막으로 확인합니다.'))return;
+  try{
+    // 취소되지 않은 건이면 재고 복원
+    if(!alreadyCancelled){
+      var pid=r.productId;
+      var curQty=(stock[pid]||{}).quantity||0;
+      var newQty=curQty+(r.quantity||0);
+      await fSet('stock/'+pid,Object.assign({},stock[pid]||{},{quantity:newQty,lastUpdated:Date.now()}));
+      stock[pid]=Object.assign({},stock[pid]||{},{quantity:newQty});
+    }
+    // Firebase에서 삭제
+    await fDel('sales/'+sid);
+    delete sales[sid];
+    toast('🗑 판매 내역이 삭제되었습니다.');
+    closeMod('modal-edit');renderST();renderHome();
+  }catch(e){toast('삭제 실패: '+e.message);}
+}
+async function restoreSale(){
+  var sid=document.getElementById('edit-id').value;
+  var r=sales[sid];if(!r)return;
+  if(!confirm('취소된 판매건을 복원하겠습니까?\n재고 '+(r.quantity||0)+'개가 다시 차감됩니다.'))return;
+  try{
+    var pid=r.productId;
+    var curQty=(stock[pid]||{}).quantity||0;
+    var newQty=Math.max(0,curQty-(r.quantity||0));
+    await fSet('stock/'+pid,Object.assign({},stock[pid]||{},{quantity:newQty,lastUpdated:Date.now()}));
+    stock[pid]=Object.assign({},stock[pid]||{},{quantity:newQty});
+    var upd={cancelled:false,cancelReason:'',cancelledAt:'',cancelledBy:''};
+    await fPatch('sales/'+sid,upd);Object.assign(sales[sid],upd);
+    toast('↩️ 판매 건이 복원되었습니다.');
+    closeMod('modal-edit');renderST();renderHome();
+  }catch(e){toast('복원 실패: '+e.message);}
+}
+/* ==================== EXPORT ==================== */
+function getMonthRecs(){
+  var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
+  return Object.values(sales).filter(function(r){return(r.date||'').startsWith(pfx);});
+}
+function showExportProgress(show,icon,text){
+  var el=document.getElementById('export-progress');
+  if(show){
+    document.getElementById('ep-icon').textContent=icon||'⏳';
+    document.getElementById('ep-text').textContent=text||'파일 생성 중...';
+    el.classList.add('show');
+  }else{el.classList.remove('show');}
+}
+function exportExcel(){
+  if(typeof XLSX==='undefined'){toast('라이브러리 로드 중. 잠시 후 다시 시도하세요.');return;}
+  showExportProgress(true,'📊','Excel 파일 생성 중...');
+  setTimeout(function(){
+    try{
+      var mm=('0'+mM).slice(-2);
+      var monthLabel=mY+'년 '+mm+'월';
+      var allRecs=getMonthRecs();
+      var activeRecs=allRecs.filter(function(r){return!r.cancelled;});
+      var wb=XLSX.utils.book_new();
+      var cv=cS(activeRecs);
+      /* ── 시트1: 월간 요약 ── */
+      var bRecs=activeRecs.filter(function(r){return r.channel==='baedalk';});
+      var sRecs=activeRecs.filter(function(r){return r.channel==='seller';});
+      var cvB=cS(bRecs);var cvS=cS(sRecs);
+      var cancelCount=allRecs.filter(function(r){return r.cancelled;}).length;
+      var s1=[
+        [monthLabel+' 월간 정산 요약','','대한김치 재고관리'],
+        ['생성일',new Date().toLocaleDateString('ko-KR'),''],
+        ['','',''],
+        ['▶ 전체 요약','',''],
+        ['총 판매금액 (VND)',cv.ts,''],
+        ['본사 입금 합계 (VND)',cv.hq,''],
+        ['판매자 수익 합계 (VND)',cv.sp,''],
+        ['배달비 합계 (VND)',cv.dl,''],
+        ['판매 건수 (취소 제외)',cv.cnt,''],
+        ['판매 수량 (취소 제외)',cv.qty,''],
+        ['취소 건수',cancelCount,''],
+        ['','',''],
+        ['▶ 채널별 요약','',''],
+        ['채널','매출 (VND)','건수'],
+        ['배달K',cvB.ts,cvB.cnt],
+        ['개인판매자',cvS.ts,cvS.cnt],
+        ['','',''],
+        ['▶ 품목별 요약','',''],
+        ['품목','판매수량','매출 (VND)']
+      ];
+      var byP={};activeRecs.forEach(function(r){var n=r.productName||'';if(!byP[n])byP[n]={q:0,s:0};byP[n].q+=r.quantity||0;byP[n].s+=r.total||0;});
+      Object.entries(byP).sort(function(a,b){return b[1].s-a[1].s;}).forEach(function(e){s1.push([e[0],e[1].q,e[1].s]);});
+      var ws1=XLSX.utils.aoa_to_sheet(s1);
+      ws1['!cols']=[{wch:30},{wch:18},{wch:18}];
+      XLSX.utils.book_append_sheet(wb,ws1,'월간요약');
+      /* ── 시트2: 일별 판매 ── */
+      var byD={};activeRecs.forEach(function(r){var d=r.date||'';if(!byD[d])byD[d]={sale:0,hq:0,del:0,cnt:0,qty:0};var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;var isB=r.channel==='baedalk';var sale=r.total||0;var hq=isB?sale:su*(r.quantity||0);byD[d].sale+=sale;byD[d].hq+=hq;byD[d].del+=r.deliveryFee||0;byD[d].cnt++;byD[d].qty+=r.quantity||0;});
+      var s2=[['날짜','총매출(VND)','본사입금(VND)','배달비(VND)','건수','수량']];
+      Object.entries(byD).sort(function(a,b){return a[0].localeCompare(b[0]);}).forEach(function(e){s2.push([e[0],e[1].sale,e[1].hq,e[1].del,e[1].cnt,e[1].qty]);});
+      s2.push(['합계',cv.ts,cv.hq,cv.dl,cv.cnt,cv.qty]);
+      var ws2=XLSX.utils.aoa_to_sheet(s2);
+      ws2['!cols']=[{wch:14},{wch:16},{wch:16},{wch:14},{wch:8},{wch:8}];
+      XLSX.utils.book_append_sheet(wb,ws2,'일별판매');
+      /* ── 시트3: 전체 거래 명세 ── */
+      var s3=[['날짜','채널','주문자/판매자','품목','수량','판매단가','판매금액','배달비','본사입금','상태','비고']];
+      allRecs.slice().sort(function(a,b){return(a.date||'').localeCompare(b.date||'');}).forEach(function(r){
+        var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
+        var isB=r.channel==='baedalk';var hq=isB?(r.total||0):su*(r.quantity||0);
+        var who=isB?(r.ordererName||''):(r.sellerName||'');
+        var status=r.cancelled?('취소('+( r.cancelReason||'')+')'):( r.paymentConfirmed?'입금확인':'미확인');
+        s3.push([r.date||'',isB?'배달K':'개인판매자',who,r.productName||'',r.quantity||0,r.salePrice||0,r.total||0,r.deliveryFee||0,hq,status,r.note||'']);
+      });
+      var ws3=XLSX.utils.aoa_to_sheet(s3);
+      ws3['!cols']=[{wch:12},{wch:12},{wch:14},{wch:18},{wch:6},{wch:12},{wch:14},{wch:12},{wch:14},{wch:22},{wch:16}];
+      XLSX.utils.book_append_sheet(wb,ws3,'전체거래명세');
+      /* ── 시트4: 판매자별 정산 ── */
+      var s4=[['판매자','총매출(VND)','본사입금(VND)','판매자수익(VND)','건수','미수금액(VND)']];
+      var bySL={};activeRecs.filter(function(r){return r.channel==='seller';}).forEach(function(r){var v=r.sellerId||'?';if(!bySL[v])bySL[v]={name:r.sellerName||v,recs:[]};bySL[v].recs.push(r);});
+      Object.values(bySL).forEach(function(sv){
+        var c=cS(sv.recs);
+        var pendAmt=sv.recs.filter(function(r){return!r.paymentConfirmed;}).reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+su*(r.quantity||0);},0);
+        s4.push([sv.name,c.ts,c.hq,c.sp,c.cnt,pendAmt]);
+      });
+      var ws4=XLSX.utils.aoa_to_sheet(s4);
+      ws4['!cols']=[{wch:16},{wch:16},{wch:16},{wch:16},{wch:8},{wch:16}];
+      XLSX.utils.book_append_sheet(wb,ws4,'판매자별정산');
+      var fname='대한김치_월간정산_'+mY+mm+'.xlsx';
+      XLSX.writeFile(wb,fname);
+      showExportProgress(false);
+      toast('✅ Excel 저장 완료: '+fname);
+    }catch(e){showExportProgress(false);toast('Excel 오류: '+e.message);console.error(e);}
+  },100);
+}
+function exportPDF(){
+  var jsPDFLib=(window.jspdf&&window.jspdf.jsPDF)||(typeof jsPDF!=='undefined'?jsPDF:null);
+  if(!jsPDFLib){toast('PDF 라이브러리 로드 중. 잠시 후 다시 시도하세요.');return;}
+  showExportProgress(true,'📄','PDF 파일 생성 중...');
+  setTimeout(function(){
+    try{
+      var doc=new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
+      var mm=('0'+mM).slice(-2);
+      var monthLabel=mY+'. '+mm;
+      var allRecs=getMonthRecs();
+      var activeRecs=allRecs.filter(function(r){return!r.cancelled;});
+      var cv=cS(activeRecs);
+      var pageW=doc.internal.pageSize.getWidth();
+      var y=14;
+      // 제목
+      doc.setFillColor(21,101,192);doc.roundedRect(14,y,pageW-28,16,3,3,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont(undefined,'bold');
+      doc.text('DAEHAN KIMCHI  Monthly Settlement Report',pageW/2,y+7,{align:'center'});
+      doc.setFontSize(10);doc.setFont(undefined,'normal');
+      doc.text(monthLabel+'  /  Generated: '+new Date().toLocaleDateString('en-CA'),pageW/2,y+13,{align:'center'});
+      doc.setTextColor(0,0,0);y+=22;
+      // 요약 테이블
+      var bRecs=activeRecs.filter(function(r){return r.channel==='baedalk';});
+      var sRecs=activeRecs.filter(function(r){return r.channel==='seller';});
+      var cvB=cS(bRecs);var cvS=cS(sRecs);
+      var cancelCount=allRecs.filter(function(r){return r.cancelled;}).length;
+      doc.autoTable({startY:y,
+        head:[['Item','Amount / Count','Item','Amount / Count']],
+        body:[
+          ['Total Sales (VND)',N(cv.ts)+'  VND','HQ Deposit (VND)',N(cv.hq)+'  VND'],
+          ['Seller Profit (VND)',N(cv.sp)+'  VND','Delivery Fee (VND)',N(cv.dl)+'  VND'],
+          ['Orders (active)',cv.cnt+' orders / '+cv.qty+' items','Cancelled',cancelCount+' orders'],
+          ['BaedalK',N(cvB.ts)+' ('+cvB.cnt+' orders)','Sellers',N(cvS.ts)+' ('+cvS.cnt+' orders)']
+        ],
+        styles:{fontSize:9,cellPadding:3},
+        headStyles:{fillColor:[21,101,192],fontSize:9},
+        columnStyles:{0:{fontStyle:'bold',cellWidth:42},1:{cellWidth:48},2:{fontStyle:'bold',cellWidth:42},3:{cellWidth:48}},
+        margin:{left:14,right:14}});
+      y=doc.lastAutoTable.finalY+8;
+      // 품목별
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(21,101,192);
+      doc.text('Sales by Product',14,y);doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');y+=4;
+      var byP={};activeRecs.forEach(function(r){var n=r.productName||'';if(!byP[n])byP[n]={q:0,s:0};byP[n].q+=r.quantity||0;byP[n].s+=r.total||0;});
+      var prodRows=Object.entries(byP).sort(function(a,b){return b[1].s-a[1].s;}).map(function(e){return[e[0],e[1].q+' ea',N(e[1].s)+' VND'];});
+      prodRows.push(['Total',cv.qty+' ea',N(cv.ts)+' VND']);
+      doc.autoTable({startY:y,head:[['Product','Qty','Amount (VND)']],body:prodRows,
+        styles:{fontSize:9},headStyles:{fillColor:[21,101,192]},
+        columnStyles:{1:{halign:'center'},2:{halign:'right'}},
+        margin:{left:14,right:14},
+        didParseCell:function(data){if(data.row.index===prodRows.length-1){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[240,248,255];}}});
+      y=doc.lastAutoTable.finalY+8;
+      // 일별 판매
+      if(y>220){doc.addPage();y=14;}
+      doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(21,101,192);
+      doc.text('Daily Sales',14,y);doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');y+=4;
+      var byD={};activeRecs.forEach(function(r){var d=r.date||'';if(!byD[d])byD[d]={sale:0,hq:0,del:0,cnt:0};var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;var isB=r.channel==='baedalk';var sale=r.total||0;byD[d].sale+=sale;byD[d].hq+=isB?sale:su*(r.quantity||0);byD[d].del+=r.deliveryFee||0;byD[d].cnt++;});
+      var dayRows=Object.entries(byD).sort(function(a,b){return a[0].localeCompare(b[0]);}).map(function(e){return[e[0],e[1].cnt+' orders',N(e[1].sale)+' VND',N(e[1].hq)+' VND',N(e[1].del)+' VND'];});
+      dayRows.push(['Total',cv.cnt+' orders',N(cv.ts)+' VND',N(cv.hq)+' VND',N(cv.dl)+' VND']);
+      doc.autoTable({startY:y,head:[['Date','Orders','Sales','HQ Deposit','Del Fee']],body:dayRows,
+        styles:{fontSize:8},headStyles:{fillColor:[21,101,192]},
+        columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}},
+        margin:{left:14,right:14},
+        didParseCell:function(data){if(data.row.index===dayRows.length-1){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[240,248,255];}}});
+      // 2페이지: 거래 명세
+      doc.addPage();y=14;
+      doc.setFillColor(21,101,192);doc.roundedRect(14,y,pageW-28,10,2,2,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont(undefined,'bold');
+      doc.text('Transaction Detail  '+monthLabel,pageW/2,y+7,{align:'center'});
+      doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');y+=14;
+      var txRows=allRecs.slice().sort(function(a,b){return(a.date||'').localeCompare(b.date||'');}).map(function(r){
+        var isB=r.channel==='baedalk';
+        var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
+        var hq=isB?(r.total||0):su*(r.quantity||0);
+        var who=isB?(r.ordererName||'-'):(r.sellerName||'-');
+        var status=r.cancelled?'X':(isB?'-':(r.paymentConfirmed?'OK':'PEND'));
+        return[r.date||'',isB?'BaedalK':'Seller',r.productName||'',r.quantity||0,N(r.total||0),N(r.deliveryFee||0),N(hq),who,status];
+      });
+      doc.autoTable({startY:y,
+        head:[['Date','Ch','Product','Qty','Amount','DelFee','HQ','Orderer/Seller','St']],
+        body:txRows,
+        styles:{fontSize:7.5,cellPadding:1.8},
+        headStyles:{fillColor:[21,101,192],fontSize:8},
+        columnStyles:{3:{halign:'center'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},8:{halign:'center'}},
+        margin:{left:14,right:14},
+        didParseCell:function(data){if(data.row.raw&&data.row.raw[8]==='X'){Object.values(data.row.cells).forEach(function(c){c.styles.textColor=[180,0,0];c.styles.fontStyle='italic';});}}});
+      // 페이지 번호
+      var pageCount=doc.internal.getNumberOfPages();
+      for(var i=1;i<=pageCount;i++){
+        doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);
+        doc.text('DAEHAN KIMCHI  '+monthLabel+'  |  Page '+i+' / '+pageCount,pageW/2,doc.internal.pageSize.getHeight()-6,{align:'center'});
+      }
+      doc.save('대한김치_월간정산_'+mY+mm+'.pdf');
+      showExportProgress(false);
+      toast('✅ PDF 저장 완료');
+    }catch(e){showExportProgress(false);toast('PDF 오류: '+e.message);console.error(e);}
+  },150);
 }
 /* REPORT */
 function renderRpt(){
@@ -1213,9 +1568,17 @@ function rMonth(){
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var recs=Object.values(sales).filter(function(r){return(r.date||'').startsWith(pfx);});
   var cv=cS(recs);
-  var byD={};recs.forEach(function(r){if(!byD[r.date])byD[r.date]={s:0,n:0};byD[r.date].s+=r.total||0;byD[r.date].n++;});
+  var byD={};recs.filter(function(r){return!r.cancelled;}).forEach(function(r){if(!byD[r.date])byD[r.date]={s:0,n:0};byD[r.date].s+=r.total||0;byD[r.date].n++;});
   var dr=Object.entries(byD).sort(function(a,b){return b[0].localeCompare(a[0]);}).map(function(e){return'<div class="rpt-row"><span>'+e[0]+'</span><strong>'+N(e[1].s)+' ₫</strong></div>';}).join('');
-  el.innerHTML=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);rMonth()','shM(1);rMonth()')+
+  var monthLabel=mY+'년 '+(TT[lang]||TT.ko).mn[mM-1];
+  var exportBar='<div class="export-bar">'+
+    '<span class="export-bar-label">📤 '+monthLabel+' 내보내기</span>'+
+    '<div class="export-btns">'+
+    '<button class="btn-excel" onclick="exportExcel()">📊 Excel</button>'+
+    '<button class="btn-pdf" onclick="exportPDF()">📄 PDF</button>'+
+    '</div></div>';
+  el.innerHTML=dn(monthLabel,'shM(-1);rMonth()','shM(1);rMonth()')+
+    exportBar+
     '<div class="rpt-sec"><div class="rpt-title">'+t('rptTitleMonthly')+'</div>'+
     '<div class="rpt-row"><span>'+t('rptLabelSale')+'</span><strong>'+N(cv.ts)+' ₫</strong></div>'+
     '<div class="rpt-row"><span>'+t('rptLabelHQ')+'</span><strong style="color:var(--success-dark)">'+N(cv.hq)+' ₫</strong></div>'+
@@ -1526,11 +1889,13 @@ function renderHOut(){
     '<th>'+t('histColDate')+'</th><th>'+t('histColProd')+'</th><th>'+t('histColChannel')+'</th>'+
     '<th>주문자</th><th>'+t('histColQty')+'</th><th>'+t('histColAmt')+'</th><th>'+t('histColDel')+'</th>'+
     '</tr></thead><tbody>'+
-    recs.map(function(e){var r=e[1];var isB=r.channel==='baedalk';
-      return'<tr><td>'+r.date+'</td><td>'+pName(r.productName||'')+'</td>'+
+    recs.map(function(e){var r=e[1];var isB=r.channel==='baedalk';var isCancelled=r.cancelled||false;
+      var rowStyle=isCancelled?'opacity:.55;background:#FFF5F5;':'';
+      var amtStr=isCancelled?'<span style="text-decoration:line-through;color:var(--gray-400)">'+N(r.total||0)+' ₫</span> <span class="ctag ctag-cancel">취소</span>':N(r.total||0)+' ₫';
+      return'<tr style="'+rowStyle+'"><td>'+r.date+'</td><td>'+pName(r.productName||'')+'</td>'+
         '<td><span class="ctag '+(isB?'ctag-b':'ctag-s')+'">'+( isB?'BaedalcK':t('rptLabelSeller').slice(0,6))+'</span></td>'+
         '<td style="font-size:12px;color:var(--gray-600)">'+(isB?(r.ordererName||'-'):( r.sellerName||'-'))+'</td>'+
-        '<td>'+(r.quantity||0)+t('invUnit')+'</td><td>'+N(r.total||0)+' ₫</td><td>'+N(r.deliveryFee||0)+' ₫</td></tr>';
+        '<td>'+(r.quantity||0)+t('invUnit')+'</td><td>'+amtStr+'</td><td>'+N(r.deliveryFee||0)+' ₫</td></tr>';
     }).join('')+
     '</tbody></table></div>';
 }
