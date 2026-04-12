@@ -246,7 +246,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <input id="cfg-key" type="text" class="form-control" placeholder="AIzaSy..."></div>
     <div class="form-group"><label class="form-label" data-i18n="mgmtUserName">사용자 이름</label>
       <input id="cfg-user" type="text" class="form-control" placeholder="홍길동"></div>
-    <button class="btn btn-primary" onclick="saveConfig()">✓ 저장하고 시작</button>
+    <button type="button" class="btn btn-primary" onclick="saveConfig()">✓ 저장하고 시작</button>
   </div>
 </div>
 <!-- APP -->
@@ -315,7 +315,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <div class="form-group"><label class="form-label" data-i18n="inQty">입고 수량 *</label><input type="number" class="form-control" id="in-qty" min="1"></div>
       <div class="form-group"><label class="form-label" data-i18n="inExpiry">유통기한</label><input type="date" class="form-control" id="in-expiry"></div>
       <div class="form-group"><label class="form-label" data-i18n="fNote">비고</label><input type="text" class="form-control" id="in-note"></div>
-      <button class="btn btn-success" onclick="saveInbound()" data-i18n="inSaveBtn">📥 입고 저장</button>
+      <button type="button" class="btn btn-success" onclick="saveInbound()" data-i18n="inSaveBtn">📥 입고 저장</button>
     </div></div>
   </div>
   <!-- SALE -->
@@ -347,7 +347,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <div style="display:flex;gap:8px;align-items:stretch">
           <input type="number" class="form-control" id="cart-qty" min="1" placeholder="수량" style="flex:1;min-width:0">
           <input type="number" class="form-control" id="cart-price" placeholder="단가(VND)" style="flex:1.5;min-width:0">
-          <button class="btn btn-sm btn-primary" onclick="addCartItem()" style="flex:0 0 auto;padding:0 14px;height:auto" data-i18n="outAddBtn">추가</button>
+          <button type="button" class="btn btn-sm btn-primary" onclick="addCartItem()" style="flex:0 0 auto;padding:0 14px;height:auto" data-i18n="outAddBtn">추가</button>
         </div>
         <div class="form-hint" data-i18n="outAddHint">제품 선택 후 수량·단가 입력 → 추가 버튼</div>
       </div>
@@ -366,7 +366,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ss-pr">0 ₫</span></div>
       </div>
       <div style="height:12px"></div>
-      <button class="btn btn-pink" onclick="saveSale()" data-i18n="outSaveBtn">📤 판매 저장</button>
+      <button type="button" class="btn btn-pink" onclick="saveSale()" data-i18n="outSaveBtn">📤 판매 저장</button>
     </div></div>
   </div>
   <!-- SETTLE -->
@@ -926,14 +926,18 @@ function onCartProdCh(){
 }
 function addCartItem(){
   var pid=document.getElementById('cart-prod').value;
-  var qty=parseInt(document.getElementById('cart-qty').value)||0;
-  var price=parseInt(document.getElementById('cart-price').value)||0;
+  var qtyInput=document.getElementById('cart-qty');
+  var priceInput=document.getElementById('cart-price');
+  var qtyValue=qtyInput.value;
+  var qty=parseInt(qtyValue)||0;
+  var price=parseInt(priceInput.value)||0;
+  console.log('addCartItem - pid:',pid,'qtyValue:',qtyValue,'qty:',qty,'price:',price);
   if(!pid){toast(t('eProd'));return;}
-  if(!qty){toast(t('eQty'));return;}
+  if(!qty){toast(t('eQty')+' (입력값: '+qtyValue+')');return;}
   cart.push({pid:pid,qty:qty,price:price});
   document.getElementById('cart-prod').value='';
-  document.getElementById('cart-qty').value='';
-  document.getElementById('cart-price').value='';
+  qtyInput.value='';
+  priceInput.value='';
   renderCart();
   updSS();
 }
