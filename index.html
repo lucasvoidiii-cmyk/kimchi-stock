@@ -373,11 +373,11 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
           <label class="form-label" style="margin-bottom:8px">💰 비용 부담 주체 *</label>
           <div style="display:flex;gap:8px">
             <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
-              <input type="radio" name="free-cost-bearer" id="free-cost-hq" value="hq" checked style="margin-right:8px">
+              <input type="radio" name="free-cost-bearer" id="free-cost-hq" value="hq" checked onchange="updSS()" style="margin-right:8px">
               <span style="font-size:14px;font-weight:600">본사 부담<br><span style="font-size:11px;color:var(--gray-500)">본사 입금 0원</span></span>
             </label>
             <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
-              <input type="radio" name="free-cost-bearer" id="free-cost-seller" value="seller" style="margin-right:8px">
+              <input type="radio" name="free-cost-bearer" id="free-cost-seller" value="seller" onchange="updSS()" style="margin-right:8px">
               <span style="font-size:14px;font-weight:600">판매자 부담<br><span style="font-size:11px;color:var(--gray-500)">공급가 입금 필요</span></span>
             </label>
           </div>
@@ -533,11 +533,11 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
           <label class="form-label" style="margin-bottom:8px">💰 비용 부담 주체 *</label>
           <div style="display:flex;gap:8px">
             <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
-              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-hq" value="hq" checked style="margin-right:8px">
+              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-hq" value="hq" checked onchange="updEditSS()" style="margin-right:8px">
               <span style="font-size:14px;font-weight:600">본사 부담<br><span style="font-size:11px;color:var(--gray-500)">본사 입금 0원</span></span>
             </label>
             <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
-              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-seller" value="seller" style="margin-right:8px">
+              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-seller" value="seller" onchange="updEditSS()" style="margin-right:8px">
               <span style="font-size:14px;font-weight:600">판매자 부담<br><span style="font-size:11px;color:var(--gray-500)">공급가 입금 필요</span></span>
             </label>
           </div>
@@ -1033,6 +1033,14 @@ function updSS(){
     if(curCh==='baedalk'){hq+=itemTot;}
     else{hq+=itemSup;spr+=Math.max(0,itemTot-itemSup);}
   });
+  // 판매 총액이 0원이고 본사 부담일 때 본사 입금도 0원으로 표시
+  if(tot===0&&cart.length>0){
+    var costBearer=document.querySelector('input[name="free-cost-bearer"]:checked');
+    if(costBearer&&costBearer.value==='hq'){
+      hq=0; // 본사 부담일 경우 본사 입금도 0원
+      spr=0; // 판매자 수익도 0원
+    }
+  }
   var unit=lang==='vi'?' SP':'품목';
   document.getElementById('ss-items').textContent=cart.length+unit;
   document.getElementById('ss-total').textContent=N(tot)+' ₫';
@@ -1409,6 +1417,13 @@ function updEditSS(){
   var ch=document.getElementById('edit-ch').value;
   var sup=parseInt(document.getElementById('edit-sup').value)||0;
   var isB=ch==='baedalk';
+  // 판매금액이 0원이고 본사 부담일 때 공급가도 0원으로 표시
+  if(amt===0){
+    var costBearer=document.querySelector('input[name="edit-free-cost-bearer"]:checked');
+    if(costBearer&&costBearer.value==='hq'){
+      sup=0; // 본사 부담일 경우 공급가도 0원
+    }
+  }
   document.getElementById('ess-tot').textContent=N(amt)+' ₫';
   document.getElementById('ess-del').textContent=N(del)+' ₫';
   document.getElementById('ess-hq').textContent=N(isB?amt:sup)+' ₫';
