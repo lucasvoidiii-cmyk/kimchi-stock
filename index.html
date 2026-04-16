@@ -900,14 +900,19 @@ function renderHome(){
   var pdA=pdR.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
   setKPI('kpi-dc',pdR.length,t('cntUnit'));setKPI('kpi-da',null,null,N(pdA)+' ₫',true);
   var pwR=mRecs.filter(function(r){return r.channel==='seller'&&!r.paymentConfirmed;});
-  var pwA=pwR.reduce(function(s,r){
+  var pwA=0;
+  var pwC=0; // 실제 미입금 건수 (0원 제외)
+  pwR.forEach(function(r){
     var p=prods[r.productId]||{};
     var su=r.supplyPrice||p.supplyPrice||0;
     // supplyTotal이 저장되어 있으면 그 값을 사용 (무상 제공 시 0원으로 저장됨)
     var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
-    return s+sup;
-  },0);
-  setKPI('kpi-wc',pwR.length,t('cntUnit'));setKPI('kpi-wa',null,null,N(pwA)+' ₫',true);
+    if(sup>0){
+      pwA+=sup;
+      pwC++; // 0원이 아닌 건만 카운트
+    }
+  });
+  setKPI('kpi-wc',pwC,t('cntUnit'));setKPI('kpi-wa',null,null,N(pwA)+' ₫',true);
   var tB=tRecs.filter(function(r){return r.channel==='baedalk';});
   document.getElementById('ch-bs').textContent=N(tB.reduce(function(s,r){return s+(r.total||0);},0))+' ₫';
   document.getElementById('ch-bc').textContent=tB.length+t('cntUnit');
@@ -920,16 +925,21 @@ function renderHome(){
     sids.forEach(function(sid){
       var s=sellers[sid];
       var uR=mRecs.filter(function(r){return r.channel==='seller'&&r.sellerId===sid&&!r.paymentConfirmed;});
-      var uA=uR.reduce(function(sm,r){
+      var uA=0;
+      var uC=0; // 실제 미입금 건수 (0원 제외)
+      uR.forEach(function(r){
         var p=prods[r.productId]||{};
         var su=r.supplyPrice||p.supplyPrice||0;
         // supplyTotal이 저장되어 있으면 그 값을 사용 (무상 제공 시 0원으로 저장됨)
         var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
-        return sm+sup;
-      },0);
-      var col=uR.length>0?'var(--warn-dark)':'var(--success-dark)';
+        if(sup>0){
+          uA+=sup;
+          uC++; // 0원이 아닌 건만 카운트
+        }
+      });
+      var col=uC>0?'var(--warn-dark)':'var(--success-dark)';
       h+='<div class="ch-stat-row"><div><div style="font-size:15px;font-weight:700">🧑‍💼 '+s.name+'</div>'+
-        '<div style="font-size:12px;color:var(--gray-400)">'+uR.length+t('unconfirmedDel')+'</div></div>'+
+        '<div style="font-size:12px;color:var(--gray-400)">'+uC+t('unconfirmedDel')+'</div></div>'+
         '<div style="text-align:right"><div style="font-size:16px;font-weight:800;color:'+col+'">'+N(uA)+' ₫</div>'+
         '<div style="font-size:11px;color:var(--gray-400)">'+t('pendWholesale')+'</div></div></div>';
     });
