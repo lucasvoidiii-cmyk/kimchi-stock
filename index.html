@@ -418,13 +418,21 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <button class="modal-close" onclick="closeMod('modal-prod')">×</button>
     <div class="modal-title" id="pm-title">제품 추가</div>
     <div class="form-group"><label class="form-label" data-i18n="pmName">제품명 *</label><input type="text" class="form-control" id="pm-name"></div>
-    <div class="form-group"><label class="form-label" data-i18n="pmSize">규격/용량 *</label><input type="text" class="form-control" id="pm-size" placeholder="1kg, 500g"></div>
+    <div class="form-group"><label class="form-label" data-i18n="pmSize">규격/용량 *</label>
+      <select class="form-control" id="pm-size-select" onchange="handleSizeSelect()" style="margin-bottom:8px">
+        <option value="1kg">1kg (기본)</option>
+        <option value="500g">500g</option>
+        <option value="600g">600g</option>
+        <option value="300g">300g</option>
+        <option value="custom">직접 입력</option>
+      </select>
+      <input type="text" class="form-control" id="pm-size" placeholder="예: 1kg, 500g" style="display:none"></div>
     <div class="form-group"><label class="form-label" data-i18n="pmUnit">단위</label><input type="text" class="form-control" id="pm-unit" placeholder="개"></div>
     <div class="form-group"><label class="form-label" data-i18n="pmSupply">공급단가 (VND)</label><input type="number" class="form-control" id="pm-supply"></div>
     <div class="form-group"><label class="form-label" data-i18n="outPrice">판매단가 (VND)</label><input type="number" class="form-control" id="pm-sale"></div>
     <div class="form-group"><label class="form-label" data-i18n="pmMin">최소 안전재고</label><input type="number" class="form-control" id="pm-min"></div>
     <input type="hidden" id="pm-id">
-    <button class="btn btn-primary" onclick="saveProd()" data-i18n="saveBtn">저장</button>
+    <button type="button" class="btn btn-primary" onclick="saveProd()" data-i18n="saveBtn">저장</button>
   </div>
 </div>
 <div class="modal-overlay" id="modal-seller">
@@ -435,7 +443,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <div class="form-group"><label class="form-label" data-i18n="slPhone">연락처</label><input type="tel" class="form-control" id="sl-phone"></div>
     <div class="form-group"><label class="form-label" data-i18n="slNote">메모</label><input type="text" class="form-control" id="sl-note"></div>
     <input type="hidden" id="sl-id">
-    <button class="btn btn-purple" onclick="saveSeller()" data-i18n="saveBtn">저장</button>
+    <button type="button" class="btn btn-purple" onclick="saveSeller()" data-i18n="saveBtn">저장</button>
   </div>
 </div>
 <div class="modal-overlay" id="modal-adj">
@@ -445,9 +453,9 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <div id="adj-name" style="font-size:15px;font-weight:700;margin-bottom:16px"></div>
     <div class="form-group"><label class="form-label" data-i18n="adjQtyLbl">현재 재고 수량</label>
       <div style="display:flex;gap:10px;align-items:center">
-        <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(-1)">−</button>
+        <button type="button" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(-1)">−</button>
         <input type="number" class="form-control" id="adj-qty" min="0" style="text-align:center;font-size:22px;font-weight:800">
-        <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(1)">+</button>
+        <button type="button" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--gray-300);background:#fff;font-size:20px;cursor:pointer" onclick="adjSt(1)">+</button>
       </div></div>
     <div class="form-group"><label class="form-label" data-i18n="adjExpLbl">유통기한 임박 수량</label>
       <input type="number" class="form-control" id="adj-exp" min="0">
@@ -458,7 +466,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
       <div class="form-hint">수정 날짜·담당자는 자동 기록됩니다</div>
     </div>
     <input type="hidden" id="adj-pid">
-    <button class="btn btn-primary" onclick="saveAdj()" data-i18n="adjSaveBtn">재고 수정 완료</button>
+    <button type="button" class="btn btn-primary" onclick="saveAdj()" data-i18n="adjSaveBtn">재고 수정 완료</button>
     <!-- 수정 이력 표시 -->
     <div id="adj-log-wrap" style="display:none;margin-top:20px;border-top:1px solid var(--gray-200);padding-top:14px">
       <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:8px">🕓 수정 이력</div>
@@ -489,7 +497,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <div class="ss-row"><span class="ss-lbl" data-i18n="ssPrLbl">판매자 수익</span><span class="ss-val pr" id="ess-pr">0 ₫</span></div>
       </div>
       <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
-      <button class="btn btn-primary" onclick="saveEditSale()" data-i18n="editSaveBtn" style="margin-bottom:10px">수정 저장</button>
+      <button type="button" class="btn btn-primary" onclick="saveEditSale()" data-i18n="editSaveBtn" style="margin-bottom:10px">수정 저장</button>
       <!-- 구분선 -->
       <div style="border-top:1px solid var(--gray-200);margin:14px 0 12px"></div>
       <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:10px">⚠️ 주문 취소 / 삭제</div>
@@ -510,8 +518,8 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
         <input type="text" class="form-control" id="cancel-reason-etc" placeholder="취소 사유를 입력하세요">
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn" style="background:#FFF3E0;color:var(--warn-dark);border:1.5px solid var(--warn);flex:1;font-size:14px" onclick="cancelSale()">🚫 주문 취소 (재고 복원)</button>
-        <button class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);flex:0 0 auto;width:54px;font-size:18px;padding:0" onclick="deleteSale()" title="완전 삭제">🗑</button>
+        <button type="button" class="btn" style="background:#FFF3E0;color:var(--warn-dark);border:1.5px solid var(--warn);flex:1;font-size:14px" onclick="cancelSale()">🚫 주문 취소 (재고 복원)</button>
+        <button type="button" class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);flex:0 0 auto;width:54px;font-size:18px;padding:0" onclick="deleteSale()" title="완전 삭제">🗑</button>
       </div>
       <div style="font-size:11px;color:var(--gray-400);margin-top:6px;line-height:1.6">
         🚫 취소: 재고 복원 후 내역에 취소 표시 (기록 유지)<br>
@@ -521,8 +529,8 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     <!-- 이미 취소된 건: 복원 버튼 표시 -->
     <div id="edit-restore-fields" style="display:none">
       <input type="hidden" id="edit-id"><input type="hidden" id="edit-ch"><input type="hidden" id="edit-sup">
-      <button class="btn btn-outline" onclick="restoreSale()" style="margin-bottom:8px">↩️ 취소 복원 (재고 차감)</button>
-      <button class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);font-size:14px" onclick="deleteSale()">🗑 완전 삭제</button>
+      <button type="button" class="btn btn-outline" onclick="restoreSale()" style="margin-bottom:8px">↩️ 취소 복원 (재고 차감)</button>
+      <button type="button" class="btn" style="background:#FFEBEE;color:var(--danger-dark);border:1.5px solid var(--danger);font-size:14px" onclick="deleteSale()">🗑 완전 삭제</button>
     </div>
   </div>
 </div>
@@ -1755,8 +1763,56 @@ function renderPR(){
   });
 }
 
-function openAddProd(){document.getElementById('pm-title').textContent='제품 추가';['pm-name','pm-size','pm-unit','pm-supply','pm-sale','pm-min','pm-id'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modal-prod').classList.add('open');}
-function openEdProd(id){var p=prods[id];document.getElementById('pm-title').textContent='제품 수정';document.getElementById('pm-name').value=p.name||'';document.getElementById('pm-size').value=p.size||'';document.getElementById('pm-unit').value=p.unit||'';document.getElementById('pm-supply').value=p.supplyPrice||'';document.getElementById('pm-sale').value=p.salePrice||'';document.getElementById('pm-min').value=p.minStock||'';document.getElementById('pm-id').value=id;document.getElementById('modal-prod').classList.add('open');}
+function openAddProd(){
+  document.getElementById('pm-title').textContent='제품 추가';
+  ['pm-name','pm-size','pm-unit','pm-supply','pm-sale','pm-min','pm-id'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('pm-size-select').value='1kg';
+  document.getElementById('pm-size').style.display='none';
+  document.getElementById('modal-prod').classList.add('open');
+}
+function handleSizeSelect(){
+  var sel=document.getElementById('pm-size-select').value;
+  var inp=document.getElementById('pm-size');
+  if(sel==='custom'){
+    inp.style.display='block';
+    inp.value='';
+    inp.focus();
+  }else{
+    inp.style.display='none';
+    inp.value=sel;
+  }
+}
+function openEdProd(id){
+  var p=prods[id];
+  document.getElementById('pm-title').textContent='제품 수정';
+  document.getElementById('pm-name').value=p.name||'';
+  var size=p.size||'';
+  var sizeSelect=document.getElementById('pm-size-select');
+  var sizeInput=document.getElementById('pm-size');
+  // 드롭다운에 있는 값인지 확인
+  var found=false;
+  for(var i=0;i<sizeSelect.options.length-1;i++){
+    if(sizeSelect.options[i].value===size){
+      sizeSelect.value=size;
+      sizeInput.style.display='none';
+      sizeInput.value=size;
+      found=true;
+      break;
+    }
+  }
+  // 드롭다운에 없으면 "직접 입력" 선택
+  if(!found){
+    sizeSelect.value='custom';
+    sizeInput.style.display='block';
+    sizeInput.value=size;
+  }
+  document.getElementById('pm-unit').value=p.unit||'';
+  document.getElementById('pm-supply').value=p.supplyPrice||'';
+  document.getElementById('pm-sale').value=p.salePrice||'';
+  document.getElementById('pm-min').value=p.minStock||'';
+  document.getElementById('pm-id').value=id;
+  document.getElementById('modal-prod').classList.add('open');
+}
 async function saveProd(){
   var name=document.getElementById('pm-name').value.trim();var size=document.getElementById('pm-size').value.trim();
   if(!name||!size){toast(t('eProdN'));return;}
