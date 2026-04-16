@@ -1173,7 +1173,9 @@ function cS(recs){
   recs.forEach(function(r){
     if(r.cancelled)return; // 취소 건 집계 제외
     var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
-    var sup=su*(r.quantity||0);var sale=r.total||((r.salePrice||0)*(r.quantity||0));
+    // supplyTotal이 저장되어 있으면 그 값을 사용 (무상 제공 시 0원으로 저장됨)
+    var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
+    var sale=r.total||((r.salePrice||0)*(r.quantity||0));
     var isB=r.channel==='baedalk';
     ts+=sale;hq+=(isB?sale:sup);sp+=(isB?0:Math.max(0,sale-sup));
     if(isB)bs+=sale;else ss+=sale;
@@ -1259,7 +1261,9 @@ function buildDL(recs,ct){
   sr.forEach(function(r){
     var sid=Object.keys(sales).find(function(k){var s=sales[k];return s===r||(s.timestamp===r.timestamp&&s.productId===r.productId);});
     var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
-    var sup=su*(r.quantity||0);var sale=r.total||((r.salePrice||0)*(r.quantity||0));
+    // supplyTotal이 저장되어 있으면 그 값을 사용 (무상 제공 시 0원으로 저장됨)
+    var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
+    var sale=r.total||((r.salePrice||0)*(r.quantity||0));
     var isB=ct==='b';var hq=isB?sale:sup;var pr=isB?0:Math.max(0,sale-sup);
     var isCancelled=r.cancelled||false;
     var cancelledClass=isCancelled?' sdi-cancelled cancel-stripe':'';
