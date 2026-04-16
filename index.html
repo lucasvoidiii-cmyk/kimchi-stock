@@ -369,6 +369,19 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
           <option value="기타">기타 (직접 입력)</option>
         </select>
         <input type="text" class="form-control" id="free-reason-etc" placeholder="사유를 입력하세요" style="display:none;margin-top:8px">
+        <div style="margin-top:12px;padding:12px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--primary)">
+          <label class="form-label" style="margin-bottom:8px">💰 비용 부담 주체 *</label>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
+              <input type="radio" name="free-cost-bearer" id="free-cost-hq" value="hq" checked style="margin-right:8px">
+              <span style="font-size:14px;font-weight:600">본사 부담<br><span style="font-size:11px;color:var(--gray-500)">본사 입금 0원</span></span>
+            </label>
+            <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
+              <input type="radio" name="free-cost-bearer" id="free-cost-seller" value="seller" style="margin-right:8px">
+              <span style="font-size:14px;font-weight:600">판매자 부담<br><span style="font-size:11px;color:var(--gray-500)">공급가 입금 필요</span></span>
+            </label>
+          </div>
+        </div>
         <div class="form-hint">판매금액이 0원일 때는 사유를 반드시 입력해야 합니다</div>
       </div>
       <div class="form-group"><label class="form-label" data-i18n="fNote">비고</label><input type="text" class="form-control" id="out-note"></div>
@@ -516,6 +529,19 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
           <option value="기타">기타 (직접 입력)</option>
         </select>
         <input type="text" class="form-control" id="edit-free-reason-etc" placeholder="사유를 입력하세요" style="display:none;margin-top:8px">
+        <div style="margin-top:12px;padding:12px;background:var(--gray-50);border-radius:8px;border-left:3px solid var(--primary)">
+          <label class="form-label" style="margin-bottom:8px">💰 비용 부담 주체 *</label>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
+              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-hq" value="hq" checked style="margin-right:8px">
+              <span style="font-size:14px;font-weight:600">본사 부담<br><span style="font-size:11px;color:var(--gray-500)">본사 입금 0원</span></span>
+            </label>
+            <label style="flex:1;display:flex;align-items:center;padding:10px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;cursor:pointer">
+              <input type="radio" name="edit-free-cost-bearer" id="edit-free-cost-seller" value="seller" style="margin-right:8px">
+              <span style="font-size:14px;font-weight:600">판매자 부담<br><span style="font-size:11px;color:var(--gray-500)">공급가 입금 필요</span></span>
+            </label>
+          </div>
+        </div>
         <div class="form-hint">판매금액이 0원일 때는 사유를 반드시 입력해야 합니다</div>
       </div>
       <div class="ss-box" style="margin-bottom:14px">
@@ -1056,12 +1082,20 @@ async function saveSale(){
   // 판매 총액 계산 및 무상 제공 사유 확인
   var totalAmt=cart.reduce(function(sum,item){return sum+(item.qty*item.price);},0);
   var freeReason='';
+  var freeCostBearer='';
   if(totalAmt===0){
     var reasonSel=document.getElementById('free-reason-select').value;
     if(!reasonSel){
       toast('판매금액이 0원입니다. 무상 제공 사유를 선택하세요.');
       return;
     }
+    // 비용 부담 주체 확인
+    var costBearer=document.querySelector('input[name="free-cost-bearer"]:checked');
+    if(!costBearer){
+      toast('비용 부담 주체를 선택하세요.');
+      return;
+    }
+    freeCostBearer=costBearer.value;
     if(reasonSel==='기타'){
       var reasonEtc=document.getElementById('free-reason-etc').value.trim();
       if(!reasonEtc){
@@ -1081,6 +1115,10 @@ async function saveSale(){
       if(su===0&&curCh==='seller'&&i===0&&!confirm(t('zeroSupplyConfirm')))return;
       var tot=item.qty*item.price;
       var sup=item.qty*su;
+      // 무상 제공일 때 비용 부담 주체에 따라 공급가 조정
+      if(tot===0&&freeCostBearer==='hq'){
+        sup=0; // 본사 부담일 경우 공급가도 0원
+      }
       var hq=curCh==='baedalk'?tot:sup;
       var spr=curCh==='baedalk'?0:Math.max(0,tot-sup);
       var itemDel=i===0?dl:0; // 배달비는 첫 번째 품목에만 기록
@@ -1092,6 +1130,7 @@ async function saveSale(){
         ordererName:orderer,groupId:groupId,
         deliveryPaid:false,paymentConfirmed:false,
         freeReason:freeReason||'',
+        freeCostBearer:freeCostBearer||'',
         staff:uName,note:note,timestamp:Date.now()+i};
       var nid=await fPush('sales',rec);sales[nid]=rec;
       var cur=(stock[item.pid]||{}).quantity||0;
@@ -1106,6 +1145,7 @@ async function saveSale(){
     document.getElementById('free-reason-select').value='';
     document.getElementById('free-reason-etc').value='';
     document.getElementById('free-reason-etc').style.display='none';
+    document.getElementById('free-cost-hq').checked=true;
     document.getElementById('regular-badge').style.display='none';
     updSS();
     if(document.getElementById('page-home').classList.contains('active'))renderHome();
@@ -1320,6 +1360,7 @@ function openEdit(sid){
   document.getElementById('edit-del').value=r.deliveryFee||0;
   // 무상 제공 사유 로드
   var freeReason=r.freeReason||'';
+  var freeCostBearer=r.freeCostBearer||'hq'; // 기본값: 본사 부담
   if(freeReason){
     if(freeReason.startsWith('기타: ')){
       document.getElementById('edit-free-reason-select').value='기타';
@@ -1329,10 +1370,17 @@ function openEdit(sid){
       document.getElementById('edit-free-reason-select').value=freeReason;
       document.getElementById('edit-free-reason-etc').style.display='none';
     }
+    // 비용 부담 주체 로드
+    if(freeCostBearer==='hq'){
+      document.getElementById('edit-free-cost-hq').checked=true;
+    }else{
+      document.getElementById('edit-free-cost-seller').checked=true;
+    }
   }else{
     document.getElementById('edit-free-reason-select').value='';
     document.getElementById('edit-free-reason-etc').value='';
     document.getElementById('edit-free-reason-etc').style.display='none';
+    document.getElementById('edit-free-cost-hq').checked=true;
   }
   var ordInfo=r.ordererName?' | 주문자: '+r.ordererName:'';
   document.getElementById('edit-info').innerHTML=
@@ -1393,11 +1441,23 @@ async function saveEditSale(){
   var sup=parseInt(document.getElementById('edit-sup').value)||0;
   // 무상 제공 사유 확인 (판매금액이 0원일 때)
   var freeReason='';
+  var freeCostBearer='';
   if(amt===0){
     var reasonSel=document.getElementById('edit-free-reason-select').value;
     if(!reasonSel){
       toast('판매금액이 0원입니다. 무상 제공 사유를 선택하세요.');
       return;
+    }
+    // 비용 부담 주체 확인
+    var costBearer=document.querySelector('input[name="edit-free-cost-bearer"]:checked');
+    if(!costBearer){
+      toast('비용 부담 주체를 선택하세요.');
+      return;
+    }
+    freeCostBearer=costBearer.value;
+    // 본사 부담일 경우 공급가도 0원으로 조정
+    if(freeCostBearer==='hq'){
+      sup=0;
     }
     if(reasonSel==='기타'){
       var reasonEtc=document.getElementById('edit-free-reason-etc').value.trim();
@@ -1414,7 +1474,7 @@ async function saveEditSale(){
   var r=sales[sid];if(!r)return;
   var nsp=Math.round(amt/(r.quantity||1));
   try{
-    var upd={total:amt,salePrice:nsp,deliveryFee:del,hqAmount:hq,sellerProfit:spr,freeReason:freeReason};
+    var upd={total:amt,salePrice:nsp,deliveryFee:del,hqAmount:hq,sellerProfit:spr,supplyTotal:sup,freeReason:freeReason,freeCostBearer:freeCostBearer};
     await fPatch('sales/'+sid,upd);Object.assign(sales[sid],upd);
     toast(t('saved'));closeMod('modal-edit');renderST();renderHome();
   }catch(e){toast('저장 실패:'+e.message);}
