@@ -1365,7 +1365,7 @@ function stWholesale(){
         '<div class="pay-name">'+r.date+' · '+pName(r.productName||'')+'</div>'+
         '<div class="pay-amt">'+(r.quantity||0)+t('invUnit')+' · '+N(hq)+' ₫</div>'+
         '</div>'+
-        '<button class="cfm-btn '+(conf?'done':'pend')+'" onclick="togWS(\'+r._id+\','+(!conf)+')">'+( conf?t('wsConfirmBtn'):t('wsUnconfirmBtn'))+'</button>'+
+        '<button class="cfm-btn '+(conf?'done':'pend')+'" onclick="togWS(\''+r._id+'\','+(!conf)+')">'+( conf?t('wsConfirmBtn'):t('wsUnconfirmBtn'))+'</button>'+
         '</div>';
     });
     h+='</div></div>';
