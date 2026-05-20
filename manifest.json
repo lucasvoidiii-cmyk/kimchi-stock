@@ -1,0 +1,28 @@
+{
+  "name": "대한김치 재고관리",
+  "short_name": "대한김치",
+  "description": "하노이 대한김치 유통 사업 재고 관리 시스템",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8F9FA",
+  "theme_color": "#1565C0",
+  "orientation": "portrait",
+  "scope": "./",
+  "lang": "ko-KR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231565C0'/><text x='50' y='50' text-anchor='middle' dy='.3em' font-size='48' fill='white' font-family='sans-serif' font-weight='bold'>김</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231565C0'/><text x='50' y='50' text-anchor='middle' dy='.3em' font-size='48' fill='white' font-family='sans-serif' font-weight='bold'>김</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": []
+}

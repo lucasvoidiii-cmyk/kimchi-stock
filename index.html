@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1565C0">
+<link rel="manifest" href="./manifest.json">
 <title>대한김치 재고관리</title>
 <style>
 :root{
@@ -227,6 +230,17 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 .export-prog-box{background:#fff;border-radius:16px;padding:28px 32px;text-align:center;min-width:220px;}
 .export-prog-icon{font-size:40px;margin-bottom:10px;}
 .export-prog-text{font-size:15px;font-weight:700;color:var(--gray-700);}
+/* UPDATE BANNER */
+#update-banner{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:12px 16px;z-index:200;display:none;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:slideDown .3s ease;}
+#update-banner.show{display:flex;}
+@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.update-content{display:flex;align-items:center;gap:10px;flex:1;}
+.update-icon{font-size:24px;}
+.update-text{flex:1;}
+.update-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.update-desc{font-size:12px;opacity:.9;}
+.update-btn{background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.update-btn:active{background:rgba(255,255,255,.35);}
 </style>
 <!-- 엑셀/PDF 라이브러리 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -234,6 +248,17 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
+<!-- UPDATE BANNER -->
+<div id="update-banner">
+  <div class="update-content">
+    <div class="update-icon">🚀</div>
+    <div class="update-text">
+      <div class="update-title">새 버전 사용 가능</div>
+      <div class="update-desc">앱을 업데이트하면 최신 기능을 사용할 수 있습니다.</div>
+    </div>
+  </div>
+  <button class="update-btn" onclick="applyUpdate()">지금 업데이트</button>
+</div>
 <!-- CONFIG -->
 <div id="cfg-pg" class="cfg-page" style="display:none">
   <div class="cfg-card">
@@ -647,6 +672,79 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
 </div>
 <div id="toast"></div>
 <script>
+/* ============================================
+   SERVICE WORKER 등록 및 업데이트 관리
+   ============================================ */
+// Service Worker 지원 확인 및 등록
+if ('serviceWorker' in navigator) {
+  let newWorker;
+  
+  // Service Worker 등록
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(registration => {
+      console.log('[앱] Service Worker 등록 성공:', registration.scope);
+      
+      // 업데이트 확인 (1시간마다)
+      setInterval(() => {
+        registration.update();
+      }, 60 * 60 * 1000);
+      
+      // 새 Service Worker 감지
+      registration.addEventListener('updatefound', () => {
+        newWorker = registration.installing;
+        console.log('[앱] 새 버전 감지됨');
+        
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // 새 버전이 대기 중 - 사용자에게 알림
+            showUpdateBanner();
+          }
+        });
+      });
+    })
+    .catch(err => {
+      console.log('[앱] Service Worker 등록 실패:', err);
+    });
+  
+  // Service Worker 메시지 수신
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+      showUpdateBanner();
+    }
+  });
+  
+  // 페이지 포커스 시 Service Worker 업데이트 확인
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+}
+
+// 업데이트 배너 표시
+function showUpdateBanner() {
+  const banner = document.getElementById('update-banner');
+  if (banner) {
+    banner.classList.add('show');
+  }
+}
+
+// 업데이트 적용 (사용자가 버튼 클릭 시)
+function applyUpdate() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(registration => {
+      if (registration && registration.waiting) {
+        // 대기 중인 Service Worker에게 활성화 메시지 전송
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+  }
+}
+
+/* ============================================
+   앱 메인 코드 시작
+   ============================================ */
 var lang='ko',DB='',AK='',uName='';
 var prods={},sellers={},stock={},sales={},inbound={},adjLogs={};
 var curCh='baedalk',stTab='daily',mgmtTab='sl',histTab='in',rptTab='daily';
