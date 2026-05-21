@@ -250,7 +250,7 @@ function exportBaedalkWeeklyExcel(weekStart,weekEnd){
   },100);
 }
 
-/* ===== 주간 배달K 정산서 PDF (window.print — 한글 완벽 지원) ===== */
+/* ===== 주간 배달K 정산서 PDF (오버레이 방식 — 모바일 완벽 지원) ===== */
 function exportBaedalkWeeklyPDF(weekStart,weekEnd){
   var recs=Object.values(sales).filter(function(r){
     return r.channel==='baedalk'&&!r.cancelled&&r.date>=weekStart&&r.date<=weekEnd;
@@ -270,9 +270,9 @@ function exportBaedalkWeeklyPDF(weekStart,weekEnd){
     var isCash=(r.paymentMethod||'bank')==='cash';
     return'<tr>'+
       '<td>'+r.date+'</td>'+
-      '<td>'+( r.ordererName||'-')+'</td>'+
+      '<td>'+(r.ordererName||'-')+'</td>'+
       '<td>'+pName(r.productName||'')+'</td>'+
-      '<td style="text-align:center">'+( r.quantity||0)+'</td>'+
+      '<td style="text-align:center">'+(r.quantity||0)+'</td>'+
       '<td style="text-align:right">'+N(r.total||0)+'</td>'+
       '<td style="text-align:right">'+N(r.deliveryFee||0)+'</td>'+
       '<td style="text-align:right">'+N(sup)+'</td>'+
@@ -280,65 +280,89 @@ function exportBaedalkWeeklyPDF(weekStart,weekEnd){
     '</tr>';
   }).join('');
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<title>대한김치 배달K 주간 정산서</title>'+
-    '<style>'+
-      'body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;font-size:11px;color:#333;margin:0;padding:20px;}'+
-      'h1{background:#1565C0;color:#fff;padding:12px 16px;border-radius:6px;font-size:15px;margin-bottom:4px;}'+
-      '.sub{font-size:11px;color:#666;margin-bottom:16px;}'+
-      '.summary{width:100%;border-collapse:collapse;margin-bottom:18px;}'+
-      '.summary td{padding:7px 10px;border-bottom:1px solid #eee;font-size:11px;}'+
-      '.summary .lbl{color:#555;width:65%;}'+
-      '.summary .val{text-align:right;font-weight:700;}'+
-      '.summary .section{background:#F0F4FF;font-weight:700;color:#1565C0;font-size:11px;}'+
-      '.summary .highlight{background:#E8F5E9;font-weight:800;font-size:12px;}'+
-      '.summary .highlight .val{color:#2E7D32;}'+
-      'h2{font-size:12px;color:#1565C0;margin:14px 0 6px;}'+
-      'table.detail{width:100%;border-collapse:collapse;font-size:10px;}'+
-      'table.detail th{background:#1565C0;color:#fff;padding:6px 6px;text-align:left;}'+
-      'table.detail td{padding:5px 6px;border-bottom:1px solid #f0f0f0;}'+
-      'table.detail tr:last-child td{background:#E8F5E9;font-weight:700;}'+
-      '.pay-bank{color:#1565C0;font-weight:700;}'+
-      '.pay-cash{color:#E65100;font-weight:700;}'+
-      '.footer{margin-top:20px;text-align:center;font-size:10px;color:#aaa;}'+
-      '@media print{body{padding:10px;}@page{margin:15mm;}}'+
-    '</style></head><body>'+
-    '<h1>🥬 대한김치 배달K 주간 정산서</h1>'+
-    '<div class="sub">정산기간: <strong>'+weekStart+' ~ '+weekEnd+'</strong> &nbsp;|&nbsp; 생성일: '+new Date().toLocaleDateString('ko-KR')+'</div>'+
-    '<table class="summary">'+
-      '<tr><td class="lbl section" colspan="2">▶ 결제수단별 판매금액 / Doanh thu theo phương thức</td></tr>'+
-      '<tr><td class="lbl">🏦 계좌이체 / Chuyển khoản</td><td class="val">'+N(bankTotal)+' ₫</td></tr>'+
-      '<tr><td class="lbl">💵 현금 / Tiền mặt</td><td class="val">'+N(cashTotal)+' ₫</td></tr>'+
-      '<tr><td class="lbl"><strong>판매금액 합계 / Tổng doanh thu</strong></td><td class="val"><strong>'+N(salesTotal)+' ₫</strong></td></tr>'+
-      '<tr><td class="lbl section" colspan="2">▶ 공제 항목 / Các khoản khấu trừ</td></tr>'+
-      '<tr><td class="lbl">배달비 합계 / Tổng phí giao hàng</td><td class="val" style="color:#E65100">− '+N(deliveryTotal)+' ₫</td></tr>'+
-      '<tr><td class="lbl">도매가 합계 / Tổng giá nhập</td><td class="val" style="color:#E65100">− '+N(wholesaleTotal)+' ₫</td></tr>'+
-      '<tr class="highlight"><td class="lbl">▶ 본사 재송금액 / Tiền chuyển lại HQ</td><td class="val">'+N(resendTotal)+' ₫</td></tr>'+
-      '<tr><td class="lbl section" colspan="2">▶ 현금 정산 / Quyết toán tiền mặt</td></tr>'+
-      '<tr><td class="lbl">현금 보관액 내가 보관 중 / Tiền mặt đang giữ</td><td class="val">'+N(cashTotal)+' ₫</td></tr>'+
-      '<tr class="highlight"><td class="lbl">▶ 추가 송금 필요액 / Cần chuyển thêm</td><td class="val">'+N(extraSend)+' ₫</td></tr>'+
+  var content=
+    '<div class="print-header">'+
+      '<div style="font-size:16px;font-weight:800;margin-bottom:4px">🥬 대한김치 배달K 주간 정산서</div>'+
+      '<div style="font-size:11px;opacity:.9">정산기간: '+weekStart+' ~ '+weekEnd+' &nbsp;|&nbsp; 생성일: '+new Date().toLocaleDateString('ko-KR')+'</div>'+
+    '</div>'+
+    '<table class="sum-tbl">'+
+      '<tr class="sec-row"><td colspan="2">▶ 결제수단별 판매금액 / Doanh thu theo phương thức</td></tr>'+
+      '<tr><td>🏦 계좌이체 / Chuyển khoản</td><td class="r">'+N(bankTotal)+' ₫</td></tr>'+
+      '<tr><td>💵 현금 / Tiền mặt</td><td class="r">'+N(cashTotal)+' ₫</td></tr>'+
+      '<tr class="bold-row"><td>판매금액 합계 / Tổng doanh thu</td><td class="r">'+N(salesTotal)+' ₫</td></tr>'+
+      '<tr class="sec-row"><td colspan="2">▶ 공제 항목 / Các khoản khấu trừ</td></tr>'+
+      '<tr><td>배달비 합계 / Tổng phí giao hàng</td><td class="r" style="color:#E65100">− '+N(deliveryTotal)+' ₫</td></tr>'+
+      '<tr><td>도매가 합계 / Tổng giá nhập</td><td class="r" style="color:#E65100">− '+N(wholesaleTotal)+' ₫</td></tr>'+
+      '<tr class="hi-row"><td>▶ 본사 재송금액 / Tiền chuyển lại HQ</td><td class="r">'+N(resendTotal)+' ₫</td></tr>'+
+      '<tr class="sec-row"><td colspan="2">▶ 현금 정산 / Quyết toán tiền mặt</td></tr>'+
+      '<tr><td>현금 보관액 내가 보관 중 / Tiền mặt đang giữ</td><td class="r">'+N(cashTotal)+' ₫</td></tr>'+
+      '<tr class="hi-row"><td>▶ 추가 송금 필요액 / Cần chuyển thêm</td><td class="r">'+N(extraSend)+' ₫</td></tr>'+
     '</table>'+
-    '<h2>📋 주문 상세 / Chi tiết đơn hàng</h2>'+
-    '<table class="detail">'+
+    '<div class="det-title">📋 주문 상세 / Chi tiết đơn hàng</div>'+
+    '<table class="det-tbl">'+
       '<thead><tr>'+
         '<th>날짜/Ngày</th><th>주문자/Người đặt</th><th>제품/Sản phẩm</th>'+
-        '<th>수량/SL</th><th>판매금액/Tiền bán</th><th>배달비/Phí giao</th>'+
-        '<th>도매가/Giá nhập</th><th>결제/TT</th>'+
+        '<th>수량</th><th>판매금액</th><th>배달비</th><th>도매가</th><th>결제</th>'+
       '</tr></thead>'+
       '<tbody>'+rows+
-      '<tr><td><strong>합계/Tổng</strong></td><td></td><td></td>'+
-        '<td style="text-align:center"><strong>'+recs.reduce(function(s,r){return s+(r.quantity||0);},0)+'</strong></td>'+
-        '<td style="text-align:right"><strong>'+N(salesTotal)+'</strong></td>'+
-        '<td style="text-align:right"><strong>'+N(deliveryTotal)+'</strong></td>'+
-        '<td style="text-align:right"><strong>'+N(wholesaleTotal)+'</strong></td>'+
-        '<td></td></tr>'+
+        '<tr class="tot-row">'+
+          '<td><b>합계/Tổng</b></td><td></td><td></td>'+
+          '<td style="text-align:center"><b>'+recs.reduce(function(s,r){return s+(r.quantity||0);},0)+'</b></td>'+
+          '<td style="text-align:right"><b>'+N(salesTotal)+'</b></td>'+
+          '<td style="text-align:right"><b>'+N(deliveryTotal)+'</b></td>'+
+          '<td style="text-align:right"><b>'+N(wholesaleTotal)+'</b></td>'+
+          '<td></td>'+
+        '</tr>'+
       '</tbody>'+
     '</table>'+
-    '<div class="footer">DAEHAN KIMCHI &nbsp;|&nbsp; BaedalK 정산 &nbsp;|&nbsp; '+weekStart+' ~ '+weekEnd+'</div>'+
-    '<script>window.onload=function(){window.print();}<\/script>'+
-  '</body></html>';
+    '<div class="print-footer">DAEHAN KIMCHI &nbsp;|&nbsp; BaedalK 정산 &nbsp;|&nbsp; '+weekStart+' ~ '+weekEnd+'</div>';
 
-  var w=window.open('','_blank');
-  if(w){w.document.write(html);w.document.close();}
-  else{toast('팝업이 차단되어 있습니다. 브라우저 팝업 허용 후 다시 시도하세요.');}
+  // 기존 오버레이 제거
+  var old=document.getElementById('pdf-overlay');
+  if(old)document.body.removeChild(old);
+  var oldSt=document.getElementById('pdf-print-style');
+  if(oldSt)document.head.removeChild(oldSt);
+
+  // 인쇄 전용 스타일 (화면에서는 오버레이만, 인쇄 시에는 오버레이만 출력)
+  var pStyle=document.createElement('style');
+  pStyle.id='pdf-print-style';
+  pStyle.textContent=
+    '@media print{'+
+      'body>*:not(#pdf-overlay){display:none!important;}'+
+      '#pdf-overlay{position:static!important;overflow:visible!important;padding:0!important;}'+
+      '#pdf-close-btn{display:none!important;}'+
+    '}'+
+    '#pdf-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;overflow-y:auto;padding:16px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;font-size:11px;color:#333;}'+
+    '#pdf-overlay .print-header{background:#1565C0;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:12px;}'+
+    '#pdf-overlay .sum-tbl{width:100%;border-collapse:collapse;margin-bottom:14px;}'+
+    '#pdf-overlay .sum-tbl td{padding:6px 8px;border-bottom:1px solid #eee;}'+
+    '#pdf-overlay .sum-tbl .r{text-align:right;font-weight:700;}'+
+    '#pdf-overlay .sum-tbl .sec-row td{background:#EEF2FF;font-weight:700;color:#1565C0;font-size:11px;}'+
+    '#pdf-overlay .sum-tbl .bold-row td{font-weight:700;}'+
+    '#pdf-overlay .sum-tbl .hi-row td{background:#E8F5E9;font-weight:800;color:#2E7D32;}'+
+    '#pdf-overlay .det-title{font-size:12px;font-weight:700;color:#1565C0;margin:10px 0 6px;}'+
+    '#pdf-overlay .det-tbl{width:100%;border-collapse:collapse;font-size:10px;}'+
+    '#pdf-overlay .det-tbl th{background:#1565C0;color:#fff;padding:5px 4px;text-align:left;}'+
+    '#pdf-overlay .det-tbl td{padding:4px 4px;border-bottom:1px solid #f0f0f0;}'+
+    '#pdf-overlay .det-tbl .tot-row td{background:#E8F5E9;}'+
+    '#pdf-overlay .print-footer{margin-top:14px;text-align:center;font-size:10px;color:#aaa;}'+
+    '#pdf-close-btn{position:fixed;top:12px;right:12px;z-index:10000;background:#fff;border:2px solid var(--gray-300);border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);}';
+  document.head.appendChild(pStyle);
+
+  // 오버레이 생성
+  var overlay=document.createElement('div');
+  overlay.id='pdf-overlay';
+  overlay.innerHTML='<button id="pdf-close-btn" onclick="closePdfOverlay()">✕</button>'+content+
+    '<div style="display:flex;gap:10px;margin-top:16px;padding-bottom:20px;">'+
+      '<button onclick="window.print()" style="flex:1;padding:14px;background:#1565C0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">🖨️ 인쇄 / PDF 저장</button>'+
+      '<button onclick="closePdfOverlay()" style="flex:0 0 auto;padding:14px 18px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✕ 닫기</button>'+
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function closePdfOverlay(){
+  var ov=document.getElementById('pdf-overlay');
+  var st=document.getElementById('pdf-print-style');
+  if(ov)document.body.removeChild(ov);
+  if(st)document.head.removeChild(st);
 }
