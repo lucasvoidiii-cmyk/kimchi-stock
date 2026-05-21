@@ -385,7 +385,29 @@ function renderFinanceProfit(){
   var mm=('0'+mM).slice(-2);var pfx=mY+'-'+mm;
   var nav=dn(mY+'년 '+(TT[lang]||TT.ko).mn[mM-1],'shM(-1);renderFinanceProfit()','shM(1);renderFinanceProfit()');
 
-  // 개인판매자 채널 수익만 집계
+  // ── 본사 수익 집계 ──
+  // 1. 총 매출액(도매가) = 이 달 인보이스 합계
+  var hqWholesale=Object.values(invoices).filter(function(inv){
+    return(inv.date||'').startsWith(pfx);
+  }).reduce(function(s,inv){return s+(inv.totalAmount||0);},0);
+
+  // 2. 본사 순수익 = 배달K (판매금액 - 도매가 - 배달비)
+  var baedalkRecs=Object.values(sales).filter(function(r){
+    return(r.date||'').startsWith(pfx)&&r.channel==='baedalk'&&!r.cancelled;
+  });
+  var baedalkSales=baedalkRecs.reduce(function(s,r){return s+(r.total||0);},0);
+  var baedalkDel=baedalkRecs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
+  var baedalkWholesale=baedalkRecs.reduce(function(s,r){
+    var p=prods[r.productId]||{};
+    var su=r.supplyPrice||p.supplyPrice||0;
+    return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));
+  },0);
+  var hqNetProfit=baedalkSales-baedalkWholesale-baedalkDel;
+
+  // 3. 합계
+  var hqTotal=hqWholesale+hqNetProfit;
+
+  // ── 내 수익 집계 ──
   var sellerRecs=Object.entries(sales).filter(function(e){
     var r=e[1];return(r.date||'').startsWith(pfx)&&r.channel==='seller'&&!r.cancelled;
   }).map(function(e){return e[1];});
@@ -414,9 +436,26 @@ function renderFinanceProfit(){
 
   var h=nav;
 
-  // 월간 수익 요약 카드
+  // ── 본사 수익 현황 카드 ──
+  h+='<div style="background:linear-gradient(135deg,var(--primary-dark),#0a2d6e);border-radius:var(--radius);padding:20px;margin-bottom:12px;color:#fff">'+
+    '<div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:12px">🏢 '+mY+'년 '+mm+'월 본사 수익 현황</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.2)">'+
+      '<span style="font-size:13px;opacity:.85">① 총 매출액 (도매가)</span>'+
+      '<span style="font-size:15px;font-weight:700">'+N(hqWholesale)+' ₫</span>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.2)">'+
+      '<span style="font-size:13px;opacity:.85">② 본사 순수익 (배달K)</span>'+
+      '<span style="font-size:15px;font-weight:700">'+N(hqNetProfit)+' ₫</span>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:2px">'+
+      '<span style="font-size:14px;font-weight:700">① + ② 합계</span>'+
+      '<span style="font-size:22px;font-weight:800">'+N(hqTotal)+' ₫</span>'+
+    '</div>'+
+  '</div>';
+
+  // ── 내 수익 현황 카드 ──
   h+='<div style="background:linear-gradient(135deg,var(--success-dark),#1B5E20);border-radius:var(--radius);padding:20px;margin-bottom:12px;color:#fff">'+
-    '<div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:6px">'+mY+'년 '+mm+'월 내 순수익</div>'+
+    '<div style="font-size:13px;font-weight:700;opacity:.85;margin-bottom:6px">💰 '+mY+'년 '+mm+'월 내 순수익</div>'+
     '<div style="font-size:32px;font-weight:800;margin-bottom:8px">'+N(myProfit)+' ₫</div>'+
     '<div style="font-size:12px;opacity:.8">개인판매 총액 '+N(totalSale)+' ₫ 중 내 몫</div>'+
   '</div>';
