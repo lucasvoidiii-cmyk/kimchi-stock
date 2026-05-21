@@ -175,7 +175,21 @@
       <div id="cart-list"></div>
       <div class="form-group" id="del-fee-grp"><label class="form-label" data-i18n="outDelFee">배달비 (VND)</label>
         <input type="number" class="form-control" id="out-del" placeholder="0" oninput="updSS()">
-        <div class="form-hint" data-i18n="outDelHint">배달K 채널 배달비 (주문 1건당 1회)</div></div>
+        <div class="form-hint" data-i18n="outDelHint">배달K 채널 배달비 (주문 1건당 1회)</div>
+      </div>
+      <div class="form-group" id="payment-method-grp">
+        <label class="form-label">💳 결제수단 *</label>
+        <div style="display:flex;gap:10px">
+          <label style="flex:1;display:flex;align-items:center;padding:13px;background:#fff;border:2px solid var(--primary);border-radius:var(--radius-sm);cursor:pointer">
+            <input type="radio" name="payment-method" id="pay-bank" value="bank" checked style="margin-right:8px">
+            <span style="font-size:14px;font-weight:700;color:var(--primary)">🏦 계좌이체<br><span style="font-size:11px;color:var(--gray-500);font-weight:400">본사 계좌로 직접 입금</span></span>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;padding:13px;background:#fff;border:2px solid var(--gray-300);border-radius:var(--radius-sm);cursor:pointer">
+            <input type="radio" name="payment-method" id="pay-cash" value="cash" style="margin-right:8px">
+            <span style="font-size:14px;font-weight:700;color:var(--gray-700)">💵 현금<br><span style="font-size:11px;color:var(--gray-500);font-weight:400">배달기사 수령 → 내가 보관</span></span>
+          </label>
+        </div>
+      </div>
       <div class="form-group" id="free-reason-grp" style="display:none">
         <label class="form-label">🎁 무상 제공 사유 *</label>
         <select class="form-control" id="free-reason-select" onchange="handleFreeReasonSelect()">

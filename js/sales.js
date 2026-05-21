@@ -7,6 +7,7 @@ function selCh(ch){
   document.getElementById('ch-seller').className='ch-btn'+(ch==='seller'?' as':'');
   document.getElementById('seller-grp').style.display=ch==='seller'?'block':'none';
   document.getElementById('del-fee-grp').style.display=ch==='baedalk'?'block':'none';
+  document.getElementById('payment-method-grp').style.display=ch==='baedalk'?'block':'none';
   document.getElementById('orderer-grp').style.display=ch==='baedalk'?'block':'none';
   updSS();
 }
@@ -108,6 +109,8 @@ async function saveSale(){
   var groupId=gid();
   var sellerObj=curCh==='seller'?(sellers[sid]||{}):{};
   var totalAmt=cart.reduce(function(sum,item){return sum+(item.qty*item.price);},0);
+  var payMethodEl=document.querySelector('input[name="payment-method"]:checked');
+  var payMethod=curCh==='baedalk'?(payMethodEl?payMethodEl.value:'bank'):'';
   var freeReason='';
   var freeCostBearer='';
   if(totalAmt===0){
@@ -140,6 +143,7 @@ async function saveSale(){
         channel:curCh,sellerId:curCh==='seller'?sid:'',
         sellerName:curCh==='seller'?(sellerObj.name||''):'',
         ordererName:orderer,groupId:groupId,
+        paymentMethod:payMethod,
         deliveryPaid:false,paymentConfirmed:false,
         freeReason:freeReason||'',
         freeCostBearer:freeCostBearer||'',

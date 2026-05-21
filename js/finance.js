@@ -97,8 +97,13 @@ function renderFinanceBaedalk(){
     var su=r.supplyPrice||p.supplyPrice||0;
     return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));
   },0);
-  var hqProfit=salesTotal-wholesaleTotal-deliveryTotal; // 본사 수익
-  var resendTotal=hqProfit; // 나→본사 재송금액
+  // 계좌이체 / 현금 분리
+  var bankTotal=weekRecs.filter(function(r){return(r.paymentMethod||'bank')==='bank';})
+    .reduce(function(s,r){return s+(r.total||0);},0);
+  var cashTotal=weekRecs.filter(function(r){return r.paymentMethod==='cash';})
+    .reduce(function(s,r){return s+(r.total||0);},0);
+  var hqProfit=salesTotal-wholesaleTotal-deliveryTotal;
+  var resendTotal=hqProfit;
 
   // 해당 주 정산 레코드 확인
   var weekKey=weekStart;
@@ -110,10 +115,21 @@ function renderFinanceBaedalk(){
 
   h+='<div class="s-sec">'+
     '<div style="font-size:14px;font-weight:700;color:var(--gray-600);margin-bottom:12px">📊 주간 배달K 집계</div>'+
+    // 결제수단별 분리
+    '<div style="background:var(--gray-50);border-radius:8px;padding:12px;margin-bottom:10px">'+
+      '<div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:8px">결제수단별 판매금액</div>'+
+      '<div class="s-row" style="padding:5px 0"><span class="s-lbl">🏦 계좌이체</span><span class="s-val">'+N(bankTotal)+' ₫</span></div>'+
+      '<div class="s-row" style="padding:5px 0;border:none"><span class="s-lbl">💵 현금</span><span class="s-val">'+N(cashTotal)+' ₫</span></div>'+
+    '</div>'+
     '<div class="s-row"><span class="s-lbl">배달K 판매금액 합계</span><span class="s-val">'+N(salesTotal)+' ₫</span></div>'+
     '<div class="s-row"><span class="s-lbl">배달비 합계</span><span class="s-val" style="color:var(--warn-dark)">− '+N(deliveryTotal)+' ₫</span></div>'+
     '<div class="s-row"><span class="s-lbl">도매가 합계</span><span class="s-val" style="color:var(--warn-dark)">− '+N(wholesaleTotal)+' ₫</span></div>'+
     '<div class="s-total"><span class="st-lbl">본사 재송금액</span><span class="st-val">'+N(resendTotal)+' ₫</span></div>'+
+    // 내보내기 버튼
+    '<div style="display:flex;gap:8px;margin-top:12px">'+
+      '<button class="btn-excel" onclick="exportBaedalkWeeklyExcel(\''+weekStart+'\',\''+weekEnd+'\')">📊 Excel</button>'+
+      '<button class="btn-pdf" onclick="exportBaedalkWeeklyPDF(\''+weekStart+'\',\''+weekEnd+'\')">📄 PDF</button>'+
+    '</div>'+
   '</div>';
 
   if(!weekRecs.length){
