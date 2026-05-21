@@ -183,7 +183,7 @@ function exportPDF(){
   },150);
 }
 
-/* ===== 주간 배달K 정산서 엑셀 ===== */
+/* ===== 주간 배달K 정산서 엑셀 (한국어 + 베트남어 병기) ===== */
 function exportBaedalkWeeklyExcel(weekStart,weekEnd){
   if(typeof XLSX==='undefined'){toast('라이브러리 로드 중. 잠시 후 다시 시도하세요.');return;}
   showExportProgress(true,'📊','주간 정산서 Excel 생성 중...');
@@ -199,46 +199,48 @@ function exportBaedalkWeeklyExcel(weekStart,weekEnd){
       var deliveryTotal=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
       var wholesaleTotal=recs.reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));},0);
       var resendTotal=salesTotal-wholesaleTotal-deliveryTotal;
+      var extraSend=Math.max(0,resendTotal-cashTotal);
 
       var wb=XLSX.utils.book_new();
 
-      /* 시트1: 정산 요약 */
+      /* 시트1: 정산 요약 (한국어 / 베트남어) */
       var s1=[
-        ['대한김치 배달K 주간 정산서','',''],
-        ['정산기간',weekStart+' ~ '+weekEnd,''],
-        ['생성일',new Date().toLocaleDateString('ko-KR'),''],
+        ['대한김치 배달K 주간 정산서 / Bảng Quyết Toán Tuần BaedalK - DAEHAN KIMCHI','',''],
+        ['정산기간 / Kỳ quyết toán',weekStart+' ~ '+weekEnd,''],
+        ['생성일 / Ngày tạo',new Date().toLocaleDateString('ko-KR'),''],
         ['','',''],
-        ['▶ 결제수단별 판매금액','',''],
-        ['계좌이체',bankTotal,'VND'],
-        ['현금',cashTotal,'VND'],
-        ['판매금액 합계',salesTotal,'VND'],
+        ['▶ 결제수단별 판매금액 / Doanh thu theo phương thức thanh toán','',''],
+        ['🏦 계좌이체 / Chuyển khoản ngân hàng',bankTotal,'VND'],
+        ['💵 현금 / Tiền mặt',cashTotal,'VND'],
+        ['판매금액 합계 / Tổng doanh thu',salesTotal,'VND'],
         ['','',''],
-        ['▶ 공제 항목','',''],
-        ['배달비 합계',deliveryTotal,'VND'],
-        ['도매가 합계',wholesaleTotal,'VND'],
+        ['▶ 공제 항목 / Các khoản khấu trừ','',''],
+        ['배달비 합계 / Tổng phí giao hàng',deliveryTotal,'VND'],
+        ['도매가 합계 / Tổng giá nhập (hóa đơn)',wholesaleTotal,'VND'],
         ['','',''],
-        ['▶ 본사 재송금액','',''],
-        ['재송금액 (판매합계 - 배달비 - 도매가)',resendTotal,'VND'],
+        ['▶ 본사 재송금액 / Tiền chuyển lại HQ','',''],
+        ['재송금액 (판매합계 - 배달비 - 도매가) / Tiền gửi lại (Tổng - Phí giao - Giá nhập)',resendTotal,'VND'],
         ['','',''],
-        ['※ 현금 보관액 (내가 보관 중)',cashTotal,'VND'],
-        ['※ 추가 송금 필요액 (재송금액 - 현금)',Math.max(0,resendTotal-cashTotal),'VND'],
+        ['※ 현금 보관액 내가 보관 중 / Tiền mặt đang giữ',cashTotal,'VND'],
+        ['※ 추가 송금 필요액 (재송금액 - 현금) / Cần chuyển thêm (Gửi lại - Tiền mặt)',extraSend,'VND'],
       ];
       var ws1=XLSX.utils.aoa_to_sheet(s1);
-      ws1['!cols']=[{wch:38},{wch:18},{wch:8}];
-      XLSX.utils.book_append_sheet(wb,ws1,'정산요약');
+      ws1['!cols']=[{wch:60},{wch:18},{wch:8}];
+      XLSX.utils.book_append_sheet(wb,ws1,'정산요약 Summary');
 
-      /* 시트2: 주문 상세 */
-      var s2=[['날짜','주문자','제품','수량','판매금액','배달비','도매가','결제수단']];
+      /* 시트2: 주문 상세 (한국어 / 베트남어) */
+      var s2=[['날짜/Ngày','주문자/Người đặt','제품/Sản phẩm','수량/SL','판매금액/Tiền bán','배달비/Phí giao','도매가/Giá nhập','결제수단/Thanh toán']];
       recs.forEach(function(r){
         var p=prods[r.productId]||{};
         var su=r.supplyPrice||p.supplyPrice||0;
         var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
-        s2.push([r.date,r.ordererName||'-',r.productName||'',r.quantity||0,r.total||0,r.deliveryFee||0,sup,(r.paymentMethod||'bank')==='bank'?'계좌이체':'현금']);
+        var pay=(r.paymentMethod||'bank')==='bank'?'계좌이체/Chuyển khoản':'현금/Tiền mặt';
+        s2.push([r.date,r.ordererName||'-',r.productName||'',r.quantity||0,r.total||0,r.deliveryFee||0,sup,pay]);
       });
-      s2.push(['합계','','',recs.reduce(function(s,r){return s+(r.quantity||0);},0),salesTotal,deliveryTotal,wholesaleTotal,'']);
+      s2.push(['합계/Tổng','','',recs.reduce(function(s,r){return s+(r.quantity||0);},0),salesTotal,deliveryTotal,wholesaleTotal,'']);
       var ws2=XLSX.utils.aoa_to_sheet(s2);
-      ws2['!cols']=[{wch:12},{wch:14},{wch:20},{wch:6},{wch:14},{wch:12},{wch:14},{wch:10}];
-      XLSX.utils.book_append_sheet(wb,ws2,'주문상세');
+      ws2['!cols']=[{wch:12},{wch:16},{wch:22},{wch:6},{wch:14},{wch:12},{wch:14},{wch:20}];
+      XLSX.utils.book_append_sheet(wb,ws2,'주문상세 Detail');
 
       var fname='대한김치_배달K정산_'+weekStart+'_'+weekEnd+'.xlsx';
       XLSX.writeFile(wb,fname);
@@ -248,95 +250,95 @@ function exportBaedalkWeeklyExcel(weekStart,weekEnd){
   },100);
 }
 
-/* ===== 주간 배달K 정산서 PDF ===== */
+/* ===== 주간 배달K 정산서 PDF (window.print — 한글 완벽 지원) ===== */
 function exportBaedalkWeeklyPDF(weekStart,weekEnd){
-  var jsPDFLib=(window.jspdf&&window.jspdf.jsPDF)||(typeof jsPDF!=='undefined'?jsPDF:null);
-  if(!jsPDFLib){toast('PDF 라이브러리 로드 중. 잠시 후 다시 시도하세요.');return;}
-  showExportProgress(true,'📄','주간 정산서 PDF 생성 중...');
-  setTimeout(function(){
-    try{
-      var recs=Object.values(sales).filter(function(r){
-        return r.channel==='baedalk'&&!r.cancelled&&r.date>=weekStart&&r.date<=weekEnd;
-      }).sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+  var recs=Object.values(sales).filter(function(r){
+    return r.channel==='baedalk'&&!r.cancelled&&r.date>=weekStart&&r.date<=weekEnd;
+  }).sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
 
-      var salesTotal=recs.reduce(function(s,r){return s+(r.total||0);},0);
-      var bankTotal=recs.filter(function(r){return(r.paymentMethod||'bank')==='bank';}).reduce(function(s,r){return s+(r.total||0);},0);
-      var cashTotal=recs.filter(function(r){return r.paymentMethod==='cash';}).reduce(function(s,r){return s+(r.total||0);},0);
-      var deliveryTotal=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
-      var wholesaleTotal=recs.reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));},0);
-      var resendTotal=salesTotal-wholesaleTotal-deliveryTotal;
-      var extraSend=Math.max(0,resendTotal-cashTotal);
+  var salesTotal=recs.reduce(function(s,r){return s+(r.total||0);},0);
+  var bankTotal=recs.filter(function(r){return(r.paymentMethod||'bank')==='bank';}).reduce(function(s,r){return s+(r.total||0);},0);
+  var cashTotal=recs.filter(function(r){return r.paymentMethod==='cash';}).reduce(function(s,r){return s+(r.total||0);},0);
+  var deliveryTotal=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
+  var wholesaleTotal=recs.reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));},0);
+  var resendTotal=salesTotal-wholesaleTotal-deliveryTotal;
+  var extraSend=Math.max(0,resendTotal-cashTotal);
 
-      var doc=new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
-      var pageW=doc.internal.pageSize.getWidth();
-      var y=14;
+  var rows=recs.map(function(r){
+    var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
+    var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
+    var isCash=(r.paymentMethod||'bank')==='cash';
+    return'<tr>'+
+      '<td>'+r.date+'</td>'+
+      '<td>'+( r.ordererName||'-')+'</td>'+
+      '<td>'+pName(r.productName||'')+'</td>'+
+      '<td style="text-align:center">'+( r.quantity||0)+'</td>'+
+      '<td style="text-align:right">'+N(r.total||0)+'</td>'+
+      '<td style="text-align:right">'+N(r.deliveryFee||0)+'</td>'+
+      '<td style="text-align:right">'+N(sup)+'</td>'+
+      '<td style="text-align:center;color:'+(isCash?'#E65100':'#1565C0')+';font-weight:700">'+(isCash?'💵 현금':'🏦 계좌')+'</td>'+
+    '</tr>';
+  }).join('');
 
-      // 헤더
-      doc.setFillColor(21,101,192);doc.roundedRect(14,y,pageW-28,18,3,3,'F');
-      doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont(undefined,'bold');
-      doc.text('DAEHAN KIMCHI  BaedalK Weekly Settlement',pageW/2,y+8,{align:'center'});
-      doc.setFontSize(10);doc.setFont(undefined,'normal');
-      doc.text(weekStart+' ~ '+weekEnd+'  /  Generated: '+new Date().toLocaleDateString('en-CA'),pageW/2,y+15,{align:'center'});
-      doc.setTextColor(0,0,0);y+=26;
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<title>대한김치 배달K 주간 정산서</title>'+
+    '<style>'+
+      'body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;font-size:11px;color:#333;margin:0;padding:20px;}'+
+      'h1{background:#1565C0;color:#fff;padding:12px 16px;border-radius:6px;font-size:15px;margin-bottom:4px;}'+
+      '.sub{font-size:11px;color:#666;margin-bottom:16px;}'+
+      '.summary{width:100%;border-collapse:collapse;margin-bottom:18px;}'+
+      '.summary td{padding:7px 10px;border-bottom:1px solid #eee;font-size:11px;}'+
+      '.summary .lbl{color:#555;width:65%;}'+
+      '.summary .val{text-align:right;font-weight:700;}'+
+      '.summary .section{background:#F0F4FF;font-weight:700;color:#1565C0;font-size:11px;}'+
+      '.summary .highlight{background:#E8F5E9;font-weight:800;font-size:12px;}'+
+      '.summary .highlight .val{color:#2E7D32;}'+
+      'h2{font-size:12px;color:#1565C0;margin:14px 0 6px;}'+
+      'table.detail{width:100%;border-collapse:collapse;font-size:10px;}'+
+      'table.detail th{background:#1565C0;color:#fff;padding:6px 6px;text-align:left;}'+
+      'table.detail td{padding:5px 6px;border-bottom:1px solid #f0f0f0;}'+
+      'table.detail tr:last-child td{background:#E8F5E9;font-weight:700;}'+
+      '.pay-bank{color:#1565C0;font-weight:700;}'+
+      '.pay-cash{color:#E65100;font-weight:700;}'+
+      '.footer{margin-top:20px;text-align:center;font-size:10px;color:#aaa;}'+
+      '@media print{body{padding:10px;}@page{margin:15mm;}}'+
+    '</style></head><body>'+
+    '<h1>🥬 대한김치 배달K 주간 정산서</h1>'+
+    '<div class="sub">정산기간: <strong>'+weekStart+' ~ '+weekEnd+'</strong> &nbsp;|&nbsp; 생성일: '+new Date().toLocaleDateString('ko-KR')+'</div>'+
+    '<table class="summary">'+
+      '<tr><td class="lbl section" colspan="2">▶ 결제수단별 판매금액 / Doanh thu theo phương thức</td></tr>'+
+      '<tr><td class="lbl">🏦 계좌이체 / Chuyển khoản</td><td class="val">'+N(bankTotal)+' ₫</td></tr>'+
+      '<tr><td class="lbl">💵 현금 / Tiền mặt</td><td class="val">'+N(cashTotal)+' ₫</td></tr>'+
+      '<tr><td class="lbl"><strong>판매금액 합계 / Tổng doanh thu</strong></td><td class="val"><strong>'+N(salesTotal)+' ₫</strong></td></tr>'+
+      '<tr><td class="lbl section" colspan="2">▶ 공제 항목 / Các khoản khấu trừ</td></tr>'+
+      '<tr><td class="lbl">배달비 합계 / Tổng phí giao hàng</td><td class="val" style="color:#E65100">− '+N(deliveryTotal)+' ₫</td></tr>'+
+      '<tr><td class="lbl">도매가 합계 / Tổng giá nhập</td><td class="val" style="color:#E65100">− '+N(wholesaleTotal)+' ₫</td></tr>'+
+      '<tr class="highlight"><td class="lbl">▶ 본사 재송금액 / Tiền chuyển lại HQ</td><td class="val">'+N(resendTotal)+' ₫</td></tr>'+
+      '<tr><td class="lbl section" colspan="2">▶ 현금 정산 / Quyết toán tiền mặt</td></tr>'+
+      '<tr><td class="lbl">현금 보관액 내가 보관 중 / Tiền mặt đang giữ</td><td class="val">'+N(cashTotal)+' ₫</td></tr>'+
+      '<tr class="highlight"><td class="lbl">▶ 추가 송금 필요액 / Cần chuyển thêm</td><td class="val">'+N(extraSend)+' ₫</td></tr>'+
+    '</table>'+
+    '<h2>📋 주문 상세 / Chi tiết đơn hàng</h2>'+
+    '<table class="detail">'+
+      '<thead><tr>'+
+        '<th>날짜/Ngày</th><th>주문자/Người đặt</th><th>제품/Sản phẩm</th>'+
+        '<th>수량/SL</th><th>판매금액/Tiền bán</th><th>배달비/Phí giao</th>'+
+        '<th>도매가/Giá nhập</th><th>결제/TT</th>'+
+      '</tr></thead>'+
+      '<tbody>'+rows+
+      '<tr><td><strong>합계/Tổng</strong></td><td></td><td></td>'+
+        '<td style="text-align:center"><strong>'+recs.reduce(function(s,r){return s+(r.quantity||0);},0)+'</strong></td>'+
+        '<td style="text-align:right"><strong>'+N(salesTotal)+'</strong></td>'+
+        '<td style="text-align:right"><strong>'+N(deliveryTotal)+'</strong></td>'+
+        '<td style="text-align:right"><strong>'+N(wholesaleTotal)+'</strong></td>'+
+        '<td></td></tr>'+
+      '</tbody>'+
+    '</table>'+
+    '<div class="footer">DAEHAN KIMCHI &nbsp;|&nbsp; BaedalK 정산 &nbsp;|&nbsp; '+weekStart+' ~ '+weekEnd+'</div>'+
+    '<script>window.onload=function(){window.print();}<\/script>'+
+  '</body></html>';
 
-      // 정산 요약 테이블
-      doc.autoTable({startY:y,
-        head:[['Item','Amount (VND)','Note']],
-        body:[
-          ['🏦 Bank Transfer',N(bankTotal)+' VND','Deposited to HQ account'],
-          ['💵 Cash',N(cashTotal)+' VND','Held by distributor'],
-          ['Total Sales',N(salesTotal)+' VND','Bank + Cash'],
-          ['− Delivery Fee',N(deliveryTotal)+' VND','To delivery riders'],
-          ['− Wholesale (Invoice)',N(wholesaleTotal)+' VND','Already paid to HQ'],
-          ['▶ Resend to HQ',N(resendTotal)+' VND','= Sales − Del − Wholesale'],
-          ['','',''],
-          ['Cash on Hand',N(cashTotal)+' VND','Distributor holds this'],
-          ['▶ Extra Transfer Needed',N(extraSend)+' VND','Resend − Cash held'],
-        ],
-        styles:{fontSize:10,cellPadding:3},
-        headStyles:{fillColor:[21,101,192]},
-        columnStyles:{1:{halign:'right'},2:{fontSize:9,textColor:[120,120,120]}},
-        margin:{left:14,right:14},
-        didParseCell:function(data){
-          if(data.row.raw&&(data.row.raw[0]==='▶ Resend to HQ'||data.row.raw[0]==='▶ Extra Transfer Needed')){
-            data.cell.styles.fontStyle='bold';
-            data.cell.styles.fillColor=[232,245,233];
-          }
-        }
-      });
-      y=doc.lastAutoTable.finalY+10;
-
-      // 주문 상세 테이블
-      doc.setFontSize(11);doc.setFont(undefined,'bold');doc.setTextColor(21,101,192);
-      doc.text('Order Detail',14,y);doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');y+=4;
-      var txRows=recs.map(function(r){
-        var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
-        var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
-        return[r.date,r.ordererName||'-',r.productName||'',r.quantity||0,N(r.total||0),N(r.deliveryFee||0),N(sup),(r.paymentMethod||'bank')==='bank'?'Bank':'Cash'];
-      });
-      txRows.push(['Total','','',recs.reduce(function(s,r){return s+(r.quantity||0);},0),N(salesTotal),N(deliveryTotal),N(wholesaleTotal),'']);
-      doc.autoTable({startY:y,
-        head:[['Date','Orderer','Product','Qty','Sale','Del','Wholesale','Pay']],
-        body:txRows,
-        styles:{fontSize:8,cellPadding:2},
-        headStyles:{fillColor:[21,101,192]},
-        columnStyles:{3:{halign:'center'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'},7:{halign:'center'}},
-        margin:{left:14,right:14},
-        didParseCell:function(data){
-          if(data.row.index===txRows.length-1){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[232,245,233];}
-          if(data.column.index===7&&data.row.raw&&data.row.raw[7]==='Cash'){data.cell.styles.textColor=[230,81,0];}
-        }
-      });
-
-      // 푸터
-      var pageCount=doc.internal.getNumberOfPages();
-      for(var i=1;i<=pageCount;i++){
-        doc.setPage(i);doc.setFontSize(8);doc.setTextColor(150);
-        doc.text('DAEHAN KIMCHI  BaedalK '+weekStart+'~'+weekEnd+'  |  Page '+i+' / '+pageCount,pageW/2,doc.internal.pageSize.getHeight()-6,{align:'center'});
-      }
-      doc.save('대한김치_배달K정산_'+weekStart+'_'+weekEnd+'.pdf');
-      showExportProgress(false);
-      toast('✅ PDF 저장 완료');
-    }catch(e){showExportProgress(false);toast('PDF 오류: '+e.message);console.error(e);}
-  },150);
+  var w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else{toast('팝업이 차단되어 있습니다. 브라우저 팝업 허용 후 다시 시도하세요.');}
 }
