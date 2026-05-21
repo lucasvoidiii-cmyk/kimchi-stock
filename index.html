@@ -504,6 +504,19 @@
     <div class="export-prog-text" id="ep-text">파일 생성 중...</div>
   </div>
 </div>
+
+<!-- 인쇄/PDF 모달 -->
+<div class="modal-overlay" id="modal-print">
+  <div class="modal" style="max-height:95vh">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeMod('modal-print')">×</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">📄 정산서 미리보기</div>
+      <button onclick="printSettlement()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer">🖨️ 인쇄/저장</button>
+    </div>
+    <div id="print-content" style="font-size:11px;color:#333;line-height:1.6"></div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <!-- JS 로드 순서: 의존성에 따라 순서 고정 -->

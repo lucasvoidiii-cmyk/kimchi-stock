@@ -250,119 +250,127 @@ function exportBaedalkWeeklyExcel(weekStart,weekEnd){
   },100);
 }
 
-/* ===== 주간 배달K 정산서 PDF (오버레이 방식 — 모바일 완벽 지원) ===== */
+/* ===== 주간 배달K 정산서 PDF (모달 미리보기 → 인쇄) ===== */
 function exportBaedalkWeeklyPDF(weekStart,weekEnd){
-  var recs=Object.values(sales).filter(function(r){
-    return r.channel==='baedalk'&&!r.cancelled&&r.date>=weekStart&&r.date<=weekEnd;
-  }).sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+  try{
+    var recs=Object.values(sales).filter(function(r){
+      return r.channel==='baedalk'&&!r.cancelled&&r.date>=weekStart&&r.date<=weekEnd;
+    }).sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
 
-  var salesTotal=recs.reduce(function(s,r){return s+(r.total||0);},0);
-  var bankTotal=recs.filter(function(r){return(r.paymentMethod||'bank')==='bank';}).reduce(function(s,r){return s+(r.total||0);},0);
-  var cashTotal=recs.filter(function(r){return r.paymentMethod==='cash';}).reduce(function(s,r){return s+(r.total||0);},0);
-  var deliveryTotal=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
-  var wholesaleTotal=recs.reduce(function(s,r){var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));},0);
-  var resendTotal=salesTotal-wholesaleTotal-deliveryTotal;
-  var extraSend=Math.max(0,resendTotal-cashTotal);
+    var salesTotal=recs.reduce(function(s,r){return s+(r.total||0);},0);
+    var bankTotal=recs.filter(function(r){return(r.paymentMethod||'bank')==='bank';}).reduce(function(s,r){return s+(r.total||0);},0);
+    var cashTotal=recs.filter(function(r){return r.paymentMethod==='cash';}).reduce(function(s,r){return s+(r.total||0);},0);
+    var deliveryTotal=recs.reduce(function(s,r){return s+(r.deliveryFee||0);},0);
+    var wholesaleTotal=recs.reduce(function(s,r){
+      var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
+      return s+(r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0));
+    },0);
+    var resendTotal=salesTotal-wholesaleTotal-deliveryTotal;
+    var extraSend=Math.max(0,resendTotal-cashTotal);
 
-  var rows=recs.map(function(r){
-    var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
-    var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
-    var isCash=(r.paymentMethod||'bank')==='cash';
-    return'<tr>'+
-      '<td>'+r.date+'</td>'+
-      '<td>'+(r.ordererName||'-')+'</td>'+
-      '<td>'+pName(r.productName||'')+'</td>'+
-      '<td style="text-align:center">'+(r.quantity||0)+'</td>'+
-      '<td style="text-align:right">'+N(r.total||0)+'</td>'+
-      '<td style="text-align:right">'+N(r.deliveryFee||0)+'</td>'+
-      '<td style="text-align:right">'+N(sup)+'</td>'+
-      '<td style="text-align:center;color:'+(isCash?'#E65100':'#1565C0')+';font-weight:700">'+(isCash?'💵 현금':'🏦 계좌')+'</td>'+
-    '</tr>';
-  }).join('');
+    var rows=recs.map(function(r){
+      var p=prods[r.productId]||{};var su=r.supplyPrice||p.supplyPrice||0;
+      var sup=r.supplyTotal!==undefined?r.supplyTotal:su*(r.quantity||0);
+      var isCash=(r.paymentMethod||'bank')==='cash';
+      return'<tr style="border-bottom:1px solid #eee">'+
+        '<td style="padding:5px 4px">'+r.date+'</td>'+
+        '<td style="padding:5px 4px">'+(r.ordererName||'-')+'</td>'+
+        '<td style="padding:5px 4px">'+pName(r.productName||'')+'</td>'+
+        '<td style="padding:5px 4px;text-align:center">'+(r.quantity||0)+'</td>'+
+        '<td style="padding:5px 4px;text-align:right">'+N(r.total||0)+'</td>'+
+        '<td style="padding:5px 4px;text-align:right">'+N(r.deliveryFee||0)+'</td>'+
+        '<td style="padding:5px 4px;text-align:right">'+N(sup)+'</td>'+
+        '<td style="padding:5px 4px;text-align:center;color:'+(isCash?'#E65100':'#1565C0')+';font-weight:700">'+(isCash?'현금':'계좌')+'</td>'+
+      '</tr>';
+    }).join('');
 
-  var content=
-    '<div class="print-header">'+
-      '<div style="font-size:16px;font-weight:800;margin-bottom:4px">🥬 대한김치 배달K 주간 정산서</div>'+
-      '<div style="font-size:11px;opacity:.9">정산기간: '+weekStart+' ~ '+weekEnd+' &nbsp;|&nbsp; 생성일: '+new Date().toLocaleDateString('ko-KR')+'</div>'+
-    '</div>'+
-    '<table class="sum-tbl">'+
-      '<tr class="sec-row"><td colspan="2">▶ 결제수단별 판매금액 / Doanh thu theo phương thức</td></tr>'+
-      '<tr><td>🏦 계좌이체 / Chuyển khoản</td><td class="r">'+N(bankTotal)+' ₫</td></tr>'+
-      '<tr><td>💵 현금 / Tiền mặt</td><td class="r">'+N(cashTotal)+' ₫</td></tr>'+
-      '<tr class="bold-row"><td>판매금액 합계 / Tổng doanh thu</td><td class="r">'+N(salesTotal)+' ₫</td></tr>'+
-      '<tr class="sec-row"><td colspan="2">▶ 공제 항목 / Các khoản khấu trừ</td></tr>'+
-      '<tr><td>배달비 합계 / Tổng phí giao hàng</td><td class="r" style="color:#E65100">− '+N(deliveryTotal)+' ₫</td></tr>'+
-      '<tr><td>도매가 합계 / Tổng giá nhập</td><td class="r" style="color:#E65100">− '+N(wholesaleTotal)+' ₫</td></tr>'+
-      '<tr class="hi-row"><td>▶ 본사 재송금액 / Tiền chuyển lại HQ</td><td class="r">'+N(resendTotal)+' ₫</td></tr>'+
-      '<tr class="sec-row"><td colspan="2">▶ 현금 정산 / Quyết toán tiền mặt</td></tr>'+
-      '<tr><td>현금 보관액 내가 보관 중 / Tiền mặt đang giữ</td><td class="r">'+N(cashTotal)+' ₫</td></tr>'+
-      '<tr class="hi-row"><td>▶ 추가 송금 필요액 / Cần chuyển thêm</td><td class="r">'+N(extraSend)+' ₫</td></tr>'+
-    '</table>'+
-    '<div class="det-title">📋 주문 상세 / Chi tiết đơn hàng</div>'+
-    '<table class="det-tbl">'+
-      '<thead><tr>'+
-        '<th>날짜/Ngày</th><th>주문자/Người đặt</th><th>제품/Sản phẩm</th>'+
-        '<th>수량</th><th>판매금액</th><th>배달비</th><th>도매가</th><th>결제</th>'+
-      '</tr></thead>'+
-      '<tbody>'+rows+
-        '<tr class="tot-row">'+
-          '<td><b>합계/Tổng</b></td><td></td><td></td>'+
-          '<td style="text-align:center"><b>'+recs.reduce(function(s,r){return s+(r.quantity||0);},0)+'</b></td>'+
-          '<td style="text-align:right"><b>'+N(salesTotal)+'</b></td>'+
-          '<td style="text-align:right"><b>'+N(deliveryTotal)+'</b></td>'+
-          '<td style="text-align:right"><b>'+N(wholesaleTotal)+'</b></td>'+
+    function sRow(label,val,color,bold){
+      return'<tr style="border-bottom:1px solid #f0f0f0">'+
+        '<td style="padding:6px 8px;color:#555;font-size:11px'+(bold?';font-weight:700':'')+'">'+label+'</td>'+
+        '<td style="padding:6px 8px;text-align:right;font-weight:'+(bold?'800':'700')+';color:'+(color||'#333')+'">'+val+'</td>'+
+      '</tr>';
+    }
+    function secRow(label){
+      return'<tr><td colspan="2" style="padding:6px 8px;background:#EEF2FF;font-weight:700;color:#1565C0;font-size:11px">'+label+'</td></tr>';
+    }
+
+    var html=
+      '<div style="background:#1565C0;color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:12px">'+
+        '<div style="font-size:13px;font-weight:800;margin-bottom:2px">🥬 대한김치 배달K 주간 정산서</div>'+
+        '<div style="font-size:11px;opacity:.9">정산기간: '+weekStart+' ~ '+weekEnd+'</div>'+
+        '<div style="font-size:10px;opacity:.8">생성일: '+new Date().toLocaleDateString('ko-KR')+'</div>'+
+      '</div>'+
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:14px">'+
+        secRow('▶ 결제수단별 판매금액 / Doanh thu theo phương thức')+
+        sRow('🏦 계좌이체 / Chuyển khoản',N(bankTotal)+' ₫')+
+        sRow('💵 현금 / Tiền mặt',N(cashTotal)+' ₫')+
+        sRow('판매금액 합계 / Tổng doanh thu',N(salesTotal)+' ₫','#333',true)+
+        secRow('▶ 공제 항목 / Các khoản khấu trừ')+
+        sRow('배달비 합계 / Tổng phí giao hàng','− '+N(deliveryTotal)+' ₫','#E65100')+
+        sRow('도매가 합계 / Tổng giá nhập','− '+N(wholesaleTotal)+' ₫','#E65100')+
+        '<tr><td colspan="2" style="padding:0"></td></tr>'+
+        '<tr style="background:#E8F5E9"><td style="padding:8px;font-weight:800;color:#2E7D32">▶ 본사 재송금액 / Tiền chuyển lại HQ</td>'+
+          '<td style="padding:8px;text-align:right;font-weight:800;color:#2E7D32;font-size:15px">'+N(resendTotal)+' ₫</td></tr>'+
+        secRow('▶ 현금 정산 / Quyết toán tiền mặt')+
+        sRow('현금 보관액 내가 보관 중 / Tiền mặt đang giữ',N(cashTotal)+' ₫')+
+        '<tr style="background:#FFF8E1"><td style="padding:8px;font-weight:800;color:#E65100">▶ 추가 송금 필요액 / Cần chuyển thêm</td>'+
+          '<td style="padding:8px;text-align:right;font-weight:800;color:#E65100;font-size:15px">'+N(extraSend)+' ₫</td></tr>'+
+      '</table>'+
+      '<div style="font-size:12px;font-weight:700;color:#1565C0;margin-bottom:6px">📋 주문 상세 / Chi tiết đơn hàng</div>'+
+      '<div style="overflow-x:auto">'+
+      '<table style="width:100%;border-collapse:collapse;font-size:10px">'+
+        '<thead><tr style="background:#1565C0;color:#fff">'+
+          '<th style="padding:5px 4px;text-align:left">날짜</th>'+
+          '<th style="padding:5px 4px;text-align:left">주문자</th>'+
+          '<th style="padding:5px 4px;text-align:left">제품</th>'+
+          '<th style="padding:5px 4px;text-align:center">수량</th>'+
+          '<th style="padding:5px 4px;text-align:right">판매금액</th>'+
+          '<th style="padding:5px 4px;text-align:right">배달비</th>'+
+          '<th style="padding:5px 4px;text-align:right">도매가</th>'+
+          '<th style="padding:5px 4px;text-align:center">결제</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+
+        '<tr style="background:#E8F5E9;font-weight:700">'+
+          '<td style="padding:5px 4px" colspan="3">합계/Tổng</td>'+
+          '<td style="padding:5px 4px;text-align:center">'+recs.reduce(function(s,r){return s+(r.quantity||0);},0)+'</td>'+
+          '<td style="padding:5px 4px;text-align:right">'+N(salesTotal)+'</td>'+
+          '<td style="padding:5px 4px;text-align:right">'+N(deliveryTotal)+'</td>'+
+          '<td style="padding:5px 4px;text-align:right">'+N(wholesaleTotal)+'</td>'+
           '<td></td>'+
         '</tr>'+
-      '</tbody>'+
-    '</table>'+
-    '<div class="print-footer">DAEHAN KIMCHI &nbsp;|&nbsp; BaedalK 정산 &nbsp;|&nbsp; '+weekStart+' ~ '+weekEnd+'</div>';
+        '</tbody>'+
+      '</table></div>'+
+      '<div style="margin-top:12px;text-align:center;font-size:10px;color:#aaa">DAEHAN KIMCHI | BaedalK 정산 | '+weekStart+' ~ '+weekEnd+'</div>';
 
-  // 기존 오버레이 제거
-  var old=document.getElementById('pdf-overlay');
-  if(old)document.body.removeChild(old);
-  var oldSt=document.getElementById('pdf-print-style');
-  if(oldSt)document.head.removeChild(oldSt);
-
-  // 인쇄 전용 스타일 (화면에서는 오버레이만, 인쇄 시에는 오버레이만 출력)
-  var pStyle=document.createElement('style');
-  pStyle.id='pdf-print-style';
-  pStyle.textContent=
-    '@media print{'+
-      'body>*:not(#pdf-overlay){display:none!important;}'+
-      '#pdf-overlay{position:static!important;overflow:visible!important;padding:0!important;}'+
-      '#pdf-close-btn{display:none!important;}'+
-    '}'+
-    '#pdf-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;overflow-y:auto;padding:16px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;font-size:11px;color:#333;}'+
-    '#pdf-overlay .print-header{background:#1565C0;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:12px;}'+
-    '#pdf-overlay .sum-tbl{width:100%;border-collapse:collapse;margin-bottom:14px;}'+
-    '#pdf-overlay .sum-tbl td{padding:6px 8px;border-bottom:1px solid #eee;}'+
-    '#pdf-overlay .sum-tbl .r{text-align:right;font-weight:700;}'+
-    '#pdf-overlay .sum-tbl .sec-row td{background:#EEF2FF;font-weight:700;color:#1565C0;font-size:11px;}'+
-    '#pdf-overlay .sum-tbl .bold-row td{font-weight:700;}'+
-    '#pdf-overlay .sum-tbl .hi-row td{background:#E8F5E9;font-weight:800;color:#2E7D32;}'+
-    '#pdf-overlay .det-title{font-size:12px;font-weight:700;color:#1565C0;margin:10px 0 6px;}'+
-    '#pdf-overlay .det-tbl{width:100%;border-collapse:collapse;font-size:10px;}'+
-    '#pdf-overlay .det-tbl th{background:#1565C0;color:#fff;padding:5px 4px;text-align:left;}'+
-    '#pdf-overlay .det-tbl td{padding:4px 4px;border-bottom:1px solid #f0f0f0;}'+
-    '#pdf-overlay .det-tbl .tot-row td{background:#E8F5E9;}'+
-    '#pdf-overlay .print-footer{margin-top:14px;text-align:center;font-size:10px;color:#aaa;}'+
-    '#pdf-close-btn{position:fixed;top:12px;right:12px;z-index:10000;background:#fff;border:2px solid var(--gray-300);border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);}';
-  document.head.appendChild(pStyle);
-
-  // 오버레이 생성
-  var overlay=document.createElement('div');
-  overlay.id='pdf-overlay';
-  overlay.innerHTML='<button id="pdf-close-btn" onclick="closePdfOverlay()">✕</button>'+content+
-    '<div style="display:flex;gap:10px;margin-top:16px;padding-bottom:20px;">'+
-      '<button onclick="window.print()" style="flex:1;padding:14px;background:#1565C0;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">🖨️ 인쇄 / PDF 저장</button>'+
-      '<button onclick="closePdfOverlay()" style="flex:0 0 auto;padding:14px 18px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✕ 닫기</button>'+
-    '</div>';
-  document.body.appendChild(overlay);
+    document.getElementById('print-content').innerHTML=html;
+    document.getElementById('modal-print').classList.add('open');
+  }catch(e){toast('PDF 오류: '+e.message);console.error(e);}
 }
 
-function closePdfOverlay(){
-  var ov=document.getElementById('pdf-overlay');
-  var st=document.getElementById('pdf-print-style');
-  if(ov)document.body.removeChild(ov);
-  if(st)document.head.removeChild(st);
+function printSettlement(){
+  var content=document.getElementById('print-content').innerHTML;
+  var w=window.open('','_blank','width=800,height=600');
+  if(!w){
+    // 팝업 차단 시 현재 페이지에서 인쇄
+    var st=document.createElement('style');
+    st.id='__ps';
+    st.textContent='@media print{body>*{display:none!important;}#__pc{display:block!important;position:static!important;}}';
+    document.head.appendChild(st);
+    var d=document.createElement('div');
+    d.id='__pc';
+    d.style.cssText='display:none;position:fixed;top:0;left:0;width:100%;background:#fff;z-index:99999;padding:16px;box-sizing:border-box;';
+    d.innerHTML=content;
+    document.body.appendChild(d);
+    d.style.display='block';
+    setTimeout(function(){
+      window.print();
+      setTimeout(function(){
+        document.body.removeChild(d);
+        document.head.removeChild(st);
+      },1000);
+    },300);
+    return;
+  }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;padding:16px;font-size:11px;}@media print{@page{margin:12mm;}}</style></head><body>'+content+'<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);}<\/script></body></html>');
+  w.document.close();
 }
