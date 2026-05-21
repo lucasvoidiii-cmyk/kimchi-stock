@@ -3,6 +3,15 @@
 /* ===== 인보이스 장바구니 (한 인보이스에 여러 품목) ===== */
 var inboundCart=[];
 
+// 제품 선택 시 등록된 공급단가 자동 입력
+function onInboundProdCh(){
+  var pid=document.getElementById('ib-prod').value;
+  if(pid&&prods[pid]){
+    var price=prods[pid].supplyPrice||0;
+    document.getElementById('ib-price').value=price||'';
+  }
+}
+
 function addInboundItem(){
   var pid=document.getElementById('ib-prod').value;
   var qty=parseInt(document.getElementById('ib-qty').value)||0;
@@ -57,13 +66,12 @@ async function saveInbound(){
   var note=document.getElementById('in-note').value;
   var invId=gid();
 
-  // 인보이스 레코드 생성
   var invRec={
     invoiceNo:invNo,
     date:date,
     totalAmount:totalAmt,
     items:inboundCart.map(function(item){return{productId:item.pid,productName:item.productName,quantity:item.qty,unitPrice:item.price,subtotal:item.qty*item.price};}),
-    paymentStatus:'unpaid', // unpaid / paid
+    paymentStatus:'unpaid',
     paymentDate:'',
     note:note,
     staff:uName,
@@ -71,14 +79,11 @@ async function saveInbound(){
   };
 
   try{
-    // 인보이스 저장
-    await fSet('invoices/'+invId, invRec);
+    await fSet('invoices/'+invId,invRec);
     invoices[invId]=invRec;
 
-    // 품목별 입고 처리 + 재고 반영
     for(var i=0;i<inboundCart.length;i++){
       var item=inboundCart[i];
-      var p=prods[item.pid]||{};
       var rec={
         date:date,
         invoiceId:invId,
@@ -99,7 +104,6 @@ async function saveInbound(){
       stock[item.pid]=Object.assign({},stock[item.pid]||{},{quantity:cur+item.qty});
     }
 
-    // 입력 초기화
     inboundCart=[];
     renderInboundCart();
     document.getElementById('in-inv-no').value='';
