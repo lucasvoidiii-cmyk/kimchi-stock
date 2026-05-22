@@ -82,7 +82,10 @@ function openEdProd(id){
   document.getElementById('modal-prod').classList.add('open');
 }
 async function saveProd(){
-  var name=document.getElementById('pm-name').value.trim();var size=document.getElementById('pm-size').value.trim();
+  var name=document.getElementById('pm-name').value.trim();
+  var sizeSelect=document.getElementById('pm-size-select').value;
+  var sizeInput=document.getElementById('pm-size').value.trim();
+  var size=sizeSelect==='custom'?sizeInput:sizeSelect;
   if(!name||!size){toast(t('eProdN'));return;}
   var id=document.getElementById('pm-id').value||gid();
   var p={name:name,size:size,unit:document.getElementById('pm-unit').value||'개',supplyPrice:parseInt(document.getElementById('pm-supply').value)||0,salePrice:parseInt(document.getElementById('pm-sale').value)||0,minStock:parseInt(document.getElementById('pm-min').value)||0};
