@@ -150,8 +150,8 @@ async function saveSale(){
         staff:uName,note:note,timestamp:Date.now()+i};
       var nid=await fPush('sales',rec);sales[nid]=rec;
       var cur=(stock[item.pid]||{}).quantity||0;
-      await fSet('stock/'+item.pid,Object.assign({},stock[item.pid]||{},{quantity:Math.max(0,cur-item.qty),lastUpdated:Date.now()}));
-      stock[item.pid]=Object.assign({},stock[item.pid]||{},{quantity:Math.max(0,cur-item.qty)});
+      await fSet('stock/'+item.pid,Object.assign({},stock[item.pid]||{},{quantity:cur-item.qty,lastUpdated:Date.now()}));
+      stock[item.pid]=Object.assign({},stock[item.pid]||{},{quantity:cur-item.qty});
     }
     toast(t('saleOk'));
     cart=[];renderCart();
@@ -328,7 +328,7 @@ async function restoreSale(){
   try{
     var pid=r.productId;
     var curQty=(stock[pid]||{}).quantity||0;
-    var newQty=Math.max(0,curQty-(r.quantity||0));
+    var newQty=curQty-(r.quantity||0);
     await fSet('stock/'+pid,Object.assign({},stock[pid]||{},{quantity:newQty,lastUpdated:Date.now()}));
     stock[pid]=Object.assign({},stock[pid]||{},{quantity:newQty});
     var upd={cancelled:false,cancelReason:'',cancelledAt:'',cancelledBy:''};

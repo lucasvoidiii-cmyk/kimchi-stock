@@ -75,11 +75,12 @@ function renderInv(){
     var p=prods[id];var s=stock[id]||{quantity:0};
     var qty=s.quantity||0;var mn=p.minStock||0;
     var bc='ib-ok',bx=t('stOk');
-    if(qty===0){bc='ib-zero';bx=t('stZero');}
+    if(qty<0){bc='ib-backorder';bx=t('stBackorder');}
+    else if(qty===0){bc='ib-zero';bx=t('stZero');}
     else if(mn&&qty<=mn){bc='ib-danger';bx=t('stDanger');}
     else if(mn&&qty<=mn*1.5){bc='ib-warn';bx=t('stWarn');}
     var tQ=Object.values(sales).filter(function(r){return r.date===tod&&r.productId===id&&!r.cancelled;}).reduce(function(a,r){return a+(r.quantity||0);},0);
-    h+='<div class="inv-item" onclick="openAdj(\''+id+'\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+pName(p.name)+'</div><div class="inv-spec">'+p.size+' · '+t('invToday')+' '+tQ+t('invUnit')+'</div><span class="inv-badge '+bc+'">'+bx+'</span></div><div class="inv-right"><div class="inv-qty" style="'+(bc==='ib-danger'?'color:var(--danger-dark);':bc==='ib-zero'?'color:var(--gray-400);':'')+'">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">'+t('invAvail')+' '+qty+t('invUnit')+'</div></div></div>';
+    h+='<div class="inv-item" onclick="openAdj(\''+id+'\')"><span class="inv-emoji">🥬</span><div class="inv-info"><div class="inv-name">'+pName(p.name)+'</div><div class="inv-spec">'+p.size+' · '+t('invToday')+' '+tQ+t('invUnit')+'</div><span class="inv-badge '+bc+'"'+(bc==='ib-backorder'?' style="background:#6A1B9A;color:#fff;"':'')+'>'+bx+'</span></div><div class="inv-right"><div class="inv-qty" style="'+(bc==='ib-backorder'?'color:var(--purple);':bc==='ib-danger'?'color:var(--danger-dark);':bc==='ib-zero'?'color:var(--gray-400);':'')+'">'+qty+'<span class="inv-unit">'+(p.unit||'개')+'</span></div><div class="inv-avail">'+(qty<0?t('stBackorder')+' '+Math.abs(qty)+t('invUnit'):t('invAvail')+' '+qty+t('invUnit'))+'</div></div></div>';
   });
   el.innerHTML=h;
 }

@@ -1,7 +1,7 @@
 // 대한김치 재고관리 앱 Service Worker
 // 역할: 앱 파일 캐싱 및 자동 업데이트 관리
 
-const CACHE_VERSION = 'daehan-kimchi-v2.1.0';
+const CACHE_VERSION = 'daehan-kimchi-v2.2.0';
 const CACHE_NAME = CACHE_VERSION;
 
 // 캐시할 파일 목록
